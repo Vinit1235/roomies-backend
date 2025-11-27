@@ -57,8 +57,24 @@ except ImportError:
     chatbot = MockChatbot()
     print("Warning: Could not import agents.chatbot. Chat functionality disabled.")
 
-from utils.verification import process_verification  # Import verification logic
-from services.news_service import NewsService
+# from utils.verification import process_verification  # Import verification logic
+try:
+    from utils.verification import process_verification
+except ImportError:
+    # Mock verification if utils module is missing or fails to load
+    def process_verification(image_path, user_record):
+        return {"verified": False, "message": "Auto-verification disabled on this server."}
+    print("Warning: Could not import utils.verification. Auto-verification disabled.")
+
+# from services.news_service import NewsService
+try:
+    from services.news_service import NewsService
+except ImportError as e:
+    print(f"Warning: Could not import services.news_service: {e}")
+    # Mock NewsService if module is missing
+    class NewsService:
+        def get_latest_news(self, limit=5):
+            return []
 
 # Initialize News Service
 news_service = NewsService()
@@ -2887,8 +2903,21 @@ def revenue_summary():
 
 # ============= BOOKING SYSTEM (Complete Flow) =============
 
-from utils.email_service import email_service
-from utils.contract_generator import contract_generator
+try:
+    from utils.email_service import email_service
+    from utils.contract_generator import contract_generator
+except ImportError as e:
+    print(f"Warning: Could not import utils: {e}")
+    
+    class MockService:
+        def __getattr__(self, name):
+            def method(*args, **kwargs):
+                print(f"MockService.{name} called")
+                return True
+            return method
+            
+    email_service = MockService()
+    contract_generator = MockService()
 
 @app.route("/api/bookings/create", methods=["POST"])
 @login_required
