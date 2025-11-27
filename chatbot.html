@@ -1,0 +1,546 @@
+<!-- Enhanced Floating Chat Button -->
+<div id="chatButton" class="fixed bottom-6 right-6 z-40">
+    <button onclick="toggleChatbot()" class="chat-button w-14 h-14 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 rounded-full shadow-xl flex items-center justify-center text-white transition-all duration-300 hover:scale-105 hover:shadow-green-500/25">
+        <svg id="chatIcon" class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+        </svg>
+    </button>
+    <!-- Enhanced Notification Badge -->
+    <div id="notificationBadge" class="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-red-500 to-pink-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg bounce-animation">
+        1
+    </div>
+</div>
+
+<!-- Chatbot Overlay (removed full-screen overlay) -->
+<div id="chatbotOverlay" class="hidden">
+    <!-- Enhanced Chatbot Container -->
+    <div id="chatbotContainer" class="fixed bottom-20 right-6 w-96 h-[500px] chatbot-container max-w-sm flex flex-col z-50">
+        <!-- Enhanced Header -->
+        <div class="flex items-center justify-between p-6 border-b border-white border-opacity-30">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 glass-effect rounded-full flex items-center justify-center pulse-animation">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-white font-bold text-lg">SwipeAI Assistant</h3>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                        <p class="text-white text-opacity-80 text-sm">Online • Voice enabled</p>
+                    </div>
+                </div>
+            </div>
+            <button onclick="closeChatbot()" class="w-10 h-10 glass-effect rounded-full flex items-center justify-center hover:bg-white hover:bg-opacity-20 transition-all duration-300">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Enhanced Quick Actions -->
+        <div class="p-4 border-b border-white border-opacity-20">
+            <div class="flex space-x-2 overflow-x-auto pb-2">
+                <button class="quick-action px-4 py-3 rounded-full text-white text-sm font-medium whitespace-nowrap" onclick="sendQuickMessage('What can you help me with?')">
+                    💡 Get Started
+                </button>
+                <button class="quick-action px-4 py-3 rounded-full text-white text-sm font-medium whitespace-nowrap" onclick="sendQuickMessage('Show products')">
+                    🛒 Products
+                </button>
+                <button class="quick-action px-4 py-3 rounded-full text-white text-sm font-medium whitespace-nowrap" onclick="sendQuickMessage('Track my order')">
+                    📦 Track Order
+                </button>
+                <button class="quick-action px-4 py-3 rounded-full text-white text-sm font-medium whitespace-nowrap" onclick="sendQuickMessage('Help me find something')">
+                    🔍 Search
+                </button>
+            </div>
+        </div>
+
+        <!-- Chat Messages -->
+        <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
+            <!-- Welcome Message -->
+            <div class="message-bubble ai-message p-4 fade-in">
+                <p class="text-sm font-medium">👋 Hello! I'm SwipeAI, your intelligent shopping assistant. You can type or speak to me. How can I help you today?</p>
+            </div>
+        </div>
+
+        <!-- Enhanced Typing Indicator -->
+        <div id="typingIndicator" class="px-4 pb-2 hidden">
+            <div class="message-bubble ai-message p-4 flex items-center space-x-3">
+                <div class="w-8 h-8 glass-effect rounded-full flex items-center justify-center">
+                    <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-sm text-gray-600 font-medium">SwipeAI is thinking...</span>
+                    <div class="flex space-x-1 mt-1">
+                        <div class="w-2 h-2 bg-gray-400 rounded-full typing-dot"></div>
+                        <div class="w-2 h-2 bg-gray-400 rounded-full typing-dot"></div>
+                        <div class="w-2 h-2 bg-gray-400 rounded-full typing-dot"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Input Area with Voice -->
+        <div class="p-4 border-t border-white border-opacity-20 relative">
+            <div id="voiceStatus" class="voice-status hidden">
+                🎤 Listening... Speak now
+            </div>
+            <div class="flex items-center space-x-3">
+                <div class="flex-1 relative">
+                    <input 
+                        type="text" 
+                        id="messageInput" 
+                        placeholder="Type or speak your message..." 
+                        class="chat-input w-full px-4 py-4 pr-14 rounded-full focus:outline-none text-gray-800 font-medium"
+                        onkeypress="handleKeyPress(event)"
+                    >
+                    <button 
+                        id="voiceButton"
+                        onclick="toggleVoiceInput()" 
+                        class="absolute right-3 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-full flex items-center justify-center text-white transition-all duration-300 hover:scale-110 shadow-lg"
+                    >
+                        <svg id="voiceIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <button 
+                    id="sendButton"
+                    onclick="sendMessage()" 
+                    class="send-button w-14 h-14 rounded-full flex items-center justify-center text-white disabled:opacity-50"
+                >
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chatbot Styles -->
+<style>
+    @keyframes slideUp {
+        from { transform: translateY(100%); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    
+    @keyframes slideDown {
+        from { transform: translateY(0); opacity: 1; }
+        to { transform: translateY(100%); opacity: 0; }
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes bounce {
+        0%, 20%, 53%, 80%, 100% { transform: translate3d(0,0,0); }
+        40%, 43% { transform: translate3d(0, -8px, 0); }
+        70% { transform: translate3d(0, -4px, 0); }
+        90% { transform: translate3d(0, -2px, 0); }
+    }
+    
+    @keyframes typing {
+        0%, 60%, 100% { transform: translateY(0); }
+        30% { transform: translateY(-10px); }
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+    
+    .slide-up {
+        animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .slide-down {
+        animation: slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .fade-in {
+        animation: fadeIn 0.3s ease-out;
+    }
+    
+    .bounce-animation {
+        animation: bounce 2s infinite;
+    }
+    
+    .typing-dot {
+        animation: typing 1.4s infinite ease-in-out;
+    }
+    
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+    
+    .pulse-animation {
+        animation: pulse 2s infinite;
+    }
+    
+    .voice-recording {
+        animation: pulse 1s infinite;
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    }
+    
+    .chatbot-overlay {
+        background: transparent;
+        pointer-events: none;
+    }
+    
+    .chatbot-container {
+        pointer-events: auto;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .message-bubble {
+        max-width: 85%;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
+    }
+    
+    .user-message {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        margin-left: auto;
+        border-radius: 20px 20px 6px 20px;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    
+    .ai-message {
+        background: rgba(255, 255, 255, 0.95);
+        color: #1f2937;
+        margin-right: auto;
+        border-radius: 20px 20px 20px 6px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        backdrop-filter: blur(10px);
+    }
+    
+    .quick-action {
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        transition: all 0.3s ease;
+    }
+    
+    .quick-action:hover {
+        background: rgba(255, 255, 255, 0.35);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    .chat-input {
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(15px);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .chat-input:focus {
+        border-color: rgba(255, 255, 255, 0.6);
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    }
+    
+    .send-button {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    
+    .send-button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    }
+    
+    .send-button:disabled {
+        opacity: 0.5;
+        transform: none;
+        box-shadow: none;
+    }
+    
+    .voice-status {
+        background: rgba(239, 68, 68, 0.9);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        padding: 8px 16px;
+        color: white;
+        font-size: 12px;
+        font-weight: 500;
+        position: absolute;
+        top: -40px;
+        left: 50%;
+        transform: translateX(-50%);
+        white-space: nowrap;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+    
+    .glass-effect {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+</style>
+
+<!-- Chatbot JavaScript -->
+<script>
+    let isOpen = false;
+    let isRecording = false;
+    let recognition = null;
+
+    // Initialize Speech Recognition
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+
+        recognition.onstart = function() {
+            isRecording = true;
+            updateVoiceButton();
+            showVoiceStatus();
+        };
+
+        recognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript;
+            document.getElementById('messageInput').value = transcript;
+            hideVoiceStatus();
+            // Auto-send the message after voice input
+            setTimeout(() => {
+                sendMessage();
+            }, 500);
+        };
+
+        recognition.onerror = function(event) {
+            console.error('Speech recognition error:', event.error);
+            isRecording = false;
+            updateVoiceButton();
+            hideVoiceStatus();
+        };
+
+        recognition.onend = function() {
+            isRecording = false;
+            updateVoiceButton();
+            hideVoiceStatus();
+        };
+    }
+
+    function toggleChatbot() {
+        if (isOpen) {
+            closeChatbot();
+        } else {
+            openChatbot();
+        }
+    }
+
+    function openChatbot() {
+        if (isOpen) return;
+        
+        isOpen = true;
+        const overlay = document.getElementById('chatbotOverlay');
+        const container = document.getElementById('chatbotContainer');
+        const chatIcon = document.getElementById('chatIcon');
+        const notificationBadge = document.getElementById('notificationBadge');
+        
+        overlay.classList.remove('hidden');
+        container.classList.add('slide-up');
+        
+        // Change button icon to close
+        chatIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>';
+        
+        // Hide notification badge
+        notificationBadge.classList.add('hidden');
+        
+        // Focus on input
+        setTimeout(() => {
+            document.getElementById('messageInput').focus();
+        }, 400);
+    }
+
+    function closeChatbot() {
+        if (!isOpen) return;
+        
+        // Stop recording if active
+        if (isRecording && recognition) {
+            recognition.stop();
+        }
+        
+        isOpen = false;
+        const overlay = document.getElementById('chatbotOverlay');
+        const container = document.getElementById('chatbotContainer');
+        const chatIcon = document.getElementById('chatIcon');
+        
+        container.classList.remove('slide-up');
+        container.classList.add('slide-down');
+        
+        // Change button icon back to chat
+        chatIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>';
+        
+        setTimeout(() => {
+            overlay.classList.add('hidden');
+            container.classList.remove('slide-down');
+        }, 400);
+    }
+
+    function toggleVoiceInput() {
+        if (!recognition) {
+            alert('Speech recognition is not supported in your browser. Please try Chrome or Edge.');
+            return;
+        }
+
+        if (isRecording) {
+            recognition.stop();
+        } else {
+            recognition.start();
+        }
+    }
+
+    function updateVoiceButton() {
+        const voiceButton = document.getElementById('voiceButton');
+        const voiceIcon = document.getElementById('voiceIcon');
+        
+        if (isRecording) {
+            voiceButton.classList.add('voice-recording');
+            voiceIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
+        } else {
+            voiceButton.classList.remove('voice-recording');
+            voiceIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>';
+        }
+    }
+
+    function showVoiceStatus() {
+        document.getElementById('voiceStatus').classList.remove('hidden');
+    }
+
+    function hideVoiceStatus() {
+        document.getElementById('voiceStatus').classList.add('hidden');
+    }
+
+    function handleKeyPress(event) {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    }
+
+    function sendMessage() {
+        const input = document.getElementById('messageInput');
+        const message = input.value.trim();
+        
+        if (!message) return;
+        
+        // Add user message
+        addMessage(message, 'user');
+        input.value = '';
+        
+        // Show typing indicator
+        showTypingIndicator();
+        
+        // Call RAG API for AI response
+        fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message: message })
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideTypingIndicator();
+            const aiResponse = data.response || data.error || 'Sorry, I encountered an error. Please try again!';
+            addMessage(aiResponse, 'ai');
+        })
+        .catch(error => {
+            console.error('Chat API Error:', error);
+            hideTypingIndicator();
+            addMessage('Sorry, I\'m having trouble connecting. Please try again!', 'ai');
+        });
+    }
+
+    function sendQuickMessage(message) {
+        document.getElementById('messageInput').value = message;
+        sendMessage();
+    }
+
+    function addMessage(text, sender) {
+        const messagesContainer = document.getElementById('chatMessages');
+        const messageDiv = document.createElement('div');
+        
+        messageDiv.className = `message-bubble ${sender}-message p-4 fade-in`;
+        messageDiv.innerHTML = `<p class="text-sm font-medium leading-relaxed">${text}</p>`;
+        
+        messagesContainer.appendChild(messageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function showTypingIndicator() {
+        document.getElementById('typingIndicator').classList.remove('hidden');
+        const messagesContainer = document.getElementById('chatMessages');
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function hideTypingIndicator() {
+        document.getElementById('typingIndicator').classList.add('hidden');
+    }
+
+    function generateAIResponse(userMessage) {
+        // This function is now replaced by fetchRAGResponse()
+        // Keeping as fallback only
+        const message = userMessage.toLowerCase();
+        
+        if (message.includes('help') || message.includes('what can you')) {
+            return "I can help you with:\n\n🛒 Finding products\n📦 Tracking orders\n💳 Payment information\n🚚 Delivery details\n� Searching items\n\nJust ask me anything!";
+        } else {
+            return "I'm here to help! Could you please tell me more about what you're looking for?";
+        }
+    }
+
+    async function fetchRAGResponse(userMessage) {
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: userMessage })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data.response || data.error || "Sorry, I couldn't process that request.";
+        } catch (error) {
+            console.error('RAG API Error:', error);
+            // Fallback to basic responses if API fails
+            return generateAIResponse(userMessage);
+        }
+    }
+
+    // Close chatbot when clicking outside
+    document.addEventListener('click', function(e) {
+        const chatContainer = document.getElementById('chatbotContainer');
+        const chatButton = document.getElementById('chatButton');
+        
+        if (isOpen && chatContainer && chatButton && !chatContainer.contains(e.target) && !chatButton.contains(e.target)) {
+            closeChatbot();
+        }
+    });
+
+    // Keyboard shortcut to open/close chatbot (Ctrl + Space)
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.key === ' ') {
+            e.preventDefault();
+            toggleChatbot();
+        }
+    });
+</script>

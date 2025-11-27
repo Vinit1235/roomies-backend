@@ -1,0 +1,54 @@
+<!-- Top Header -->
+<header class="top-header">
+    <div class="header-left">
+        <button class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <a href="/" class="brand-logo" style="text-decoration: none; color: inherit; cursor: pointer;">
+            <i class="fas fa-home"></i>
+            <span>Roomies</span>
+        </a>
+    </div>
+    <div class="header-search">
+        <input type="text" id="globalSearch" placeholder="Search rooms, locations, colleges...">
+        <button class="search-btn">
+            <i class="fas fa-search"></i>
+        </button>
+    </div>
+    <div class="header-right">
+        <a href="/pricing" class="header-btn" title="View Pricing Plans">
+            <i class="fas fa-tags"></i>
+            <span>Pricing</span>
+        </a>
+        {% if current_user.is_authenticated %}
+            <a href="/verify" class="header-btn verify-btn" title="Get Verified">
+                <i class="fas fa-id-card"></i>
+                <span>Verify</span>
+            </a>
+        {% endif %}
+        <a href="/admin/verifications" class="header-btn admin-btn" title="Admin Panel">
+            <i class="fas fa-shield-alt"></i>
+            <span>Admin</span>
+        </a>
+        {% if current_user.is_authenticated %}
+            <div class="user-avatar" title="{{ current_user.name }}">
+                {{ current_user.name[0].upper() }}
+            </div>
+        {% else %}
+            <a href="/login" class="header-btn">
+                <i class="fas fa-user-circle"></i>
+                Sign In
+            </a>
+        {% endif %}
+    </div>
+</header>
+
+<!-- Voice Search Button (floating) -->
+<button id="voiceSearchBtn" title="Voice Search">
+    <i class="fas fa-microphone"></i>
+</button>
+
+<!-- PWA Install Button (hidden by default) -->
+<button id="pwaInstallBtn" style="display: none;">
+    <i class="fas fa-download"></i> Install App
+</button>

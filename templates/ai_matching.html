@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Matching - Roomies</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    {% include 'partials/header.html' %}
+    {% include 'partials/sidebar.html' %}
+
+    <div class="main-content" id="mainContent">
+        <section class="ai-matching-section">
+            <div class="ai-container">
+                <div class="ai-content">
+                    <div class="ai-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h2>AI-Powered Roommate Matching</h2>
+                    <p>Our intelligent matching algorithm considers your lifestyle, study habits, budget preferences, and personality traits to find compatible roommates.</p>
+                    <div class="ai-features">
+                        <div class="ai-feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Personality compatibility analysis</span>
+                        </div>
+                        <div class="ai-feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Study schedule alignment</span>
+                        </div>
+                        <div class="ai-feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Lifestyle & habits matching</span>
+                        </div>
+                        <div class="ai-feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Budget range optimization</span>
+                        </div>
+                    </div>
+                    <button class="btn-ai-start">
+                        <i class="fas fa-magic"></i>
+                        Start AI Matching
+                    </button>
+                </div>
+                <div class="ai-visual">
+                    <div class="ai-circle pulse"></div>
+                    <div class="ai-stats">
+                        <div class="stat-item">
+                            <h3>98%</h3>
+                            <p>Match Success Rate</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3>5000+</h3>
+                            <p>Happy Roommates</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3>&lt;2min</h3>
+                            <p>Match Time</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ai-form-section">
+                <h3>Tell us about yourself</h3>
+                <p>Complete this quick questionnaire to help our AI find your perfect roommate match.</p>
+                
+                <form class="ai-questionnaire">
+                    <div class="form-row">
+                        <label>What's your sleep schedule?</label>
+                        <select name="sleep_schedule">
+                            <option>Early bird (sleep before 11 PM)</option>
+                            <option>Night owl (sleep after 1 AM)</option>
+                            <option>Flexible / Varies</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label>How social are you?</label>
+                        <select name="social_level">
+                            <option>Very social - Love having friends over</option>
+                            <option>Moderately social - Occasional gatherings</option>
+                            <option>Private - Prefer quiet time</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label>Cleanliness preference?</label>
+                        <select name="cleanliness">
+                            <option>Very organized - Everything in place</option>
+                            <option>Moderately clean - Generally tidy</option>
+                            <option>Relaxed - Casual about cleanliness</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label>Budget range (monthly)</label>
+                        <select name="budget">
+                            <option>₹5,000 - ₹8,000</option>
+                            <option>₹8,000 - ₹12,000</option>
+                            <option>₹12,000 - ₹18,000</option>
+                            <option>₹18,000+</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-primary full-width">
+                        <i class="fas fa-search"></i> Find My Matches
+                    </button>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

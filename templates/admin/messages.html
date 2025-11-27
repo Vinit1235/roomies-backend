@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Messages - Roomies Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #dc2626;
+            --primary-dark: #991b1b;
+            --accent: #2563eb;
+            --accent-dark: #1e40af;
+            --success: #16a34a;
+            --warning: #f59e0b;
+            --danger: #dc2626;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f9fafb;
+            color: #1f2937;
+        }
+        
+        .admin-nav {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .admin-nav h1 {
+            font-size: 24px;
+            color: var(--primary);
+        }
+        
+        .admin-nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .admin-nav-links a {
+            color: #6b7280;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+        
+        .admin-nav-links a:hover,
+        .admin-nav-links a.active {
+            background: #f3f4f6;
+            color: var(--accent);
+        }
+        
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 24px;
+        }
+        
+        .page-header {
+            margin-bottom: 30px;
+        }
+        
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        
+        .messages-grid {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .message-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .message-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .message-from {
+            flex: 1;
+        }
+        
+        .message-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+        
+        .message-email {
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        .message-date {
+            font-size: 12px;
+            color: #9ca3af;
+            text-align: right;
+        }
+        
+        .message-subject {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+        
+        .message-body {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #374151;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        .pagination a,
+        .pagination span {
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .pagination a:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+        
+        .pagination .current {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .empty-state i {
+            font-size: 64px;
+            color: #d1d5db;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state h3 {
+            font-size: 20px;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+        
+        .empty-state p {
+            color: #9ca3af;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .badge-new {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .badge-web {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+    </style>
+</head>
+<body>
+    <nav class="admin-nav">
+        <h1><i class="fas fa-shield-alt"></i> Roomies Admin</h1>
+        <div class="admin-nav-links">
+            <a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-chart-line"></i> Dashboard</a>
+            <a href="{{ url_for('admin_listings') }}"><i class="fas fa-home"></i> Listings</a>
+            <a href="{{ url_for('admin_users') }}"><i class="fas fa-users"></i> Users</a>
+            <a href="{{ url_for('admin_messages') }}" class="active"><i class="fas fa-envelope"></i> Messages</a>
+            <a href="{{ url_for('admin_logout') }}" style="color: var(--danger);"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </nav>
+    
+    <div class="admin-container">
+        <div class="page-header">
+            <h1 class="page-title">Contact Messages</h1>
+        </div>
+        
+        {% if messages %}
+            <div class="messages-grid">
+                {% for msg in messages %}
+                    <div class="message-card">
+                        <div class="message-header">
+                            <div class="message-from">
+                                <div class="message-name">
+                                    <i class="fas fa-user"></i> {{ msg.name }}
+                                </div>
+                                <div class="message-email">
+                                    <i class="fas fa-envelope"></i> {{ msg.email }}
+                                </div>
+                            </div>
+                            <div class="message-date">
+                                {% if msg.created_at %}
+                                    {{ msg.created_at.strftime('%b %d, %Y %I:%M %p') }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                                <div style="margin-top: 4px;">
+                                    <span class="badge badge-{{ msg.disposition }}">{{ msg.disposition }}</span>
+                                    <span class="badge badge-{{ msg.source }}">{{ msg.source }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="message-subject">
+                            <i class="fas fa-tag"></i> {{ msg.subject }}
+                        </div>
+                        
+                        <div class="message-body">
+                            {{ msg.message }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            {% if pagination.pages > 1 %}
+                <div class="pagination">
+                    {% if pagination.has_prev %}
+                        <a href="{{ url_for('admin_messages', page=pagination.prev_num) }}">
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </a>
+                    {% endif %}
+                    
+                    {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                        {% if page_num %}
+                            {% if page_num == pagination.page %}
+                                <span class="current">{{ page_num }}</span>
+                            {% else %}
+                                <a href="{{ url_for('admin_messages', page=page_num) }}">{{ page_num }}</a>
+                            {% endif %}
+                        {% else %}
+                            <span>...</span>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if pagination.has_next %}
+                        <a href="{{ url_for('admin_messages', page=pagination.next_num) }}">
+                            Next <i class="fas fa-chevron-right"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-envelope-open"></i>
+                <h3>No messages yet</h3>
+                <p>Contact messages from users will appear here.</p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

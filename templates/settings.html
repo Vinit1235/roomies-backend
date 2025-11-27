@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Roomies</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .settings-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .settings-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .settings-card h2 {
+            margin: 0 0 1.5rem 0;
+            color: #1f2937;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .settings-card h2 i {
+            color: #dc2626;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #374151;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #dc2626;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            color: white;
+            padding: 0.875rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
+        }
+
+        .user-info-display {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            background: #f9fafb;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .user-avatar-large {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 2rem;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+
+        .user-info-text h3 {
+            margin: 0 0 0.25rem 0;
+            color: #1f2937;
+            font-size: 1.25rem;
+        }
+
+        .user-info-text p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 0.95rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.813rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .badge-verified {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-unverified {
+            background: #fef3c7;
+            color: #92400e;
+        }
+    </style>
+</head>
+<body>
+    {% include 'partials/header.html' %}
+    {% include 'partials/sidebar.html' %}
+
+    <div class="main-content" id="mainContent">
+        <section class="page-section">
+            <div class="settings-container">
+                <div class="section-heading">
+                    <h1>Settings</h1>
+                    <p>Manage your account settings and preferences</p>
+                </div>
+
+                <!-- User Profile Info -->
+                <div class="settings-card">
+                    <h2><i class="fas fa-user"></i> Profile Information</h2>
+                    
+                    <div class="user-info-display">
+                        <div class="user-avatar-large">
+                            {{ current_user.name[0].upper() }}
+                        </div>
+                        <div class="user-info-text">
+                            <h3>{{ current_user.name }}</h3>
+                            <p>{{ current_user.email }}</p>
+                            {% if current_user.role is defined %}
+                                <p style="margin-top: 0.25rem; color: #dc2626; font-weight: 600;">
+                                    <i class="fas fa-tag"></i> {{ current_user.role|capitalize }}
+                                </p>
+                            {% endif %}
+                            {% if current_user.verified is defined %}
+                                {% if current_user.verified %}
+                                    <span class="badge badge-verified">
+                                        <i class="fas fa-check-circle"></i> Verified
+                                    </span>
+                                {% else %}
+                                    <span class="badge badge-unverified">
+                                        <i class="fas fa-clock"></i> Not Verified
+                                    </span>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <form method="POST" action="#">
+                        <div class="form-group">
+                            <label for="name">
+                                <i class="fas fa-user"></i> Full Name
+                            </label>
+                            <input type="text" id="name" name="name" value="{{ current_user.name }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">
+                                <i class="fas fa-envelope"></i> Email Address
+                            </label>
+                            <input type="email" id="email" name="email" value="{{ current_user.email }}" required>
+                        </div>
+
+                        {% if current_user.college is defined %}
+                        <div class="form-group">
+                            <label for="college">
+                                <i class="fas fa-graduation-cap"></i> College/Institution
+                            </label>
+                            <input type="text" id="college" name="college" value="{{ current_user.college }}">
+                        </div>
+                        {% endif %}
+
+                        <button type="submit" class="btn-primary" disabled>
+                            <i class="fas fa-save"></i> Save Changes (Coming Soon)
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Password Change -->
+                <div class="settings-card">
+                    <h2><i class="fas fa-lock"></i> Change Password</h2>
+                    
+                    <form method="POST" action="#">
+                        <div class="form-group">
+                            <label for="current_password">
+                                <i class="fas fa-key"></i> Current Password
+                            </label>
+                            <input type="password" id="current_password" name="current_password">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="new_password">
+                                <i class="fas fa-lock"></i> New Password
+                            </label>
+                            <input type="password" id="new_password" name="new_password">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="confirm_password">
+                                <i class="fas fa-check"></i> Confirm New Password
+                            </label>
+                            <input type="password" id="confirm_password" name="confirm_password">
+                        </div>
+
+                        <button type="submit" class="btn-primary" disabled>
+                            <i class="fas fa-save"></i> Update Password (Coming Soon)
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Account Verification -->
+                <div class="settings-card">
+                    <h2><i class="fas fa-shield-alt"></i> Account Verification</h2>
+                    
+                    {% if current_user.verified is defined %}
+                        {% if current_user.verified %}
+                            <div style="padding: 1.5rem; background: #d1fae5; border-radius: 12px; border-left: 4px solid #16a34a; margin-bottom: 1.5rem;">
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <i class="fas fa-check-circle" style="font-size: 2rem; color: #16a34a;"></i>
+                                    <div>
+                                        <h3 style="margin: 0 0 0.25rem 0; color: #065f46; font-size: 1.125rem;">
+                                            Your account is verified!
+                                        </h3>
+                                        <p style="margin: 0; color: #047857; font-size: 0.95rem;">
+                                            You have full access to all Roomies features.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div style="padding: 1.5rem; background: #fef3c7; border-radius: 12px; border-left: 4px solid #f59e0b; margin-bottom: 1.5rem;">
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #f59e0b;"></i>
+                                    <div>
+                                        <h3 style="margin: 0 0 0.25rem 0; color: #92400e; font-size: 1.125rem;">
+                                            Account Not Verified
+                                        </h3>
+                                        <p style="margin: 0; color: #b45309; font-size: 0.95rem;">
+                                            Upload your documents to get verified and unlock premium features.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <a href="/verify" class="btn-primary" style="display: inline-block; text-decoration: none;">
+                                <i class="fas fa-upload"></i> Upload Verification Documents
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+
+                <!-- Preferences -->
+                <div class="settings-card">
+                    <h2><i class="fas fa-cog"></i> Preferences</h2>
+                    
+                    <form method="POST" action="#">
+                        <div class="form-group">
+                            <label for="language">
+                                <i class="fas fa-globe"></i> Language
+                            </label>
+                            <select id="language" name="language">
+                                <option value="en" selected>English</option>
+                                <option value="hi">हिंदी (Hindi)</option>
+                                <option value="mr">मराठी (Marathi)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="email_notifications" name="email_notifications" checked>
+                                <i class="fas fa-envelope"></i> Email Notifications
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="sms_notifications" name="sms_notifications">
+                                <i class="fas fa-sms"></i> SMS Notifications
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn-primary" disabled>
+                            <i class="fas fa-save"></i> Save Preferences (Coming Soon)
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Danger Zone -->
+                <div class="settings-card" style="border: 2px solid #fee2e2;">
+                    <h2 style="color: #dc2626;"><i class="fas fa-exclamation-triangle"></i> Danger Zone</h2>
+                    
+                    <p style="color: #6b7280; margin-bottom: 1rem;">
+                        Once you delete your account, there is no going back. Please be certain.
+                    </p>
+
+                    <button type="button" class="btn-primary" disabled style="background: #dc2626;">
+                        <i class="fas fa-trash"></i> Delete Account (Coming Soon)
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

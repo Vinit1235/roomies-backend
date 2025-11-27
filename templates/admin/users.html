@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Users - Roomies Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #dc2626;
+            --primary-dark: #991b1b;
+            --accent: #2563eb;
+            --accent-dark: #1e40af;
+            --success: #16a34a;
+            --warning: #f59e0b;
+            --danger: #dc2626;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f9fafb;
+            color: #1f2937;
+        }
+        
+        .admin-nav {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .admin-nav h1 {
+            font-size: 24px;
+            color: var(--primary);
+        }
+        
+        .admin-nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .admin-nav-links a {
+            color: #6b7280;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+        
+        .admin-nav-links a:hover,
+        .admin-nav-links a.active {
+            background: #f3f4f6;
+            color: var(--accent);
+        }
+        
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 24px;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            background: white;
+            padding: 8px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .filter-tab {
+            padding: 8px 20px;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #6b7280;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .filter-tab:hover,
+        .filter-tab.active {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .users-section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .users-table th {
+            text-align: left;
+            padding: 12px;
+            background: #f9fafb;
+            color: #6b7280;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .users-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 14px;
+        }
+        
+        .users-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .users-table tr:hover {
+            background: #f9fafb;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .btn {
+            padding: 6px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #15803d;
+        }
+        
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+        
+        .flash-message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .flash-message.success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+        
+        .flash-message.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #9ca3af;
+        }
+    </style>
+</head>
+<body>
+    <nav class="admin-nav">
+        <h1><i class="fas fa-shield-alt"></i> Roomies Admin</h1>
+        <div class="admin-nav-links">
+            <a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-chart-line"></i> Dashboard</a>
+            <a href="{{ url_for('admin_listings') }}"><i class="fas fa-home"></i> Listings</a>
+            <a href="{{ url_for('admin_users') }}" class="active"><i class="fas fa-users"></i> Users</a>
+            <a href="{{ url_for('admin_messages') }}"><i class="fas fa-envelope"></i> Messages</a>
+            <a href="{{ url_for('admin_logout') }}" style="color: var(--danger);"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </nav>
+    
+    <div class="admin-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash-message {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        
+        <div class="page-header">
+            <h1 class="page-title">Manage Users</h1>
+            <div class="filter-tabs">
+                <a href="{{ url_for('admin_users', role='all') }}" 
+                   class="filter-tab {{ 'active' if role_filter == 'all' else '' }}">
+                    All Users
+                </a>
+                <a href="{{ url_for('admin_users', role='students') }}" 
+                   class="filter-tab {{ 'active' if role_filter == 'students' else '' }}">
+                    Students
+                </a>
+                <a href="{{ url_for('admin_users', role='owners') }}" 
+                   class="filter-tab {{ 'active' if role_filter == 'owners' else '' }}">
+                    Owners
+                </a>
+            </div>
+        </div>
+        
+        {% if role_filter in ['all', 'students'] %}
+            <div class="users-section">
+                <h2 class="section-title">
+                    <i class="fas fa-user-graduate" style="color: var(--primary);"></i>
+                    Students
+                </h2>
+                
+                {% if students %}
+                    {% if students is mapping %}
+                        {# Pagination object #}
+                        <table class="users-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>College</th>
+                                    <th>Status</th>
+                                    <th>Registered</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in students.items %}
+                                    <tr>
+                                        <td>{{ student.name }}</td>
+                                        <td>{{ student.email }}</td>
+                                        <td>{{ student.college }}</td>
+                                        <td>
+                                            {% if student.verified %}
+                                                <span class="badge badge-success"><i class="fas fa-check-circle"></i> Verified</span>
+                                            {% else %}
+                                                <span class="badge badge-warning"><i class="fas fa-clock"></i> Unverified</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ student.created_at.strftime('%b %d, %Y') if student.created_at else 'N/A' }}</td>
+                                        <td>
+                                            {% if not student.verified %}
+                                                <form method="POST" action="{{ url_for('verify_student', user_id=student.id) }}" style="margin: 0; display: inline;">
+                                                    <button type="submit" class="btn btn-success">
+                                                        <i class="fas fa-check"></i> Verify
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        {# List of students #}
+                        <table class="users-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>College</th>
+                                    <th>Status</th>
+                                    <th>Registered</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in students %}
+                                    <tr>
+                                        <td>{{ student.name }}</td>
+                                        <td>{{ student.email }}</td>
+                                        <td>{{ student.college }}</td>
+                                        <td>
+                                            {% if student.verified %}
+                                                <span class="badge badge-success"><i class="fas fa-check-circle"></i> Verified</span>
+                                            {% else %}
+                                                <span class="badge badge-warning"><i class="fas fa-clock"></i> Unverified</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ student.created_at.strftime('%b %d, %Y') if student.created_at else 'N/A' }}</td>
+                                        <td>
+                                            {% if not student.verified %}
+                                                <form method="POST" action="{{ url_for('verify_student', user_id=student.id) }}" style="margin: 0; display: inline;">
+                                                    <button type="submit" class="btn btn-success">
+                                                        <i class="fas fa-check"></i> Verify
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                {% else %}
+                    <div class="empty-state">No students found.</div>
+                {% endif %}
+            </div>
+        {% endif %}
+        
+        {% if role_filter in ['all', 'owners'] %}
+            <div class="users-section">
+                <h2 class="section-title">
+                    <i class="fas fa-user-tie" style="color: var(--success);"></i>
+                    Property Owners
+                </h2>
+                
+                {% if owners %}
+                    {% if owners is mapping %}
+                        {# Pagination object #}
+                        <table class="users-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>KYC Status</th>
+                                    <th>Listings</th>
+                                    <th>Registered</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for owner in owners.items %}
+                                    <tr>
+                                        <td>{{ owner.name }}</td>
+                                        <td>{{ owner.email }}</td>
+                                        <td>
+                                            {% if owner.kyc_verified %}
+                                                <span class="badge badge-success"><i class="fas fa-check-circle"></i> Verified</span>
+                                            {% else %}
+                                                <span class="badge badge-warning"><i class="fas fa-clock"></i> Pending</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ owner.rooms.count() }} listings</td>
+                                        <td>{{ owner.created_at.strftime('%b %d, %Y') if owner.created_at else 'N/A' }}</td>
+                                        <td>
+                                            {% if not owner.kyc_verified %}
+                                                <form method="POST" action="{{ url_for('verify_owner', user_id=owner.id) }}" style="margin: 0; display: inline;">
+                                                    <button type="submit" class="btn btn-success">
+                                                        <i class="fas fa-check"></i> Verify KYC
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        {# List of owners #}
+                        <table class="users-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>KYC Status</th>
+                                    <th>Listings</th>
+                                    <th>Registered</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for owner in owners %}
+                                    <tr>
+                                        <td>{{ owner.name }}</td>
+                                        <td>{{ owner.email }}</td>
+                                        <td>
+                                            {% if owner.kyc_verified %}
+                                                <span class="badge badge-success"><i class="fas fa-check-circle"></i> Verified</span>
+                                            {% else %}
+                                                <span class="badge badge-warning"><i class="fas fa-clock"></i> Pending</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ owner.rooms.count() }} listings</td>
+                                        <td>{{ owner.created_at.strftime('%b %d, %Y') if owner.created_at else 'N/A' }}</td>
+                                        <td>
+                                            {% if not owner.kyc_verified %}
+                                                <form method="POST" action="{{ url_for('verify_owner', user_id=owner.id) }}" style="margin: 0; display: inline;">
+                                                    <button type="submit" class="btn btn-success">
+                                                        <i class="fas fa-check"></i> Verify KYC
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                {% else %}
+                    <div class="empty-state">No owners found.</div>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

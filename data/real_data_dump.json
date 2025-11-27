@@ -1,0 +1,284 @@
+[
+  {
+    "college": "Sardar Patel College of Engineering",
+    "location": {
+      "lat": 19.1234149,
+      "lon": 72.8360643
+    },
+    "nearby_hostels": [
+      {
+        "name": "SPCE boys hostel",
+        "lat": 19.1260118,
+        "lon": 72.8351779,
+        "type": "hostel"
+      },
+      {
+        "name": "SP Jain Hostel",
+        "lat": 19.1247831,
+        "lon": 72.8338916,
+        "type": "hostel"
+      }
+    ]
+  },
+  {
+    "college": "Fr. Conceicao Rodrigues College of Engineering",
+    "location": {
+      "lat": 19.0444011,
+      "lon": 72.8206506
+    },
+    "nearby_hostels": [
+      {
+        "name": "Unknown Hostel",
+        "lat": 19.0532539,
+        "lon": 72.8284156,
+        "type": "hostel"
+      },
+      {
+        "name": "Manuel Gonsalves Ladies Hostel",
+        "lat": 19.0565554,
+        "lon": 72.8294609,
+        "type": "hostel"
+      },
+      {
+        "name": "Horn Ok Please Hostel Mumbai",
+        "lat": 19.0544134,
+        "lon": 72.8351609,
+        "type": "hostel"
+      }
+    ]
+  },
+  {
+    "college": "Rajiv Gandhi Institute of Technology",
+    "location": {
+      "lat": 19.1213937,
+      "lon": 72.823901
+    },
+    "nearby_hostels": [
+      {
+        "name": "SPCE boys hostel",
+        "lat": 19.1260118,
+        "lon": 72.8351779,
+        "type": "hostel"
+      },
+      {
+        "name": "SP Jain Hostel",
+        "lat": 19.1247831,
+        "lon": 72.8338916,
+        "type": "hostel"
+      }
+    ]
+  },
+  {
+    "college": "Atharva College of Engineering",
+    "location": {
+      "lat": 19.1977249,
+      "lon": 72.8270575
+    },
+    "nearby_hostels": []
+  },
+  {
+    "college": "Vidyalankar Institute of Technology",
+    "location": {
+      "lat": 19.0216175,
+      "lon": 72.8709125
+    },
+    "nearby_hostels": []
+  },
+  {
+    "college": "Mukesh Patel School of Technology Management and Engineering",
+    "location": {
+      "lat": 19.1100909,
+      "lon": 72.837774
+    },
+    "nearby_hostels": []
+  },
+  {
+    "college": "Indian Institute of Technology Bombay",
+    "location": {
+      "lat": 19.1326186,
+      "lon": 72.9149702
+    },
+    "nearby_hostels": [
+      {
+        "name": "Hostel No. 5",
+        "lat": 19.1350214,
+        "lon": 72.9096978,
+        "type": "hostel"
+      },
+      {
+        "name": "Hostel No. 2",
+        "lat": 19.1364536,
+        "lon": 72.9125695,
+        "type": "hostel"
+      },
+      {
+        "name": "Hostel No. 3",
+        "lat": 19.1362317,
+        "lon": 72.9114868,
+        "type": "hostel"
+      },
+      {
+        "name": "Hostel No. 1",
+        "lat": 19.1362571,
+        "lon": 72.9139938,
+        "type": "hostel"
+      },
+      {
+        "name": "Hostel No. 10",
+        "lat": 19.1290631,
+        "lon": 72.9157813,
+        "type": "hostel"
+      },
+      {
+        "name": "Hostel No. 11",
+        "lat": 19.1329296,
+        "lon": 72.9118107,
+        "type": "hostel"
+      },
+      {
+        "name": "Hostel 16 C Wing",
+        "lat": 19.137742,
+        "lon": 72.9131065,
+        "type": "hostel"
+      },
+      {
+        "name": "Powai Dormitory, Gold Finance, Manappuram",
+        "lat": 19.1258078,
+        "lon": 72.9194489,
+        "type": "hostel"
+      },
+      {
+        "name": "Hostel No 10",
+        "lat": 19.1288936,
+        "lon": 72.9157995,
+        "type": "accommodation"
+      },
+      {
+        "name": "Hostel 11",
+        "lat": 19.1330021,
+        "lon": 72.9118556,
+        "type": "accommodation"
+      },
+      {
+        "name": "Hostel 3",
+        "lat": 19.1366565,
+        "lon": 72.911518,
+        "type": "accommodation"
+      },
+      {
+        "name": "Hostel 2",
+        "lat": 19.1369855,
+        "lon": 72.9126289,
+        "type": "accommodation"
+      },
+      {
+        "name": "Hostel 1",
+        "lat": 19.1366696,
+        "lon": 72.9139367,
+        "type": "accommodation"
+      },
+      {
+        "name": "Hostel 9 A",
+        "lat": 19.1356566,
+        "lon": 72.908043,
+        "type": "accommodation"
+      },
+      {
+        "name": "Hostel 9 B",
+        "lat": 19.1356084,
+        "lon": 72.9082355,
+        "type": "accommodation"
+      },
+      {
+        "name": "Hostel 9 C",
+        "lat": 19.1354886,
+        "lon": 72.9086618,
+        "type": "accommodation"
+      },
+      {
+        "name": "Hostel 5 A",
+        "lat": 19.1347935,
+        "lon": 72.9095968,
+        "type": "accommodation"
+      },
+      {
+        "name": "Hostel 5 B",
+        "lat": 19.1350022,
+        "lon": 72.909668,
+        "type": "accommodation"
+      },
+      {
+        "name": "Hostel 5 C",
+        "lat": 19.1352064,
+        "lon": 72.90974,
+        "type": "accommodation"
+      },
+      {
+        "name": "CETTM Hostel (MTNL Guesthouse)",
+        "lat": 19.1176986,
+        "lon": 72.9147825,
+        "type": "hostel"
+      },
+      {
+        "name": "Hostel 15A",
+        "lat": 19.1376037,
+        "lon": 72.9138665,
+        "type": "accommodation"
+      },
+      {
+        "name": "H-15 Wing B",
+        "lat": 19.138034,
+        "lon": 72.913945,
+        "type": "hostel"
+      },
+      {
+        "name": "Hostel 15 C",
+        "lat": 19.1379376,
+        "lon": 72.9145406,
+        "type": "accommodation"
+      },
+      {
+        "name": "Hostel 16 B Wing",
+        "lat": 19.1379998,
+        "lon": 72.9126957,
+        "type": "accommodation"
+      },
+      {
+        "name": "Hostel 16 C",
+        "lat": 19.1382331,
+        "lon": 72.9131477,
+        "type": "accommodation"
+      },
+      {
+        "name": "Hostel 16 A",
+        "lat": 19.1377251,
+        "lon": 72.9131239,
+        "type": "accommodation"
+      },
+      {
+        "name": "Hostel 12",
+        "lat": 19.1355428,
+        "lon": 72.9046052,
+        "type": "accommodation"
+      },
+      {
+        "name": "Hostel 14 C",
+        "lat": 19.1350348,
+        "lon": 72.9061023,
+        "type": "accommodation"
+      },
+      {
+        "name": "Hostel 14 B",
+        "lat": 19.1346894,
+        "lon": 72.9060609,
+        "type": "accommodation"
+      },
+      {
+        "name": "Hostel 14 A",
+        "lat": 19.1343909,
+        "lon": 72.9058761,
+        "type": "accommodation"
+      }
+    ]
+  }
+]

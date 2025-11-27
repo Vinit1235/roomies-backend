@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Features Guide - Roomies</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .features-guide {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .feature-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--primary);
+        }
+        .feature-card h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        .feature-card .location {
+            background: #f3f4f6;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            display: inline-block;
+            margin: 0.5rem 0;
+            font-family: monospace;
+        }
+        .feature-card .api-endpoint {
+            background: #1e293b;
+            color: #10b981;
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin: 0.5rem 0;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        .test-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+        .test-btn:hover {
+            background: var(--accent-light);
+        }
+        .category {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+    </style>
+</head>
+<body>
+    {% include 'partials/header.html' %}
+    {% include 'partials/sidebar.html' %}
+
+    <div class="main-content" id="mainContent">
+        <div class="features-guide">
+            <h1>🎯 Roomies Features Guide</h1>
+            <p style="font-size: 1.1rem; color: #6b7280; margin-bottom: 2rem;">
+                Navigate to any feature using the links below. All features are live and working!
+            </p>
+
+            <!-- UI FEATURES -->
+            <div class="category">
+                <h2>🎨 Visual Features (Already Visible)</h2>
+            </div>
+
+            <div class="feature-card">
+                <h3>🗺️ Interactive Map with Flash Deals</h3>
+                <p><strong>Where:</strong> Click "Explore" in the left sidebar</p>
+                <div class="location">/explore</div>
+                <p><strong>What you'll see:</strong></p>
+                <ul>
+                    <li>✅ Interactive OpenStreetMap centered on Mumbai</li>
+                    <li>✅ Room markers with popups showing details</li>
+                    <li>⚡ Pulsing RED markers for flash deals (when active)</li>
+                    <li>✅ Search filters (location, price, type)</li>
+                    <li>✅ Room cards below the map</li>
+                </ul>
+                <button class="test-btn" onclick="window.location.href='/explore'">Open Map Now</button>
+            </div>
+
+            <div class="feature-card">
+                <h3>🎤 Voice Search</h3>
+                <p><strong>Where:</strong> Look for the RED microphone button at the bottom-right corner</p>
+                <p><strong>How to use:</strong></p>
+                <ol>
+                    <li>Click the floating red mic button</li>
+                    <li>Allow microphone access (browser will prompt)</li>
+                    <li>Say location or room type (e.g., "Andheri" or "2BHK")</li>
+                    <li>Search executes automatically!</li>
+                </ol>
+                <p>⚠️ <strong>Note:</strong> Works best in Chrome/Edge browsers</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>📱 PWA - Install as App</h3>
+                <p><strong>Where:</strong> Look for "Install App" button at top-right (appears after visiting site 2-3 times)</p>
+                <p><strong>How to use:</strong></p>
+                <ol>
+                    <li>Visit the site multiple times (or click browser menu → Install Roomies)</li>
+                    <li>Click "Install App" button when it appears</li>
+                    <li>App installs to your desktop/home screen</li>
+                    <li>Works offline with cached listings!</li>
+                </ol>
+            </div>
+
+            <div class="feature-card">
+                <h3>🧭 YouTube-Style Sidebar</h3>
+                <p><strong>Where:</strong> Left side of every page</p>
+                <p><strong>Navigation options:</strong></p>
+                <ul>
+                    <li>🏠 Home - Hero section</li>
+                    <li>🔍 Explore - MAP + Search rooms</li>
+                    <li>⭐ Discover - Featured listings</li>
+                    <li>👥 Findmate - Find roommates</li>
+                    <li>🤖 AI Matching - AI-powered matching</li>
+                    <li>ℹ️ About - About us</li>
+                    <li>📧 Contact - Contact form</li>
+                </ul>
+                <button class="test-btn" onclick="document.getElementById('menuToggle').click()">Toggle Sidebar</button>
+            </div>
+
+            <!-- API FEATURES -->
+            <div class="category">
+                <h2>🔌 API-Based Features (Test via Console/API)</h2>
+            </div>
+
+            <div class="feature-card">
+                <h3>⚡ Flash Deals (24hr Limited Offers)</h3>
+                <p><strong>Owner Feature:</strong> Create ₹29 flash deals with pulsing map markers</p>
+                <div class="api-endpoint">GET /api/flash-deals</div>
+                <button class="test-btn" onclick="fetch('/api/flash-deals').then(r=>r.json()).then(d=>alert(JSON.stringify(d, null, 2)))">
+                    View Active Flash Deals
+                </button>
+                <p><strong>Create Flash Deal (Owners):</strong></p>
+                <div class="api-endpoint">POST /api/flash-deals/create<br>Body: { "room_id": 1, "deal_price": 8000 }</div>
+                <p><strong>Test Command (Browser Console):</strong></p>
+                <pre style="background: #f3f4f6; padding: 1rem; border-radius: 6px; overflow-x: auto;">
+fetch('/api/flash-deals/create', {
+  method: 'POST',
+  headers: {'Content-Type': 'application/json'},
+  body: JSON.stringify({room_id: 1, deal_price: 7500})
+}).then(r => r.json()).then(console.log)</pre>
+            </div>
+
+            <div class="feature-card">
+                <h3>👔 Owner Pro Subscription (₹199/mo)</h3>
+                <div class="api-endpoint">POST /api/subscriptions/create</div>
+                <div class="api-endpoint">GET /api/subscriptions/my</div>
+                <p><strong>Test Command:</strong></p>
+                <pre style="background: #f3f4f6; padding: 1rem; border-radius: 6px; overflow-x: auto;">
+fetch('/api/subscriptions/my')
+  .then(r => r.json())
+  .then(console.log)</pre>
+            </div>
+
+            <div class="feature-card">
+                <h3>💰 Referral & Wallet System (₹200 Credits)</h3>
+                <div class="api-endpoint">GET /api/referrals/my-code</div>
+                <div class="api-endpoint">POST /api/referrals/apply</div>
+                <div class="api-endpoint">GET /api/wallet/balance</div>
+                <button class="test-btn" onclick="fetch('/api/wallet/balance').then(r=>r.json()).then(d=>alert('Balance: ₹' + d.balance))">
+                    Check Wallet Balance
+                </button>
+                <button class="test-btn" onclick="fetch('/api/referrals/my-code').then(r=>r.json()).then(d=>alert('Your Code: ' + d.referral_code))">
+                    Get My Referral Code
+                </button>
+            </div>
+
+            <div class="feature-card">
+                <h3>🏠 Partial Payment Booking (₹999 Advance)</h3>
+                <div class="api-endpoint">POST /api/bookings/create</div>
+                <div class="api-endpoint">GET /api/bookings/my</div>
+                <button class="test-btn" onclick="fetch('/api/bookings/my').then(r=>r.json()).then(d=>alert(JSON.stringify(d, null, 2)))">
+                    View My Bookings
+                </button>
+            </div>
+
+            <div class="feature-card">
+                <h3>🍽️ Mess Menu Calendar</h3>
+                <div class="api-endpoint">GET /api/mess-menu/1</div>
+                <button class="test-btn" onclick="fetch('/api/mess-menu/1').then(r=>r.json()).then(d=>alert(JSON.stringify(d, null, 2)))">
+                    View Mess Menu (Room 1)
+                </button>
+            </div>
+
+            <div class="feature-card">
+                <h3>🛡️ Safety Audit Score (10-Point Checklist)</h3>
+                <div class="api-endpoint">GET /api/safety-audit/1</div>
+                <button class="test-btn" onclick="fetch('/api/safety-audit/1').then(r=>r.json()).then(d=>alert('Safety Score: ' + d.score + '/10'))">
+                    Check Safety Score (Room 1)
+                </button>
+            </div>
+
+            <div class="feature-card">
+                <h3>🤝 AI Roommate Matching</h3>
+                <div class="api-endpoint">GET /api/roommate-match</div>
+                <div class="api-endpoint">POST /api/profile-tags/update</div>
+                <button class="test-btn" onclick="fetch('/api/roommate-match').then(r=>r.json()).then(d=>alert(JSON.stringify(d, null, 2)))">
+                    Find Compatible Roommates
+                </button>
+            </div>
+
+            <div class="feature-card">
+                <h3>🌱 Carbon Savings Calculator</h3>
+                <p><strong>JavaScript Function:</strong> Call in browser console</p>
+                <pre style="background: #f3f4f6; padding: 1rem; border-radius: 6px; overflow-x: auto;">
+// Shows CO2 savings comparison
+displayCarbonSavings('someContainerId')</pre>
+                <button class="test-btn" onclick="const savings = calculateCarbonSavings('shared'); alert('Total CO2 Savings: ' + savings.total + ' kg/month\\nEquivalent to ' + Math.floor(savings.total/10) + ' trees!')">
+                    Calculate Carbon Savings
+                </button>
+            </div>
+
+            <!-- ADMIN FEATURES -->
+            <div class="category">
+                <h2>🔐 Admin Features</h2>
+            </div>
+
+            <div class="feature-card">
+                <h3>📊 Admin Revenue Dashboard</h3>
+                <p><strong>Login Credentials:</strong></p>
+                <ul>
+                    <li>Email: <code>admin@roomies.com</code></li>
+                    <li>Password: <code>admin123</code></li>
+                </ul>
+                <div class="location">/admin/login</div>
+                <button class="test-btn" onclick="window.location.href='/admin/login'">Go to Admin Login</button>
+                <p><strong>What you'll see:</strong></p>
+                <ul>
+                    <li>💰 Total Revenue (This Month)</li>
+                    <li>👔 Active Subscriptions Count</li>
+                    <li>⚡ Active Flash Deals Count</li>
+                    <li>🏠 Total/Confirmed Bookings</li>
+                    <li>💳 Wallet Balances</li>
+                    <li>📈 Revenue Breakdown by Type</li>
+                    <li>👥 User Statistics</li>
+                    <li>🏘️ Listing Statistics</li>
+                </ul>
+            </div>
+
+            <!-- QUICK START -->
+            <div class="category">
+                <h2>🚀 Quick Start Guide</h2>
+            </div>
+
+            <div class="feature-card">
+                <h3>Step-by-Step Testing</h3>
+                <ol style="line-height: 2;">
+                    <li><strong>See the Map:</strong> Click "Explore" in sidebar → See interactive map with markers</li>
+                    <li><strong>Try Voice Search:</strong> Click red mic button (bottom-right) → Say "Andheri"</li>
+                    <li><strong>Check Admin Dashboard:</strong> Go to /admin/login → Use admin@roomies.com / admin123</li>
+                    <li><strong>Test Flash Deals:</strong> Open browser console (F12) → Run test commands above</li>
+                    <li><strong>View API Data:</strong> Visit any API endpoint directly (e.g., /api/flash-deals)</li>
+                </ol>
+            </div>
+
+            <div class="feature-card">
+                <h3>📝 All Page Routes</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                    <div><a href="/" style="color: var(--accent);">/ - Home</a></div>
+                    <div><a href="/explore" style="color: var(--accent);">/explore - Map + Search</a></div>
+                    <div><a href="/discover" style="color: var(--accent);">/discover - Featured</a></div>
+                    <div><a href="/findmate" style="color: var(--accent);">/findmate - Roommates</a></div>
+                    <div><a href="/ai-matching" style="color: var(--accent);">/ai-matching - AI Match</a></div>
+                    <div><a href="/about" style="color: var(--accent);">/about - About</a></div>
+                    <div><a href="/contact" style="color: var(--accent);">/contact - Contact</a></div>
+                    <div><a href="/login" style="color: var(--accent);">/login - Login</a></div>
+                    <div><a href="/signup" style="color: var(--accent);">/signup - Signup</a></div>
+                    <div><a href="/admin/login" style="color: var(--primary);">/admin/login - Admin</a></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,237 @@
+[
+    {
+        "category": "General",
+        "question": "What is Roomies?",
+        "answer": "Roomies is a comprehensive platform designed to help students find hostels, PGs, and flats for rent, as well as compatible roommates using AI matching technology."
+    },
+    {
+        "category": "General",
+        "question": "Is Roomies free to use?",
+        "answer": "Yes, searching for rooms and roommates is completely free for students. We also offer premium features for enhanced visibility."
+    },
+    {
+        "category": "General",
+        "question": "How do I create an account?",
+        "answer": "Click on the 'Sign Up' button in the top right corner, choose your role (Student or Owner), and fill in your details."
+    },
+    {
+        "category": "General",
+        "question": "Is my data safe with Roomies?",
+        "answer": "Yes, we prioritize user privacy and data security. We use encryption and secure servers to protect your personal information."
+    },
+    {
+        "category": "General",
+        "question": "Can I use Roomies in any city?",
+        "answer": "Currently, we are focused on major education hubs like Mumbai, Pune, and Bangalore, but we are expanding rapidly to other cities."
+    },
+    {
+        "category": "General",
+        "question": "Do you have a mobile app?",
+        "answer": "We are currently developing our mobile app for iOS and Android. For now, our website is fully responsive and works great on mobile browsers."
+    },
+    {
+        "category": "General",
+        "question": "How can I contact customer support?",
+        "answer": "You can reach us via the 'Contact' page or email us at support@roomies.in. We typically respond within 24 hours."
+    },
+    {
+        "category": "General",
+        "question": "Can I change my email address?",
+        "answer": "Yes, you can update your email address in the Settings page. You will need to verify the new email."
+    },
+    {
+        "category": "General",
+        "question": "How do I reset my password?",
+        "answer": "Click 'Forgot Password' on the login page and follow the instructions sent to your email."
+    },
+    {
+        "category": "General",
+        "question": "Can I delete my account?",
+        "answer": "Yes, you can request account deletion from the Settings page. This action is permanent."
+    },
+    {
+        "category": "For Students",
+        "question": "How do I search for a room?",
+        "answer": "Go to the 'Explore' page and use filters for location, price, and property type to find suitable rooms."
+    },
+    {
+        "category": "For Students",
+        "question": "How does the AI roommate matching work?",
+        "answer": "Our AI analyzes your profile preferences (lifestyle, study habits, interests) and suggests compatible roommates with a compatibility score."
+    },
+    {
+        "category": "For Students",
+        "question": "Can I visit the property before booking?",
+        "answer": "Yes, you can schedule a visit by contacting the owner directly through the platform."
+    },
+    {
+        "category": "For Students",
+        "question": "What documents do I need for verification?",
+        "answer": "Students typically need a valid College ID and a Government ID (Aadhar/PAN) for verification."
+    },
+    {
+        "category": "For Students",
+        "question": "Are the listings verified?",
+        "answer": "Look for the 'Verified' badge on listings. These properties have been verified by our team or through document submission."
+    },
+    {
+        "category": "For Students",
+        "question": "How do I book a room?",
+        "answer": "Click 'View Details' on a listing and use the 'Reserve' or 'Contact Owner' button to initiate the booking process."
+    },
+    {
+        "category": "For Students",
+        "question": "Is there a booking fee?",
+        "answer": "Roomies charges a small platform fee for secure bookings made through the website. Direct dealings with owners are free but not covered by our guarantees."
+    },
+    {
+        "category": "For Students",
+        "question": "Can I cancel my booking?",
+        "answer": "Cancellation policies vary by property. Please check the specific cancellation terms on the room details page before booking."
+    },
+    {
+        "category": "For Students",
+        "question": "What if the room is different from the photos?",
+        "answer": "If you book through Roomies and the room is significantly different, contact us within 24 hours of move-in for resolution or refund assistance."
+    },
+    {
+        "category": "For Students",
+        "question": "Can I search for roommates without booking a room?",
+        "answer": "Yes, you can use the 'Findmate' feature to connect with potential roommates even if you haven't finalized a property yet."
+    },
+    {
+        "category": "For Students",
+        "question": "How do I report a fake listing?",
+        "answer": "Use the 'Report' button on the listing page. Our trust and safety team will investigate immediately."
+    },
+    {
+        "category": "For Students",
+        "question": "Are guests allowed in hostels/PGs?",
+        "answer": "Guest policies depend on the specific owner or hostel rules. Check the 'Amenities' and 'Rules' section of the listing."
+    },
+    {
+        "category": "For Students",
+        "question": "Is food included in the rent?",
+        "answer": "Some PGs and hostels include meals. Look for the 'Food' or 'Mess' amenity icon on the listing."
+    },
+    {
+        "category": "For Students",
+        "question": "Can I negotiate the rent?",
+        "answer": "Rent is set by the owner. You can contact them to discuss, but the listed price is usually final."
+    },
+    {
+        "category": "For Students",
+        "question": "What is the 'Flash Deal' feature?",
+        "answer": "Flash Deals are limited-time discounts on select rooms. They are usually valid for 24 hours."
+    },
+    {
+        "category": "For Owners",
+        "question": "How do I list my property?",
+        "answer": "Sign up as an Owner, go to your dashboard, and click 'List Room'. Fill in the details and submit."
+    },
+    {
+        "category": "For Owners",
+        "question": "Is it free to list a property?",
+        "answer": "Basic listings are free. We offer premium plans for higher visibility and featured spots."
+    },
+    {
+        "category": "For Owners",
+        "question": "How do I verify my property?",
+        "answer": "Upload property documents (Electricity bill, ownership proof) in the Verification section. Our team will review them."
+    },
+    {
+        "category": "For Owners",
+        "question": "How do I manage bookings?",
+        "answer": "You can view and manage all booking requests from your Owner Dashboard."
+    },
+    {
+        "category": "For Owners",
+        "question": "Can I list multiple properties?",
+        "answer": "Yes, you can manage multiple hostels, PGs, or flats under a single owner account."
+    },
+    {
+        "category": "For Owners",
+        "question": "How do I receive payments?",
+        "answer": "Payments made through the platform are transferred to your linked bank account after deducting the service fee."
+    },
+    {
+        "category": "For Owners",
+        "question": "What is the Owner Pro subscription?",
+        "answer": "Owner Pro gives you advanced analytics, priority support, and featured listing status for ₹199/month."
+    },
+    {
+        "category": "For Owners",
+        "question": "How can I boost my listing?",
+        "answer": "You can use 'Flash Deals' or subscribe to Owner Pro to get better visibility in search results."
+    },
+    {
+        "category": "For Owners",
+        "question": "Can I reject a booking request?",
+        "answer": "Yes, owners have the right to accept or reject booking requests based on availability or preferences."
+    },
+    {
+        "category": "For Owners",
+        "question": "How do I update room availability?",
+        "answer": "Go to 'My Listings' and edit the 'Occupied Beds' count to reflect current availability."
+    },
+    {
+        "category": "Safety & Security",
+        "question": "Does Roomies conduct background checks?",
+        "answer": "We verify identities via government ID uploads, but we do not conduct full criminal background checks. Users are advised to exercise caution."
+    },
+    {
+        "category": "Safety & Security",
+        "question": "Is there an emergency helpline?",
+        "answer": "For immediate emergencies, please dial 100 (Police) or 112. For platform issues, contact our support team."
+    },
+    {
+        "category": "Safety & Security",
+        "question": "How do you handle harassment?",
+        "answer": "We have a zero-tolerance policy for harassment. Report any abusive behavior immediately, and we will take strict action, including account bans."
+    },
+    {
+        "category": "Safety & Security",
+        "question": "Are my chats private?",
+        "answer": "Yes, chats between users are private. However, they may be reviewed by moderators if a report is filed."
+    },
+    {
+        "category": "Payments & Refunds",
+        "question": "What payment methods are accepted?",
+        "answer": "We accept UPI, Credit/Debit Cards, and Net Banking via our secure payment gateway."
+    },
+    {
+        "category": "Payments & Refunds",
+        "question": "How do refunds work?",
+        "answer": "Refunds for cancelled bookings (if eligible) are processed within 5-7 business days to the original payment method."
+    },
+    {
+        "category": "Payments & Refunds",
+        "question": "Is the security deposit refundable?",
+        "answer": "Security deposits are held by the owner and are refundable at the end of the tenancy, subject to property condition and terms."
+    },
+    {
+        "category": "Payments & Refunds",
+        "question": "Why was my payment failed?",
+        "answer": "Payment failures can happen due to network issues or bank downtime. Please try again or contact your bank."
+    },
+    {
+        "category": "Technical Support",
+        "question": "The website is loading slowly. What do I do?",
+        "answer": "Please check your internet connection. If the issue persists, try clearing your browser cache or try a different browser."
+    },
+    {
+        "category": "Technical Support",
+        "question": "I'm not receiving emails.",
+        "answer": "Check your Spam/Junk folder. If you still don't see them, ensure your email address is correct in Settings."
+    },
+    {
+        "category": "Technical Support",
+        "question": "How do I report a bug?",
+        "answer": "Please email details of the bug (with screenshots if possible) to tech@roomies.in."
+    },
+    {
+        "category": "Technical Support",
+        "question": "Which browsers are supported?",
+        "answer": "Roomies works best on the latest versions of Chrome, Firefox, Safari, and Edge."
+    }
+]

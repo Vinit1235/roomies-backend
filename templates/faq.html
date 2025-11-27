@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frequently Asked Questions - Roomies</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8fafc;
+        }
+        .faq-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .faq-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .faq-header h1 {
+            font-size: 2.5rem;
+            color: #1e293b;
+            margin-bottom: 16px;
+        }
+        .faq-header p {
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+        
+        .faq-category {
+            margin-bottom: 40px;
+        }
+        .category-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .faq-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+        .faq-item:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .faq-question {
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+            color: #1e293b;
+            background: white;
+            border: none;
+            width: 100%;
+            text-align: left;
+            font-size: 1rem;
+        }
+        .faq-question:hover {
+            background-color: #f8fafc;
+        }
+        .faq-question i {
+            color: #94a3b8;
+            transition: transform 0.3s;
+        }
+        .faq-question.active i {
+            transform: rotate(180deg);
+            color: #ff385c;
+        }
+        .faq-question.active {
+            color: #ff385c;
+        }
+        
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease;
+            color: #475569;
+            line-height: 1.6;
+            background-color: #fcfcfc;
+        }
+        .faq-answer.open {
+            padding: 0 20px 20px 20px;
+            max-height: 500px; /* Arbitrary large height */
+            border-top: 1px solid #f1f5f9;
+        }
+
+        /* Search Bar */
+        .faq-search {
+            max-width: 600px;
+            margin: 0 auto 40px;
+            position: relative;
+        }
+        .faq-search input {
+            width: 100%;
+            padding: 16px 20px 16px 50px;
+            border: 2px solid #e2e8f0;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+        }
+        .faq-search input:focus {
+            outline: none;
+            border-color: #ff385c;
+            box-shadow: 0 0 0 4px rgba(255, 56, 92, 0.1);
+        }
+        .faq-search i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    {% include 'partials/header.html' %}
+    {% include 'partials/sidebar.html' %}
+
+    <div class="main-content" style="padding-top: 80px;">
+        <div class="faq-container">
+            <div class="faq-header">
+                <h1>Frequently Asked Questions</h1>
+                <p>Everything you need to know about Roomies</p>
+            </div>
+
+            <div class="faq-search">
+                <i class="fas fa-search"></i>
+                <input type="text" id="faqSearch" placeholder="Search for questions...">
+            </div>
+
+            <!-- General Questions -->
+            <div class="faq-category">
+                <div class="category-title">
+                    <i class="fas fa-info-circle"></i> General
+                </div>
+                
+                <div class="faq-item">
+                    <button class="faq-question">What is Roomies? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Roomies is a comprehensive platform designed to help students find hostels, PGs, and flats for rent, as well as compatible roommates using AI matching technology.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Is Roomies free to use? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Yes, searching for rooms and roommates is completely free for students. We also offer premium features for enhanced visibility.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">How do I create an account? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Click on the "Sign Up" button in the top right corner, choose your role (Student or Owner), and fill in your details.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Is my data safe with Roomies? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Yes, we prioritize user privacy and data security. We use encryption and secure servers to protect your personal information.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Can I use Roomies in any city? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Currently, we are focused on major education hubs like Mumbai, Pune, and Bangalore, but we are expanding rapidly to other cities.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Do you have a mobile app? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">We are currently developing our mobile app for iOS and Android. For now, our website is fully responsive and works great on mobile browsers.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">How can I contact customer support? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">You can reach us via the "Contact" page or email us at support@roomies.in. We typically respond within 24 hours.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Can I change my email address? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Yes, you can update your email address in the Settings page. You will need to verify the new email.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">How do I reset my password? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Click "Forgot Password" on the login page and follow the instructions sent to your email.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Can I delete my account? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Yes, you can request account deletion from the Settings page. This action is permanent.</div>
+                </div>
+            </div>
+
+            <!-- For Students -->
+            <div class="faq-category">
+                <div class="category-title">
+                    <i class="fas fa-user-graduate"></i> For Students
+                </div>
+                
+                <div class="faq-item">
+                    <button class="faq-question">How do I search for a room? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Go to the "Explore" page and use filters for location, price, and property type to find suitable rooms.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">How does the AI roommate matching work? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Our AI analyzes your profile preferences (lifestyle, study habits, interests) and suggests compatible roommates with a compatibility score.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Can I visit the property before booking? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Yes, you can schedule a visit by contacting the owner directly through the platform.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">What documents do I need for verification? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Students typically need a valid College ID and a Government ID (Aadhar/PAN) for verification.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Are the listings verified? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Look for the "Verified" badge on listings. These properties have been verified by our team or through document submission.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">How do I book a room? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Click "View Details" on a listing and use the "Reserve" or "Contact Owner" button to initiate the booking process.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Is there a booking fee? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Roomies charges a small platform fee for secure bookings made through the website. Direct dealings with owners are free but not covered by our guarantees.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Can I cancel my booking? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Cancellation policies vary by property. Please check the specific cancellation terms on the room details page before booking.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">What if the room is different from the photos? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">If you book through Roomies and the room is significantly different, contact us within 24 hours of move-in for resolution or refund assistance.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Can I search for roommates without booking a room? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Yes, you can use the "Findmate" feature to connect with potential roommates even if you haven't finalized a property yet.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">How do I report a fake listing? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Use the "Report" button on the listing page. Our trust and safety team will investigate immediately.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Are guests allowed in hostels/PGs? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Guest policies depend on the specific owner or hostel rules. Check the "Amenities" and "Rules" section of the listing.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Is food included in the rent? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Some PGs and hostels include meals. Look for the "Food" or "Mess" amenity icon on the listing.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Can I negotiate the rent? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Rent is set by the owner. You can contact them to discuss, but the listed price is usually final.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">What is the "Flash Deal" feature? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Flash Deals are limited-time discounts on select rooms. They are usually valid for 24 hours.</div>
+                </div>
+            </div>
+
+            <!-- For Owners -->
+            <div class="faq-category">
+                <div class="category-title">
+                    <i class="fas fa-building"></i> For Owners
+                </div>
+                
+                <div class="faq-item">
+                    <button class="faq-question">How do I list my property? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Sign up as an Owner, go to your dashboard, and click "List Room". Fill in the details and submit.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Is it free to list a property? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Basic listings are free. We offer premium plans for higher visibility and featured spots.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">How do I verify my property? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Upload property documents (Electricity bill, ownership proof) in the Verification section. Our team will review them.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">How do I manage bookings? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">You can view and manage all booking requests from your Owner Dashboard.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Can I list multiple properties? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Yes, you can manage multiple hostels, PGs, or flats under a single owner account.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">How do I receive payments? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Payments made through the platform are transferred to your linked bank account after deducting the service fee.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">What is the Owner Pro subscription? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Owner Pro gives you advanced analytics, priority support, and featured listing status for ₹199/month.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">How can I boost my listing? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">You can use "Flash Deals" or subscribe to Owner Pro to get better visibility in search results.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Can I reject a booking request? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Yes, owners have the right to accept or reject booking requests based on availability or preferences.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">How do I update room availability? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Go to "My Listings" and edit the "Occupied Beds" count to reflect current availability.</div>
+                </div>
+            </div>
+
+            <!-- Safety & Security -->
+            <div class="faq-category">
+                <div class="category-title">
+                    <i class="fas fa-shield-alt"></i> Safety & Security
+                </div>
+                
+                <div class="faq-item">
+                    <button class="faq-question">Does Roomies conduct background checks? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">We verify identities via government ID uploads, but we do not conduct full criminal background checks. Users are advised to exercise caution.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Is there an emergency helpline? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">For immediate emergencies, please dial 100 (Police) or 112. For platform issues, contact our support team.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">How do you handle harassment? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">We have a zero-tolerance policy for harassment. Report any abusive behavior immediately, and we will take strict action, including account bans.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Are my chats private? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Yes, chats between users are private. However, they may be reviewed by moderators if a report is filed.</div>
+                </div>
+            </div>
+
+            <!-- Payments -->
+            <div class="faq-category">
+                <div class="category-title">
+                    <i class="fas fa-credit-card"></i> Payments & Refunds
+                </div>
+                
+                <div class="faq-item">
+                    <button class="faq-question">What payment methods are accepted? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">We accept UPI, Credit/Debit Cards, and Net Banking via our secure payment gateway.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">How do refunds work? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Refunds for cancelled bookings (if eligible) are processed within 5-7 business days to the original payment method.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Is the security deposit refundable? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Security deposits are held by the owner and are refundable at the end of the tenancy, subject to property condition and terms.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Why was my payment failed? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Payment failures can happen due to network issues or bank downtime. Please try again or contact your bank.</div>
+                </div>
+            </div>
+
+            <!-- Technical -->
+            <div class="faq-category">
+                <div class="category-title">
+                    <i class="fas fa-laptop-code"></i> Technical Support
+                </div>
+                
+                <div class="faq-item">
+                    <button class="faq-question">The website is loading slowly. What do I do? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Please check your internet connection. If the issue persists, try clearing your browser cache or try a different browser.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">I'm not receiving emails. <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Check your Spam/Junk folder. If you still don't see them, ensure your email address is correct in Settings.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">How do I report a bug? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Please email details of the bug (with screenshots if possible) to tech@roomies.in.</div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">Which browsers are supported? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer">Roomies works best on the latest versions of Chrome, Firefox, Safari, and Edge.</div>
+                </div>
+            </div>
+            
+            <!-- More FAQs to reach count -->
+            <div class="faq-category">
+                <div class="category-title">
+                    <i class="fas fa-plus"></i> Additional Questions
+                </div>
+                <!-- Generating more generic placeholders to reach high count as requested -->
+                <div class="faq-item"><button class="faq-question">Can I bring my pet? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Pet policies vary by property. Use the "Pet Friendly" filter when searching.</div></div>
+                <div class="faq-item"><button class="faq-question">Is there a curfew? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Curfew times are set by the hostel or PG owner. Check the listing rules.</div></div>
+                <div class="faq-item"><button class="faq-question">Do you offer short-term stays? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Yes, some properties offer daily or weekly rates. Check the listing details.</div></div>
+                <div class="faq-item"><button class="faq-question">Can I share a room with a friend? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Yes, you can book multiple beds or a full room if available.</div></div>
+                <div class="faq-item"><button class="faq-question">Is there parking available? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Check the amenities section for "Parking" availability.</div></div>
+                <div class="faq-item"><button class="faq-question">Do rooms have attached bathrooms? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Some rooms do. Look for "Attached Washroom" in amenities.</div></div>
+                <div class="faq-item"><button class="faq-question">Is there a laundry service? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Many hostels offer laundry facilities or services. Check the listing.</div></div>
+                <div class="faq-item"><button class="faq-question">Are bills included? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Electricity and water bills are often included in PGs, but check the specific listing.</div></div>
+                <div class="faq-item"><button class="faq-question">Is there Wi-Fi? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Most student accommodations listed on Roomies offer Wi-Fi.</div></div>
+                <div class="faq-item"><button class="faq-question">Can I cook my own food? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">If the property has a kitchen or kitchenette allowed for use, yes.</div></div>
+                <div class="faq-item"><button class="faq-question">Is there a gym? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Some premium hostels have gyms. Check amenities.</div></div>
+                <div class="faq-item"><button class="faq-question">How far is the college? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Distance to nearby colleges is usually mentioned in the listing description.</div></div>
+                <div class="faq-item"><button class="faq-question">Is the area safe? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">We try to list in safe student-friendly areas, but always visit and judge for yourself.</div></div>
+                <div class="faq-item"><button class="faq-question">Can I get a receipt? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Yes, owners should provide receipts for rent payments.</div></div>
+                <div class="faq-item"><button class="faq-question">What if I lose my key? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Contact the owner or warden immediately. Replacement charges may apply.</div></div>
+                <div class="faq-item"><button class="faq-question">Can I have overnight guests? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Usually restricted in student housing. Check with the owner.</div></div>
+                <div class="faq-item"><button class="faq-question">Is there a study room? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Some hostels provide dedicated study areas.</div></div>
+                <div class="faq-item"><button class="faq-question">Is there power backup? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Look for the "Power Backup" amenity.</div></div>
+                <div class="faq-item"><button class="faq-question">How often is cleaning done? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Housekeeping frequency varies (daily, weekly). Check listing.</div></div>
+                <div class="faq-item"><button class="faq-question">Is there a TV? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Common areas usually have TVs. Some private rooms might too.</div></div>
+                <div class="faq-item"><button class="faq-question">Is there a fridge? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Common fridges are standard in PGs.</div></div>
+                <div class="faq-item"><button class="faq-question">Is there RO water? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Yes, safe drinking water is a standard requirement we encourage.</div></div>
+                <div class="faq-item"><button class="faq-question">Is there a warden? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Hostels usually have a warden. PGs might not.</div></div>
+                <div class="faq-item"><button class="faq-question">Can I smoke? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Most student accommodations are non-smoking.</div></div>
+                <div class="faq-item"><button class="faq-question">Is alcohol allowed? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Alcohol is generally strictly prohibited in student housing.</div></div>
+                <div class="faq-item"><button class="faq-question">What is the notice period? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Notice period for moving out is usually 1 month. Check your agreement.</div></div>
+                <div class="faq-item"><button class="faq-question">Is there a lock-in period? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Some owners require a minimum stay (e.g., 3-6 months).</div></div>
+                <div class="faq-item"><button class="faq-question">Can I customize my room? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Minor changes might be allowed, but no structural changes. Ask owner.</div></div>
+                <div class="faq-item"><button class="faq-question">Is there CCTV? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">For safety, many properties have CCTV in common areas.</div></div>
+                <div class="faq-item"><button class="faq-question">Do I need to sign a lease? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Yes, a rental agreement is recommended for legal protection.</div></div>
+                <div class="faq-item"><button class="faq-question">Who pays for maintenance? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Major repairs are owner's responsibility. Minor damages by you are yours.</div></div>
+                <div class="faq-item"><button class="faq-question">Can I change rooms later? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Subject to availability and owner's approval.</div></div>
+                <div class="faq-item"><button class="faq-question">Is there a referral bonus? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Yes! Refer a friend and both get ₹200 wallet credit.</div></div>
+                <div class="faq-item"><button class="faq-question">How do I use wallet credit? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">You can use it to pay booking fees or unlock premium features.</div></div>
+                <div class="faq-item"><button class="faq-question">Can I withdraw wallet money? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">No, wallet credits are for platform use only.</div></div>
+                <div class="faq-item"><button class="faq-question">What if I have a dispute with my roommate? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">We encourage open communication. If it escalates, contact support for mediation advice.</div></div>
+                <div class="faq-item"><button class="faq-question">Can I review my landlord? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Yes, you can leave reviews after your stay.</div></div>
+                <div class="faq-item"><button class="faq-question">Can I review my roommate? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Yes, peer reviews help build trust in the community.</div></div>
+                <div class="faq-item"><button class="faq-question">Is my profile public? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Basic info is visible to potential roommates. Contact details are hidden until you connect.</div></div>
+                <div class="faq-item"><button class="faq-question">How do I hide my profile? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Go to Settings > Privacy and toggle "Profile Visibility".</div></div>
+                <div class="faq-item"><button class="faq-question">Can I block a user? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Yes, you can block users from your chat or their profile.</div></div>
+                <div class="faq-item"><button class="faq-question">What happens if I break a rule? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Violations can lead to warnings or account suspension.</div></div>
+                <div class="faq-item"><button class="faq-question">Do you have a newsletter? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Yes, subscribe to get updates on new listings and tips.</div></div>
+                <div class="faq-item"><button class="faq-question">Are you hiring? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Check our "Careers" page (coming soon) for openings.</div></div>
+                <div class="faq-item"><button class="faq-question">Where is your office? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">We are headquartered in Mumbai, India.</div></div>
+                <div class="faq-item"><button class="faq-question">How old is Roomies? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Roomies was founded in 2024 to solve student housing problems.</div></div>
+                <div class="faq-item"><button class="faq-question">Can I partner with Roomies? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Yes, for business partnerships, email partners@roomies.in.</div></div>
+                <div class="faq-item"><button class="faq-question">Do you support international students? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Absolutely! We help students from all over the world find homes in India.</div></div>
+                <div class="faq-item"><button class="faq-question">What languages do you support? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Currently English, but we are working on adding regional languages.</div></div>
+                <div class="faq-item"><button class="faq-question">Is there a dark mode? <i class="fas fa-chevron-down"></i></button><div class="faq-answer">Not yet, but it's on our roadmap!</div></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Accordion Logic
+        const questions = document.querySelectorAll('.faq-question');
+        
+        questions.forEach(question => {
+            question.addEventListener('click', () => {
+                const answer = question.nextElementSibling;
+                const isActive = question.classList.contains('active');
+                
+                // Close all others
+                document.querySelectorAll('.faq-question').forEach(q => {
+                    q.classList.remove('active');
+                    q.nextElementSibling.classList.remove('open');
+                });
+
+                if (!isActive) {
+                    question.classList.add('active');
+                    answer.classList.add('open');
+                }
+            });
+        });
+
+        // Search Logic
+        const searchInput = document.getElementById('faqSearch');
+        const faqItems = document.querySelectorAll('.faq-item');
+
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question').innerText.toLowerCase();
+                const answer = item.querySelector('.faq-answer').innerText.toLowerCase();
+                
+                if (question.includes(term) || answer.includes(term)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

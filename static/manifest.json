@@ -1,0 +1,61 @@
+{
+  "name": "Roomies - Student Housing Platform",
+  "short_name": "Roomies",
+  "description": "Find affordable student housing with roommate matching, flash deals, and more!",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#dc2626",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/static/images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "lifestyle"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Search Rooms",
+      "short_name": "Search",
+      "url": "/explore",
+      "icons": [
+        {
+          "src": "/static/images/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Find Roommate",
+      "short_name": "Roommate",
+      "url": "/findmate",
+      "icons": [
+        {
+          "src": "/static/images/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Flash Deals",
+      "short_name": "Deals",
+      "url": "/flash-deals",
+      "icons": [
+        {
+          "src": "/static/images/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

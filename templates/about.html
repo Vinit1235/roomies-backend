@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Roomies</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    {% include 'partials/header.html' %}
+    {% include 'partials/sidebar.html' %}
+
+    <div class="main-content" id="mainContent">
+        <section class="page-section about-page">
+            <div class="about-hero">
+                <h1>Built by student founders, scaled with university partners</h1>
+                <p>We're on a mission to make student housing transparent, affordable, and hassle-free.</p>
+            </div>
+
+            <div class="about-grid">
+                <div class="about-card">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>Campus verified</h3>
+                    <p>Every owner passes KYC and property checks. Students verify with college IDs before move-in. We maintain strict verification standards to ensure safe and genuine listings.</p>
+                </div>
+                <div class="about-card">
+                    <i class="fas fa-users"></i>
+                    <h3>Roommate chemistry</h3>
+                    <p>Our Findmates engine factors lifestyle, budgets, and study rhythms to avoid mismatches. AI-powered compatibility scoring helps you find roommates you'll actually get along with.</p>
+                </div>
+                <div class="about-card">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <h3>Nationwide roll-out</h3>
+                    <p>We currently serve Mumbai, Pune, Bengaluru and NCR with 24x7 support desks. Expanding to 15+ cities across India by 2026.</p>
+                </div>
+            </div>
+
+            <div class="mission-section">
+                <h2>Our Mission</h2>
+                <p>To eliminate brokerage fees and hidden costs from student housing, while building a trusted community where students can find safe, affordable homes and compatible roommates.</p>
+            </div>
+
+            <div class="stats-section">
+                <div class="stat-box">
+                    <h2>10,000+</h2>
+                    <p>Students Housed</p>
+                </div>
+                <div class="stat-box">
+                    <h2>500+</h2>
+                    <p>Verified Properties</p>
+                </div>
+                <div class="stat-box">
+                    <h2>4 Cities</h2>
+                    <p>Currently Operating</p>
+                </div>
+                <div class="stat-box">
+                    <h2>Zero</h2>
+                    <p>Broker Fees</p>
+                </div>
+            </div>
+
+            <div class="team-section">
+                <h2>Our Values</h2>
+                <div class="values-grid">
+                    <div class="value-item">
+                        <i class="fas fa-handshake"></i>
+                        <h4>Transparency</h4>
+                        <p>No hidden costs, no surprises</p>
+                    </div>
+                    <div class="value-item">
+                        <i class="fas fa-lock"></i>
+                        <h4>Safety First</h4>
+                        <p>Verified listings and secure payments</p>
+                    </div>
+                    <div class="value-item">
+                        <i class="fas fa-heart"></i>
+                        <h4>Student-Centric</h4>
+                        <p>Built for students, by students</p>
+                    </div>
+                    <div class="value-item">
+                        <i class="fas fa-bolt"></i>
+                        <h4>Innovation</h4>
+                        <p>AI-powered matching technology</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

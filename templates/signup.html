@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Roomies | Student Housing</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="logo">
+                <h1>🏠 Roomies</h1>
+                <p>Find Your Tribe, Find Your Home</p>
+            </div>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flash-container">
+                {% for category, message in messages %}
+                <div class="flash-message {{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            <form id="signupForm" method="POST" action="/signup">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="name" required placeholder="Arjun Patel">
+                </div>
+                
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" required placeholder="arjun@stjohn.ac.in">
+                </div>
+                
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" required placeholder="••••••••">
+                </div>
+                
+                <div class="form-group">
+                    <label>I am a</label>
+                    <div class="role-selector">
+                        <input type="radio" id="student" name="role" value="student" checked>
+                        <label for="student" class="role-card">
+                            <span>👨‍🎓</span>
+                            <strong>Student</strong>
+                            <small>Looking for rooms</small>
+                        </label>
+                        
+                        <input type="radio" id="owner" name="role" value="owner">
+                        <label for="owner" class="role-card">
+                            <span>🏠</span>
+                            <strong>Owner</strong>
+                            <small>Listing rooms</small>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group" id="collegeField">
+                    <label>College</label>
+                    <select name="college" id="collegeSelect" required>
+                        <option value="">Select College</option>
+                        <option>St. John College of Engineering Palghar</option>
+                        <option>KJ Somaiya College</option>
+                        <option>Fr. C Rodrigues Institute</option>
+                        <option>Mithibai College</option>
+                        <option>NMIMS Mumbai</option>
+                        <option>IIT Bombay</option>
+                        <option>VJTI Mumbai</option>
+                        <option>DJ Sanghvi</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn-primary">Create Account</button>
+            </form>
+            
+            <div class="auth-footer">
+                Already have an account? <a href="/login">Sign In</a>
+            </div>
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+</body>
+</html>

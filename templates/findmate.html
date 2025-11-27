@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Findmate - Roomies</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    {% include 'partials/header.html' %}
+    {% include 'partials/sidebar.html' %}
+
+    <div class="main-content" id="mainContent">
+        <section class="page-section findmate-page">
+            <div class="section-heading">
+                <div>
+                    <h1>Find Your Perfect Roommate</h1>
+                    <p>Discover rooms with available slots and connect with compatible roommates.</p>
+                </div>
+                <button class="btn-primary" id="refreshFindmates">
+                    <i class="fas fa-sync-alt"></i> Refresh Recommendations
+                </button>
+            </div>
+
+            <div class="findmate-info">
+                <div class="info-card">
+                    <i class="fas fa-users"></i>
+                    <h3>Roommate Matching</h3>
+                    <p>Find rooms where current tenants are looking for compatible roommates to fill empty slots.</p>
+                </div>
+                <div class="info-card">
+                    <i class="fas fa-home"></i>
+                    <h3>Shared Living</h3>
+                    <p>Explore apartments and houses with capacity for 2-6 people where you can share rent and make friends.</p>
+                </div>
+                <div class="info-card">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>Verified Hosts</h3>
+                    <p>All listings are from KYC-verified owners with transparent pricing and genuine availability.</p>
+                </div>
+            </div>
+
+            <div class="rooms-grid" id="findmatesGrid"></div>
+        </section>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

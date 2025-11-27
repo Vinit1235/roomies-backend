@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map Test - Roomies</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            color: #dc2626;
+        }
+        #testMap {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #dc2626;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .info {
+            background: #f3f4f6;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .success {
+            color: #10b981;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc2626;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🗺️ Map Test Page</h1>
+    <p>This page tests if the OpenStreetMap integration is working correctly.</p>
+    
+    <div id="status" class="info">
+        <strong>Status:</strong> <span id="statusText">Initializing...</span>
+    </div>
+    
+    <div id="testMap"></div>
+    
+    <div class="info">
+        <h3>Instructions:</h3>
+        <ul>
+            <li>If you see a map with markers above, the map is working! ✅</li>
+            <li>If you see a gray box, check the browser console (F12) for errors ❌</li>
+            <li>Try zooming in/out and clicking markers</li>
+        </ul>
+        <p><strong>Sample Locations:</strong></p>
+        <ul>
+            <li>📍 Andheri East PG - ₹8,500/month</li>
+            <li>📍 Malad West Hostel - ₹6,000/month</li>
+            <li>📍 Bandra Apartment - ₹12,000/month</li>
+            <li>📍 Juhu Beach Studio - ₹15,000/month</li>
+            <li>📍 Powai Lake View - ₹10,500/month</li>
+        </ul>
+    </div>
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const statusText = document.getElementById('statusText');
+        
+        try {
+            statusText.innerHTML = '<span class="success">Leaflet loaded ✓</span>';
+            
+            // Initialize map
+            const map = L.map('testMap').setView([19.076, 72.8777], 12);
+            
+            // Add OpenStreetMap tiles
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                maxZoom: 19
+            }).addTo(map);
+            
+            statusText.innerHTML = '<span class="success">Map initialized successfully! ✓</span>';
+            
+            // Add sample markers
+            const locations = [
+                { lat: 19.0760, lng: 72.8777, title: "Andheri East PG", price: "₹8,500" },
+                { lat: 19.1136, lng: 72.8697, title: "Malad West Hostel", price: "₹6,000" },
+                { lat: 19.0330, lng: 72.8569, title: "Bandra Apartment", price: "₹12,000" },
+                { lat: 19.0596, lng: 72.8295, title: "Juhu Beach Studio", price: "₹15,000" },
+                { lat: 19.1197, lng: 72.9080, title: "Powai Lake View", price: "₹10,500" },
+            ];
+            
+            locations.forEach(loc => {
+                L.marker([loc.lat, loc.lng])
+                    .bindPopup(`<strong>${loc.title}</strong><br>${loc.price}/month`)
+                    .addTo(map);
+            });
+            
+            statusText.innerHTML = '<span class="success">Map working perfectly! ✓ All 5 markers added.</span>';
+            
+            console.log('✅ Map initialized successfully with', locations.length, 'markers');
+            
+        } catch (error) {
+            statusText.innerHTML = '<span class="error">Error: ' + error.message + '</span>';
+            console.error('❌ Map initialization failed:', error);
+        }
+    </script>
+</body>
+</html>

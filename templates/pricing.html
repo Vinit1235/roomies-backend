@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing - Roomies</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <style>
+        .pricing-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        
+        .pricing-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .pricing-header h1 {
+            font-size: 2em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .pricing-header p {
+            font-size: 1em;
+            color: #7f8c8d;
+        }
+        
+        .pricing-toggle {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .toggle-button {
+            display: inline-block;
+            background: #ecf0f1;
+            border-radius: 30px;
+            padding: 5px;
+        }
+        
+        .toggle-button button {
+            padding: 10px 30px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .toggle-button button.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .pricing-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+            gap: 20px;
+        }
+        
+        .tab-btn {
+            padding: 15px 40px;
+            border: 2px solid #3498db;
+            background: white;
+            color: #3498db;
+            cursor: pointer;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 60px;
+        }
+        
+        .pricing-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px 20px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            position: relative;
+            border: 2px solid transparent;
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+        
+        .pricing-card.featured {
+            border-color: #3498db;
+            transform: scale(1.02);
+        }
+        
+        .pricing-card.featured::before {
+            content: "POPULAR";
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #3498db;
+            color: white;
+            padding: 4px 16px;
+            border-radius: 15px;
+            font-size: 0.75em;
+            font-weight: 700;
+        }
+        
+        .plan-name {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .plan-price {
+            font-size: 2em;
+            font-weight: 800;
+            color: #3498db;
+            margin-bottom: 5px;
+        }
+        
+        .plan-price .currency {
+            font-size: 0.5em;
+            vertical-align: super;
+        }
+        
+        .plan-period {
+            color: #95a5a6;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+        
+        .plan-features {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+        
+        .plan-features li {
+            padding: 8px 0;
+            color: #34495e;
+            display: flex;
+            align-items: center;
+            font-size: 0.9em;
+        }
+        
+        .plan-features li::before {
+            content: "✓";
+            color: #27ae60;
+            font-weight: 700;
+            margin-right: 8px;
+            font-size: 1.1em;
+            flex-shrink: 0;
+        }
+        
+        .plan-features li.unavailable {
+            color: #95a5a6;
+            text-decoration: line-through;
+        }
+        
+        .plan-features li.unavailable::before {
+            content: "✗";
+            color: #e74c3c;
+        }
+        
+        .subscribe-btn {
+            width: 100%;
+            padding: 12px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .subscribe-btn:hover {
+            background: #2980b9;
+        }
+        
+        .subscribe-btn.current {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+        
+        .savings-badge {
+            display: inline-block;
+            background: #27ae60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+        
+        .services-section {
+            background: #f8f9fa;
+            padding: 60px 20px;
+            margin-top: 80px;
+        }
+        
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .service-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.12);
+        }
+        
+        .service-icon {
+            font-size: 2em;
+            margin-bottom: 12px;
+        }
+        
+        .service-name {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .service-price {
+            font-size: 1.5em;
+            color: #3498db;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .service-description {
+            color: #7f8c8d;
+            line-height: 1.5;
+            font-size: 0.9em;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2em;
+            color: #2c3e50;
+            margin-bottom: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="pricing-container">
+        <!-- Header -->
+        <div class="pricing-header">
+            <h1>Choose Your Perfect Plan</h1>
+            <p>Unlock premium features and save with yearly billing</p>
+        </div>
+        
+        <!-- Billing Toggle -->
+        <div class="pricing-toggle">
+            <div class="toggle-button">
+                <button id="monthlyBtn" class="active" onclick="switchBilling('monthly')">Monthly</button>
+                <button id="yearlyBtn" onclick="switchBilling('yearly')">Yearly <span class="savings-badge">Save 20%</span></button>
+            </div>
+        </div>
+        
+        <!-- User Type Tabs -->
+        <div class="pricing-tabs">
+            <button class="tab-btn active" onclick="switchTab('student')">For Students</button>
+            <button class="tab-btn" onclick="switchTab('owner')">For Owners</button>
+        </div>
+        
+        <!-- Pricing Cards -->
+        <div id="pricingGrid" class="pricing-grid">
+            <!-- Will be populated by JavaScript -->
+        </div>
+    </div>
+    
+    <!-- Value-Added Services -->
+    <div class="services-section">
+        <h2 class="section-title">📦 Value-Added Services</h2>
+        <div id="servicesGrid" class="services-grid">
+            <!-- Will be populated by JavaScript -->
+        </div>
+    </div>
+    
+    <script>
+        let currentUserType = 'student';
+        let currentBilling = 'monthly';
+        let plans = [];
+        let services = [];
+        
+        // Load subscription plans
+        async function loadPlans() {
+            try {
+                const response = await fetch(`/api/subscription-plans?user_type=${currentUserType}`);
+                plans = await response.json();
+                renderPricingCards();
+            } catch (error) {
+                console.error('Error loading plans:', error);
+            }
+        }
+        
+        // Load services
+        async function loadServices() {
+            try {
+                const response = await fetch('/api/services');
+                const data = await response.json();
+                services = data.services;
+                renderServices();
+            } catch (error) {
+                console.error('Error loading services:', error);
+            }
+        }
+        
+        // Switch billing cycle
+        function switchBilling(billing) {
+            currentBilling = billing;
+            document.getElementById('monthlyBtn').classList.toggle('active', billing === 'monthly');
+            document.getElementById('yearlyBtn').classList.toggle('active', billing === 'yearly');
+            renderPricingCards();
+        }
+        
+        // Switch user type tab
+        function switchTab(userType) {
+            currentUserType = userType;
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            loadPlans();
+        }
+        
+        // Render pricing cards
+        function renderPricingCards() {
+            const grid = document.getElementById('pricingGrid');
+            grid.innerHTML = '';
+            
+            const sortedPlans = (plans.plans || []).sort((a, b) => a.display_order - b.display_order);
+            
+            sortedPlans.forEach((plan, index) => {
+                const price = currentBilling === 'monthly' ? plan.price_monthly : plan.price_yearly;
+                const isFeatured = index === 1; // Middle plan is featured
+                
+                const card = document.createElement('div');
+                card.className = `pricing-card ${isFeatured ? 'featured' : ''}`;
+                
+                const features = typeof plan.features === 'string' ? JSON.parse(plan.features) : plan.features;
+                
+                card.innerHTML = `
+                    <div class="plan-name">${plan.name}</div>
+                    <div class="plan-price">
+                        <span class="currency">₹</span>${price.toLocaleString()}
+                    </div>
+                    <div class="plan-period">per ${currentBilling === 'monthly' ? 'month' : 'year'}</div>
+                    
+                    <ul class="plan-features">
+                        ${Object.entries(features).map(([key, value]) => `
+                            <li ${value === false ? 'class="unavailable"' : ''}>
+                                ${formatFeature(key, value)}
+                            </li>
+                        `).join('')}
+                        ${plan.commission_discount > 0 ? `
+                            <li><strong>${plan.commission_discount}% Commission Discount</strong></li>
+                        ` : ''}
+                    </ul>
+                    
+                    <button class="subscribe-btn" onclick="subscribeToPlan(${plan.id}, '${currentBilling}')">
+                        ${price === 0 ? 'Get Started Free' : 'Subscribe Now'}
+                    </button>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+        
+        // Format feature text
+        function formatFeature(key, value) {
+            const labels = {
+                property_inquiries: 'Property Inquiries',
+                saved_properties: 'Saved Properties',
+                chat_support: 'Chat Support',
+                priority_responses: 'Priority Responses',
+                move_in_assistance: 'Move-in Assistance',
+                verified_listings: 'Verified Listings Only',
+                virtual_tours: 'Virtual Tours',
+                dedicated_support: '24/7 Dedicated Support',
+                active_listings: 'Active Listings',
+                commission_rate: 'Commission Rate',
+                listing_fee_required: 'Listing Fee Required',
+                featured_listings: 'Featured Listings',
+                analytics_dashboard: 'Analytics Dashboard',
+                priority_support: 'Priority Support',
+                auto_promotion: 'Auto Promotion',
+                dedicated_account_manager: 'Dedicated Account Manager',
+                advanced_analytics: 'Advanced Analytics',
+                bulk_operations: 'Bulk Operations'
+            };
+            
+            const label = labels[key] || key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            
+            if (typeof value === 'boolean') {
+                return label;
+            } else if (typeof value === 'number') {
+                return `${label}: ${value}${key.includes('rate') ? '%' : ''}`;
+            } else {
+                return `${value} ${label}`;
+            }
+        }
+        
+        // Subscribe to plan
+        async function subscribeToPlan(planId, billingCycle) {
+            if (!confirm('Proceed to payment?')) return;
+            
+            try {
+                const response = await fetch('/api/subscriptions/subscribe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        plan_id: planId,
+                        billing_cycle: billingCycle
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`Subscription created! Amount: ₹${result.amount}\\n\\nIn production, Razorpay payment gateway will be shown here.`);
+                    // TODO: Integrate Razorpay payment gateway
+                    // TODO: After payment, call /api/subscriptions/activate/<id>
+                } else {
+                    alert(result.error || 'Failed to create subscription');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            }
+        }
+        
+        // Render services
+        function renderServices() {
+            const grid = document.getElementById('servicesGrid');
+            grid.innerHTML = '';
+            
+            const serviceIcons = {
+                photography: '📸',
+                verification: '✅',
+                legal: '⚖️',
+                moving: '🚚',
+                consultation: '💼'
+            };
+            
+            services.forEach(service => {
+                const card = document.createElement('div');
+                card.className = 'service-card';
+                
+                card.innerHTML = `
+                    <div class="service-icon">${serviceIcons[service.service_type] || '🔧'}</div>
+                    <div class="service-name">${service.service_name}</div>
+                    <div class="service-price">₹${service.price.toLocaleString()}</div>
+                    <div class="service-description">${service.description}</div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPlans();
+            loadServices();
+        });
+    </script>
+</body>
+</html>

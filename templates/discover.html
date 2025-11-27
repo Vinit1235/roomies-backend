@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discover - Roomies</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    {% include 'partials/header.html' %}
+    {% include 'partials/sidebar.html' %}
+
+    <div class="main-content" id="mainContent">
+        <section class="page-section discover-page">
+            <div class="section-heading">
+                <div>
+                    <h1>Discover Premium Accommodations</h1>
+                    <p>Hand-picked premium listings from our verified partner properties across major cities.</p>
+                </div>
+            </div>
+
+            <div class="discover-grid">
+                <div class="discover-card featured">
+                    <div class="discover-image" style="background-image: url('https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800')"></div>
+                    <div class="discover-badge">Featured</div>
+                    <div class="discover-content">
+                        <h3>Luxury Student Apartments</h3>
+                        <p>Premium furnished apartments near top colleges with all amenities included. Modern interiors, high-speed WiFi, and 24/7 security.</p>
+                        <a href="/explore" class="discover-link">Explore Now →</a>
+                    </div>
+                </div>
+                <div class="discover-card">
+                    <div class="discover-image" style="background-image: url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800')"></div>
+                    <div class="discover-content">
+                        <h3>Co-living Spaces</h3>
+                        <p>Modern co-living with community events and networking opportunities. Perfect for social students.</p>
+                        <a href="/explore" class="discover-link">View Spaces →</a>
+                    </div>
+                </div>
+                <div class="discover-card">
+                    <div class="discover-image" style="background-image: url('https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800')"></div>
+                    <div class="discover-content">
+                        <h3>Budget-Friendly Hostels</h3>
+                        <p>Affordable hostel rooms perfect for students on a tight budget without compromising on quality.</p>
+                        <a href="/explore" class="discover-link">Browse Hostels →</a>
+                    </div>
+                </div>
+                <div class="discover-card">
+                    <div class="discover-image" style="background-image: url('https://images.unsplash.com/photo-1486304873000-235643847519?w=800')"></div>
+                    <div class="discover-content">
+                        <h3>Girls-Only PG</h3>
+                        <p>Safe and secure paying guest accommodations exclusively for female students with strict security protocols.</p>
+                        <a href="/explore" class="discover-link">View Listings →</a>
+                    </div>
+                </div>
+                <div class="discover-card">
+                    <div class="discover-image" style="background-image: url('https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=800')"></div>
+                    <div class="discover-content">
+                        <h3>Private Studios</h3>
+                        <p>Independent studio apartments for students who value privacy and personal space.</p>
+                        <a href="/explore" class="discover-link">Explore Studios →</a>
+                    </div>
+                </div>
+                <div class="discover-card">
+                    <div class="discover-image" style="background-image: url('https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800')"></div>
+                    <div class="discover-content">
+                        <h3>Campus Residences</h3>
+                        <p>On-campus and near-campus housing options within walking distance of your college.</p>
+                        <a href="/explore" class="discover-link">Find Near Me →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

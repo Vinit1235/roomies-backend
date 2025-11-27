@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ room.title }} - Roomies</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="/_sdk/data_sdk.js"></script>
+  <!-- Leaflet CSS and JS for OpenStreetMap -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.5;
+            color: #222222;
+            background: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid #e5e7eb;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-weight: 600;
+            font-size: 24px;
+            color: #ff385c;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: #111827;
+        }
+
+        /* Room Details Container */
+        .room-container {
+            max-width: 1120px;
+            margin: 100px auto 40px;
+            padding: 0 24px;
+        }
+
+        .room-header {
+            margin-bottom: 24px;
+        }
+
+        .room-title {
+            font-size: 26px;
+            font-weight: 600;
+            color: #222222;
+            margin-bottom: 8px;
+        }
+
+        .room-meta {
+            display: flex;
+            gap: 16px;
+            color: #717171;
+            font-size: 14px;
+            align-items: center;
+        }
+
+        .room-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Image Gallery */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            grid-template-rows: 200px 200px;
+            gap: 8px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 32px;
+        }
+
+        .gallery-item {
+            background-color: #f0f0f0;
+            background-size: cover;
+            background-position: center;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .gallery-item:hover {
+            opacity: 0.9;
+        }
+
+        .gallery-main {
+            grid-column: 1 / 2;
+            grid-row: 1 / 3;
+            height: 100%;
+        }
+
+        /* Content Layout */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 48px;
+        }
+
+        .room-info h2 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #dddddd;
+        }
+
+        .host-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #dddddd;
+            margin-bottom: 24px;
+        }
+
+        .host-details h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 0 4px 0;
+        }
+
+        .host-details p {
+            color: #717171;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .amenities-section {
+            padding-bottom: 24px;
+            border-bottom: 1px solid #dddddd;
+            margin-bottom: 24px;
+        }
+
+        .amenities-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .amenity-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #222222;
+        }
+
+        /* Booking Card */
+        .booking-card {
+            position: sticky;
+            top: 100px;
+            border: 1px solid #dddddd;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+            background: white;
+        }
+
+        .price-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 24px;
+        }
+
+        .price-amount {
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .price-period {
+            font-size: 16px;
+            color: #717171;
+            font-weight: 400;
+        }
+
+        .booking-btn {
+            width: 100%;
+            background: #ff385c;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-bottom: 16px;
+        }
+
+        .booking-btn:hover {
+            background: #e31c5f;
+        }
+
+        .booking-info {
+            text-align: center;
+            color: #717171;
+            font-size: 14px;
+        }
+
+        /* Map Section */
+        .map-section {
+            margin-top: 48px;
+            padding-top: 48px;
+            border-top: 1px solid #dddddd;
+        }
+
+        #map {
+            height: 400px;
+            width: 100%;
+            border-radius: 12px;
+            margin-top: 24px;
+            z-index: 1;
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .gallery-grid {
+                grid-template-columns: 1fr;
+                grid-template-rows: 250px;
+            }
+            
+            .gallery-item:not(.gallery-main) {
+                display: none;
+            }
+        }
+  </style>
+ </head>
+ <body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <span style="font-size: 24px;">🏠</span> Roomies
+            </a>
+            <div class="nav-links">
+                <a href="/explore">Explore</a>
+                <a href="/login">Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="room-container">
+        <!-- Header -->
+        <div class="room-header">
+            <h1 class="room-title">{{ room.title }}</h1>
+            <div class="room-meta">
+                <span>📍 {{ room.location }}</span>
+                <span>🎓 Near {{ room.college_nearby }}</span>
+                <span>🏠 {{ room.property_type|title }}</span>
+            </div>
+        </div>
+
+        <!-- Gallery -->
+        <div class="gallery-grid">
+            {% set images = room.images.split(',') if room.images else [] %}
+            {% set main_image = images[0] if images else 'https://placehold.co/800x600?text=No+Image' %}
+            
+            <div class="gallery-item gallery-main" style="background-image: url('{{ main_image }}')"></div>
+            
+            {% for img in images[1:3] %}
+                <div class="gallery-item" style="background-image: url('{{ img }}')"></div>
+            {% endfor %}
+            
+            {% if images|length < 2 %}
+                <div class="gallery-item" style="background-image: url('https://placehold.co/400x300?text=Roomies')"></div>
+                <div class="gallery-item" style="background-image: url('https://placehold.co/400x300?text=Roomies')"></div>
+            {% endif %}
+        </div>
+
+        <div class="content-grid">
+            <!-- Left Column: Details -->
+            <div class="room-info">
+                <div class="host-info">
+                    <div class="host-details">
+                        <h3>Hosted by {{ room.owner.name }}</h3>
+                        <p>{% if room.verified %}Verified Listing ✅{% else %}Unverified Listing ⚠️{% endif %}</p>
+                    </div>
+                    <div style="width: 48px; height: 48px; background: #222; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600;">
+                        {{ room.owner.name[0] }}
+                    </div>
+                </div>
+
+                <div class="amenities-section">
+                    <h2>What this place offers</h2>
+                    <div class="amenities-grid">
+                        {% if room.amenities %}
+                            {% for amenity in room.amenities.split(',') %}
+                                <div class="amenity-item">✓ {{ amenity.strip() }}</div>
+                            {% endfor %}
+                        {% else %}
+                            <p>No specific amenities listed.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="description-section">
+                    <h2>About this place</h2>
+                    <p>
+                        Located near {{ room.college_nearby }}, this {{ room.property_type }} accommodation offers a comfortable stay for students.
+                        With a total capacity of {{ room.capacity_total }} students, currently {{ room.capacity_occupied }} spots are occupied.
+                        {{ room.available_slots }} spots available!
+                    </p>
+                </div>
+
+                <!-- Map -->
+                <div class="map-section">
+                    <h2>Where you'll be</h2>
+                    <div id="map"></div>
+                </div>
+            </div>
+
+            <!-- Right Column: Booking Card -->
+            <div class="booking-sidebar">
+                <div class="booking-card">
+                    <div class="price-header">
+                        <div>
+                            <span class="price-amount">₹{{ room.price }}</span>
+                            <span class="price-period">/ month</span>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 16px; border: 1px solid #ddd; border-radius: 8px; padding: 12px;">
+                        <div style="font-size: 12px; font-weight: 600; margin-bottom: 4px;">AVAILABILITY</div>
+                        <div>{{ room.available_slots }} slots left</div>
+                    </div>
+
+                    <button class="booking-btn" id="reserveBtn">Reserve</button>
+                    
+                    <p class="booking-info">You won't be charged yet</p>
+                    
+                    <div style="margin-top: 16px; display: flex; justify-content: space-between; color: #717171;">
+                        <span>Security Deposit</span>
+                        <span>₹{{ room.price * 2 }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Reserve/Book Button Handler
+        document.getElementById('reserveBtn').addEventListener('click', async function() {
+            // Check if user is logged in
+            {% if current_user.is_authenticated %}
+                // Check if user is a student
+                {% if current_user.role == 'student' %}
+                    // Create booking
+                    const confirmed = confirm('Reserve this room for ₹{{ room.price }}/month?\n\n✅ Simulated Flow:\n1. Pay ₹999 booking fee\n2. Send request to owner\n3. Auto-approve by owner\n4. Complete full payment\n5. Sign contract\n\nProceed?');
+                    
+                    if (!confirmed) return;
+                    
+                    const btn = document.getElementById('reserveBtn');
+                    const originalText = btn.textContent;
+                    btn.disabled = true;
+                    btn.textContent = 'Step 1/5: Creating booking...';
+                    
+                    try {
+                        // STEP 1: Create booking
+                        console.log('Step 1: Creating booking...');
+                        const createResponse = await fetch('/api/bookings/create', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                room_id: {{ room.id }},
+                                move_in_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                                contract_duration_months: 11
+                            })
+                        });
+                        
+                        const createResult = await createResponse.json();
+                        console.log('Create result:', createResult);
+                        
+                        if (!createResponse.ok || !createResult.success) {
+                            throw new Error(createResult.error || 'Failed to create booking');
+                        }
+                        
+                        const bookingId = createResult.booking.id;
+                        
+                        // STEP 2: Pay booking fee (₹999)
+                        btn.textContent = 'Step 2/5: Paying ₹999...';
+                        console.log('Step 2: Paying booking fee...');
+                        await sleep(500);
+                        
+                        const payResponse = await fetch(`/api/bookings/${bookingId}/pay-booking-fee`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                razorpay_payment_id: 'sim_pay_' + Date.now(),
+                                razorpay_signature: 'sim_sig_' + Date.now()
+                            })
+                        });
+                        
+                        const payResult = await payResponse.json();
+                        console.log('Payment result:', payResult);
+                        
+                        if (!payResponse.ok || !payResult.success) {
+                            throw new Error(payResult.error || 'Payment failed');
+                        }
+                        
+                        // Success!
+                        alert('✅ Booking Successful!\n\n' +
+                              'Step 1: ✓ Booking created\n' +
+                              'Step 2: ✓ Paid ₹999 booking fee\n\n' +
+                              'Your request has been sent to the owner.\n' +
+                              'You will be notified when they respond.\n\n' +
+                              'Redirecting to home page...');
+                        
+                        window.location.href = '/';
+                        
+                    } catch (error) {
+                        console.error('Booking error:', error);
+                        btn.disabled = false;
+                        btn.textContent = originalText;
+                        alert('❌ Error: ' + error.message + '\n\nCheck console (F12) for details.');
+                    }
+                {% else %}
+                    alert('Only students can book rooms. You are logged in as an owner.');
+                {% endif %}
+            {% else %}
+                // Redirect to login
+                if (confirm('Please login to reserve this room.\n\nClick OK to go to login page.')) {
+                    window.location.href = '/login';
+                }
+            {% endif %}
+        });
+        
+        // Helper: Sleep function
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        // Initialize Map
+        {% if room.latitude and room.longitude %}
+            var map = L.map('map').setView([{{ room.latitude }}, {{ room.longitude }}], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+            
+            L.marker([{{ room.latitude }}, {{ room.longitude }}]).addTo(map)
+                .bindPopup("<b>{{ room.title }}</b><br>{{ room.location }}")
+                .openPopup();
+        {% else %}
+            document.getElementById('map').innerHTML = '<div style="height:100%; display:flex; align-items:center; justify-content:center; background:#f0f0f0; color:#666;">Map location not available</div>';
+        {% endif %}
+    </script>
+
+ </body>
+</html>

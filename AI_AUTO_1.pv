@@ -1,0 +1,47 @@
+import requests
+
+# Configuration
+N8N_WEBHOOK_BASE = "http://localhost:5678/webhook"  # Change when deployed
+
+# 1. ID Verification Webhook
+@app.route('/api/verify-document', methods=['POST'])
+def trigger_verification():
+    data = {
+        'user_id': request.json['user_id'],
+        'user_name': request.json['user_name'],
+        'document_url': request.json['document_url'],
+        'email': request.json['email']
+    }
+    
+    # Trigger n8n workflow
+    response = requests.post(f"{N8N_WEBHOOK_BASE}/verify-id", json=data)
+    return jsonify({'status': 'verification_initiated'})
+
+# 2. Roommate Matching Webhook
+@app.route('/api/trigger-matching', methods=['POST'])
+def trigger_matching():
+    data = {
+        'student_id': request.json['student_id'],
+        'student_name': request.json['student_name'],
+        'student_tags': request.json['tags'],
+        'student_email': request.json['email']
+    }
+    
+    response = requests.post(f"{N8N_WEBHOOK_BASE}/match-roommates", json=data)
+    return jsonify({'status': 'matching_initiated'})
+
+# 3. Listing Optimization Webhook
+@app.route('/api/trigger-listing-optimizer', methods=['POST'])
+def trigger_optimizer():
+    data = {
+        'owner_id': request.json['owner_id'],
+        'owner_email': request.json['owner_email'],
+        'listing_id': request.json['listing_id'],
+        'title': request.json['title'],
+        'description': request.json['description'],
+        'price': request.json['price'],
+        'location': request.json['location']
+    }
+    
+    response = requests.post(f"{N8N_WEBHOOK_BASE}/optimize-listing", json=data)
+    return jsonify({'status': 'optimization_initiated'})

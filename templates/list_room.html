@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List Your Property - Roomies</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8fafc;
+        }
+        .listing-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .listing-card {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .form-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .form-header h1 {
+            font-size: 2rem;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+        .form-header p {
+            color: #64748b;
+        }
+        .form-section {
+            margin-bottom: 32px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .form-section:last-child {
+            border-bottom: none;
+        }
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+        label {
+            display: block;
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #ff385c;
+            box-shadow: 0 0 0 3px rgba(255, 56, 92, 0.1);
+        }
+        .helper-text {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: #ff385c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .submit-btn:hover {
+            background: #e31c5f;
+        }
+        .amenities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+        }
+        .amenity-checkbox {
+            display: none;
+        }
+        .amenity-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+        .amenity-checkbox:checked + .amenity-label {
+            background: #fff1f2;
+            border-color: #ff385c;
+            color: #ff385c;
+        }
+        
+        @media (max-width: 640px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include 'partials/header.html' %}
+    {% include 'partials/sidebar.html' %}
+
+    <div class="main-content" style="padding-top: 80px;">
+        <div class="listing-container">
+            <div class="listing-card">
+                <div class="form-header">
+                    <h1>List Your Property</h1>
+                    <p>Reach thousands of students looking for accommodation</p>
+                </div>
+
+                <form id="listingForm">
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-home"></i> Property Details
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label for="title">Property Title</label>
+                                <input type="text" id="title" name="title" placeholder="e.g. Sunny 2BHK near IIT Bombay" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="property_type">Property Type</label>
+                                <select id="property_type" name="property_type" required>
+                                    <option value="hostel">Hostel</option>
+                                    <option value="pg">PG (Paying Guest)</option>
+                                    <option value="flat">Flat / Apartment</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="price">Monthly Rent (₹)</label>
+                                <input type="number" id="price" name="price" placeholder="e.g. 15000" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="capacity_total">Total Capacity (Beds)</label>
+                                <input type="number" id="capacity_total" name="capacity_total" value="1" min="1" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="capacity_occupied">Occupied Beds</label>
+                                <input type="number" id="capacity_occupied" name="capacity_occupied" value="0" min="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-map-marker-alt"></i> Location
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label for="location">Address / Area</label>
+                                <input type="text" id="location" name="location" placeholder="e.g. Powai, Mumbai" required>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="college">Nearby College</label>
+                                <input type="text" id="college" name="college" placeholder="e.g. IIT Bombay" required>
+                                <p class="helper-text">This helps students find properties near their campus</p>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="latitude">Latitude (Optional)</label>
+                                <input type="text" id="latitude" name="latitude" placeholder="e.g. 19.0760">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="longitude">Longitude (Optional)</label>
+                                <input type="text" id="longitude" name="longitude" placeholder="e.g. 72.8777">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-concierge-bell"></i> Amenities
+                        </div>
+                        <div class="amenities-grid">
+                            <label>
+                                <input type="checkbox" name="amenities" value="WiFi" class="amenity-checkbox">
+                                <span class="amenity-label"><i class="fas fa-wifi"></i> WiFi</span>
+                            </label>
+                            <label>
+                                <input type="checkbox" name="amenities" value="AC" class="amenity-checkbox">
+                                <span class="amenity-label"><i class="fas fa-snowflake"></i> AC</span>
+                            </label>
+                            <label>
+                                <input type="checkbox" name="amenities" value="Food" class="amenity-checkbox">
+                                <span class="amenity-label"><i class="fas fa-utensils"></i> Food</span>
+                            </label>
+                            <label>
+                                <input type="checkbox" name="amenities" value="Laundry" class="amenity-checkbox">
+                                <span class="amenity-label"><i class="fas fa-tshirt"></i> Laundry</span>
+                            </label>
+                            <label>
+                                <input type="checkbox" name="amenities" value="Security" class="amenity-checkbox">
+                                <span class="amenity-label"><i class="fas fa-shield-alt"></i> Security</span>
+                            </label>
+                            <label>
+                                <input type="checkbox" name="amenities" value="Power Backup" class="amenity-checkbox">
+                                <span class="amenity-label"><i class="fas fa-bolt"></i> Power Backup</span>
+                            </label>
+                            <label>
+                                <input type="checkbox" name="amenities" value="Cleaning" class="amenity-checkbox">
+                                <span class="amenity-label"><i class="fas fa-broom"></i> Cleaning</span>
+                            </label>
+                            <label>
+                                <input type="checkbox" name="amenities" value="TV" class="amenity-checkbox">
+                                <span class="amenity-label"><i class="fas fa-tv"></i> TV</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-images"></i> Photos
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="images">Image URLs (Comma separated)</label>
+                            <textarea id="images" name="images" rows="3" placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"></textarea>
+                            <p class="helper-text">For now, please provide direct links to images.</p>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Publish Listing</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('listingForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = this.querySelector('.submit-btn');
+            const originalText = submitBtn.innerText;
+            submitBtn.innerText = 'Publishing...';
+            submitBtn.disabled = true;
+
+            // Collect form data
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Handle amenities (checkboxes)
+            const amenities = Array.from(document.querySelectorAll('input[name="amenities"]:checked'))
+                .map(cb => cb.value)
+                .join(', ');
+            data.amenities = amenities;
+
+            // Handle images
+            if (data.images) {
+                data.images = data.images.split(',').map(url => url.trim()).filter(url => url);
+            } else {
+                data.images = [];
+            }
+
+            try {
+                const response = await fetch('/api/owner/listings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Listing published successfully!');
+                    window.location.href = '/room/' + result.id;
+                } else {
+                    alert('Error: ' + (result.error || 'Failed to publish listing'));
+                    if (response.status === 403) {
+                        // Redirect to login if not authorized
+                        window.location.href = '/login';
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An unexpected error occurred.');
+            } finally {
+                submitBtn.innerText = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Verified - Roomies</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .verification-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .verification-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .verification-header i {
+            font-size: 4rem;
+            color: #dc2626;
+            margin-bottom: 1rem;
+        }
+        
+        .verification-header h1 {
+            margin: 0.5rem 0;
+            color: #1f2937;
+        }
+        
+        .verification-header p {
+            color: #6b7280;
+            font-size: 1rem;
+        }
+        
+        .verification-status {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .verification-status.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .verification-status.verified {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .verification-status.rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .upload-section {
+            margin: 2rem 0;
+        }
+        
+        .upload-section h3 {
+            margin-bottom: 1rem;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .file-upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+        
+        .file-upload-area:hover {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+        
+        .file-upload-area.dragover {
+            border-color: #dc2626;
+            background: #fee2e2;
+        }
+        
+        .file-upload-area i {
+            font-size: 3rem;
+            color: #9ca3af;
+            margin-bottom: 1rem;
+        }
+        
+        .file-upload-area input[type="file"] {
+            display: none;
+        }
+        
+        .file-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: #f3f4f6;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .file-item i {
+            color: #dc2626;
+        }
+        
+        .file-item button {
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+        
+        .file-item button:hover {
+            color: #dc2626;
+        }
+        
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        
+        .info-box ul {
+            margin: 0.5rem 0 0 1.5rem;
+            color: #1e40af;
+        }
+        
+        .btn-submit {
+            width: 100%;
+            padding: 1rem;
+            background: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .btn-submit:hover {
+            background: #b91c1c;
+        }
+        
+        .btn-submit:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    {% include 'partials/header.html' %}
+    {% include 'partials/sidebar.html' %}
+
+    <div class="main-content" id="mainContent">
+        <div class="verification-container">
+            <div class="verification-header">
+                <i class="fas fa-shield-alt"></i>
+                <h1>Get Verified</h1>
+                <p>Upload your documents to verify your account and gain trust from the community</p>
+            </div>
+
+            <!-- Verification Status -->
+            {% if verification_status %}
+                {% if verification_status == 'pending' %}
+                <div class="verification-status pending" id="verificationStatus">
+                    <i class="fas fa-clock"></i>
+                    <div>
+                        <strong>Verification Pending</strong>
+                        <p style="margin: 0.25rem 0 0 0; font-size: 0.9rem;">Your documents are under review. We'll notify you within 24-48 hours.</p>
+                    </div>
+                    <button onclick="checkVerificationStatus()" style="margin-left: auto; padding: 0.5rem 1rem; background: #f59e0b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                        <i class="fas fa-sync-alt"></i> Check Status
+                    </button>
+                </div>
+                {% elif verification_status == 'verified' %}
+                <div class="verification-status verified">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <strong>Account Verified!</strong>
+                        <p style="margin: 0.25rem 0 0 0; font-size: 0.9rem;">Your account is verified. You can now access all features.</p>
+                    </div>
+                </div>
+                {% elif verification_status == 'rejected' %}
+                <div class="verification-status rejected">
+                    <i class="fas fa-times-circle"></i>
+                    <div>
+                        <strong>Verification Rejected</strong>
+                        <p style="margin: 0.25rem 0 0 0; font-size: 0.9rem;">{{ rejection_reason or 'Please upload clear, valid documents and try again.' }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            {% endif %}
+
+            <form id="verificationForm" method="POST" action="/api/verification/upload" enctype="multipart/form-data">
+                <!-- Student ID Card (Students Only) -->
+                {% if current_user.role == 'student' %}
+                <div class="upload-section">
+                    <h3><i class="fas fa-id-card"></i> Student ID Card</h3>
+                    <div class="info-box">
+                        <strong>Requirements:</strong>
+                        <ul>
+                            <li>Clear photo of your college ID card</li>
+                            <li>Name and college must be visible</li>
+                            <li>Valid for current academic year</li>
+                        </ul>
+                    </div>
+                    <div class="file-upload-area" data-input="studentId">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p><strong>Click to upload</strong> or drag and drop</p>
+                        <p style="font-size: 0.85rem; color: #6b7280;">PNG, JPG or PDF (max 5MB)</p>
+                        <input type="file" name="student_id" id="studentId" accept="image/*,.pdf">
+                    </div>
+                    <div class="file-preview" id="preview-studentId"></div>
+                </div>
+
+                <!-- College Admission Letter / Bonafide (Students Only) -->
+                <div class="upload-section">
+                    <h3><i class="fas fa-graduation-cap"></i> College Letter (Optional but Recommended)</h3>
+                    <div class="info-box">
+                        <strong>Accepted Documents:</strong>
+                        <ul>
+                            <li>Admission letter</li>
+                            <li>Bonafide certificate</li>
+                            <li>Fee receipt</li>
+                        </ul>
+                    </div>
+                    <div class="file-upload-area" data-input="collegeLetter">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p><strong>Click to upload</strong> or drag and drop</p>
+                        <p style="font-size: 0.85rem; color: #6b7280;">PNG, JPG or PDF (max 5MB)</p>
+                        <input type="file" name="college_letter" id="collegeLetter" accept="image/*,.pdf">
+                    </div>
+                    <div class="file-preview" id="preview-collegeLetter"></div>
+                </div>
+                {% endif %}
+
+                <!-- Government ID (All Users) -->
+                <div class="upload-section">
+                    <h3><i class="fas fa-id-badge"></i> Government ID</h3>
+                    <div class="info-box">
+                        <strong>Accepted IDs:</strong>
+                        <ul>
+                            <li>Aadhaar Card</li>
+                            <li>PAN Card</li>
+                            <li>Passport</li>
+                            <li>Driving License</li>
+                        </ul>
+                    </div>
+                    <div class="file-upload-area" data-input="govId">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p><strong>Click to upload</strong> or drag and drop</p>
+                        <p style="font-size: 0.85rem; color: #6b7280;">PNG, JPG or PDF (max 5MB)</p>
+                        <input type="file" name="gov_id" id="govId" accept="image/*,.pdf">
+                    </div>
+                    <div class="file-preview" id="preview-govId"></div>
+                </div>
+
+                <!-- Electricity Bill (Owners Only) -->
+                {% if current_user.role == 'owner' %}
+                <div class="upload-section">
+                    <h3><i class="fas fa-file-invoice"></i> Electricity Bill</h3>
+                    <div class="info-box">
+                        <strong>Requirements:</strong>
+                        <ul>
+                            <li>Recent electricity bill (within last 3 months)</li>
+                            <li>Property address must be clearly visible</li>
+                            <li>Bill must show your name as owner/tenant</li>
+                        </ul>
+                    </div>
+                    <div class="file-upload-area" data-input="electricityBill">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p><strong>Click to upload</strong> or drag and drop</p>
+                        <p style="font-size: 0.85rem; color: #6b7280;">PNG, JPG or PDF (max 5MB)</p>
+                        <input type="file" name="electricity_bill" id="electricityBill" accept="image/*,.pdf">
+                    </div>
+                    <div class="file-preview" id="preview-electricityBill"></div>
+                </div>
+                {% endif %}
+
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    <i class="fas fa-check-circle"></i> Submit for Verification
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // File upload handling
+        document.querySelectorAll('.file-upload-area').forEach(area => {
+            const inputId = area.getAttribute('data-input');
+            const input = document.getElementById(inputId);
+            const preview = document.getElementById('preview-' + inputId);
+            
+            // Click to upload
+            area.addEventListener('click', () => input.click());
+            
+            // Drag and drop
+            area.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                area.classList.add('dragover');
+            });
+            
+            area.addEventListener('dragleave', () => {
+                area.classList.remove('dragover');
+            });
+            
+            area.addEventListener('drop', (e) => {
+                e.preventDefault();
+                area.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    input.files = files;
+                    displayFilePreview(input, preview);
+                }
+            });
+            
+            // File selection
+            input.addEventListener('change', () => {
+                displayFilePreview(input, preview);
+            });
+        });
+        
+        function displayFilePreview(input, preview) {
+            preview.innerHTML = '';
+            if (input.files.length > 0) {
+                const file = input.files[0];
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <i class="fas fa-file-alt"></i>
+                    <span>${file.name} (${formatFileSize(file.size)})</span>
+                    <button type="button" onclick="clearFile('${input.id}')"><i class="fas fa-times"></i></button>
+                `;
+                preview.appendChild(fileItem);
+            }
+        }
+        
+        function clearFile(inputId) {
+            const input = document.getElementById(inputId);
+            const preview = document.getElementById('preview-' + inputId);
+            input.value = '';
+            preview.innerHTML = '';
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+        
+        // Form submission
+        document.getElementById('verificationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const userRole = '{{ current_user.role }}';
+            
+            // Get file inputs based on role
+            let studentId, govId, electricityBill;
+            
+            if (userRole === 'student') {
+                studentId = document.getElementById('studentId').files[0];
+                govId = document.getElementById('govId').files[0];
+                
+                // Validation for students
+                if (!studentId) {
+                    alert('Please upload your Student ID Card');
+                    return;
+                }
+                
+                if (!govId) {
+                    alert('Please upload a Government ID');
+                    return;
+                }
+                
+                // Check file sizes
+                if (studentId.size > 5 * 1024 * 1024 || govId.size > 5 * 1024 * 1024) {
+                    alert('File size must be less than 5MB');
+                    return;
+                }
+            } else {
+                // Owner validation
+                govId = document.getElementById('govId').files[0];
+                electricityBill = document.getElementById('electricityBill').files[0];
+                
+                if (!govId) {
+                    alert('Please upload a Government ID');
+                    return;
+                }
+                
+                if (!electricityBill) {
+                    alert('Please upload an Electricity Bill');
+                    return;
+                }
+                
+                // Check file sizes
+                if (govId.size > 5 * 1024 * 1024 || electricityBill.size > 5 * 1024 * 1024) {
+                    alert('File size must be less than 5MB');
+                    return;
+                }
+            }
+            
+            // Submit form
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+            
+            const formData = new FormData(e.target);
+            
+            try {
+                const response = await fetch('/api/verification/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert('Documents uploaded successfully! We will review them within 24-48 hours.');
+                    
+                    // Check if auto-verified
+                    if (result.verification_status === 'verified') {
+                        alert('🎉 Auto-verified! Your account has been verified instantly.');
+                    }
+                    
+                    window.location.reload();
+                } else {
+                    alert(result.error || 'Upload failed. Please try again.');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-check-circle"></i> Submit for Verification';
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                alert('Network error. Please check your connection and try again.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-check-circle"></i> Submit for Verification';
+            }
+        });
+        
+        // Check verification status
+        async function checkVerificationStatus() {
+            try {
+                const response = await fetch('/api/verification/status');
+                const result = await response.json();
+                
+                if (response.ok) {
+                    const statusDiv = document.getElementById('verificationStatus');
+                    
+                    if (result.status === 'verified') {
+                        // Verified! Reload page to show green banner
+                        alert('✅ Verification Approved! Your account is now verified.');
+                        window.location.reload();
+                    } else if (result.status === 'rejected') {
+                        alert('❌ Verification Rejected: ' + (result.rejection_reason || 'Please upload better documents.'));
+                        window.location.reload();
+                    } else if (result.status === 'pending') {
+                        alert('⏳ Still pending review. Please check back later or contact admin.');
+                    } else {
+                        alert('No verification request found. Please upload documents first.');
+                    }
+                } else {
+                    alert('Failed to check status. Please try again.');
+                }
+            } catch (error) {
+                console.error('Status check error:', error);
+                alert('Network error. Please try again.');
+            }
+        }
+    </script>
+</body>
+</html>

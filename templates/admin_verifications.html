@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification Requests - Admin Panel</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .admin-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .admin-header h1 {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 0;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card h3 {
+            margin: 0 0 0.5rem 0;
+            color: #6b7280;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        
+        .stat-card.pending .value {
+            color: #f59e0b;
+        }
+        
+        .stat-card.verified .value {
+            color: #10b981;
+        }
+        
+        .stat-card.rejected .value {
+            color: #ef4444;
+        }
+        
+        .verifications-list {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .verification-item {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 1.5rem;
+            align-items: start;
+        }
+        
+        .verification-item:last-child {
+            border-bottom: none;
+        }
+        
+        .verification-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .verification-info h3 {
+            margin: 0 0 0.5rem 0;
+            color: #1f2937;
+        }
+        
+        .verification-meta {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-bottom: 1rem;
+        }
+        
+        .verification-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .documents-grid {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        
+        .document-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #f3f4f6;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #374151;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .document-link:hover {
+            background: #e5e7eb;
+            color: #dc2626;
+        }
+        
+        .verification-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .btn-approve {
+            padding: 0.75rem 1.5rem;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        
+        .btn-approve:hover {
+            background: #059669;
+        }
+        
+        .btn-reject {
+            padding: 0.75rem 1.5rem;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        
+        .btn-reject:hover {
+            background: #dc2626;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .status-badge.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-badge.verified {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-badge.rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .filter-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .filter-tab {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 600;
+            color: #6b7280;
+            transition: all 0.2s;
+        }
+        
+        .filter-tab.active {
+            color: #dc2626;
+            border-bottom-color: #dc2626;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #6b7280;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>
+                <i class="fas fa-shield-alt" style="color: #dc2626;"></i>
+                Verification Requests
+            </h1>
+            <a href="/admin/dashboard" class="btn-outline">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card pending">
+                <h3>Pending Review</h3>
+                <div class="value">{{ stats.pending }}</div>
+            </div>
+            <div class="stat-card verified">
+                <h3>Verified</h3>
+                <div class="value">{{ stats.verified }}</div>
+            </div>
+            <div class="stat-card rejected">
+                <h3>Rejected</h3>
+                <div class="value">{{ stats.rejected }}</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Requests</h3>
+                <div class="value">{{ stats.total }}</div>
+            </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-filter="all">All ({{ stats.total }})</button>
+            <button class="filter-tab" data-filter="pending">Pending ({{ stats.pending }})</button>
+            <button class="filter-tab" data-filter="verified">Verified ({{ stats.verified }})</button>
+            <button class="filter-tab" data-filter="rejected">Rejected ({{ stats.rejected }})</button>
+        </div>
+
+        <!-- Verifications List -->
+        <div class="verifications-list">
+            {% if verifications %}
+                {% for verification in verifications %}
+                <div class="verification-item" data-status="{{ verification.status }}">
+                    <div class="verification-avatar">
+                        {{ verification.user_name[0].upper() }}
+                    </div>
+                    
+                    <div class="verification-info">
+                        <h3>{{ verification.user_name }}</h3>
+                        <div class="verification-meta">
+                            <span><i class="fas fa-envelope"></i> {{ verification.user_email }}</span>
+                            <span><i class="fas fa-user-tag"></i> {{ verification.user_type|capitalize }}</span>
+                            {% if verification.user_college %}
+                            <span><i class="fas fa-graduation-cap"></i> {{ verification.user_college }}</span>
+                            {% endif %}
+                            <span><i class="fas fa-clock"></i> {{ verification.created_at.strftime('%b %d, %Y at %I:%M %p') }}</span>
+                        </div>
+                        
+                        <div class="documents-grid">
+                            {% if verification.student_id_path %}
+                            <a href="{{ url_for('static', filename=verification.student_id_path) }}" target="_blank" class="document-link">
+                                <i class="fas fa-id-card"></i> Student ID
+                            </a>
+                            {% endif %}
+                            {% if verification.college_letter_path %}
+                            <a href="{{ url_for('static', filename=verification.college_letter_path) }}" target="_blank" class="document-link">
+                                <i class="fas fa-file-alt"></i> College Letter
+                            </a>
+                            {% endif %}
+                            {% if verification.gov_id_path %}
+                            <a href="{{ url_for('static', filename=verification.gov_id_path) }}" target="_blank" class="document-link">
+                                <i class="fas fa-id-badge"></i> Government ID
+                            </a>
+                            {% endif %}
+                            {% if verification.electricity_bill_path %}
+                            <a href="{{ url_for('static', filename=verification.electricity_bill_path) }}" target="_blank" class="document-link">
+                                <i class="fas fa-file-invoice"></i> Electricity Bill
+                            </a>
+                            {% endif %}
+                        </div>
+                        
+                        {% if verification.rejection_reason %}
+                        <div style="margin-top: 1rem; padding: 0.75rem; background: #fee2e2; border-left: 3px solid #dc2626; border-radius: 4px;">
+                            <strong style="color: #991b1b;">Rejection Reason:</strong>
+                            <p style="margin: 0.25rem 0 0 0; color: #7f1d1d;">{{ verification.rejection_reason }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="verification-actions">
+                        {% if verification.status == 'pending' %}
+                        <button class="btn-approve" onclick="approveVerification('{{ verification.id }}')">
+                            <i class="fas fa-check"></i> Approve
+                        </button>
+                        <button class="btn-reject" onclick="rejectVerification('{{ verification.id }}')">
+                            <i class="fas fa-times"></i> Reject
+                        </button>
+                        {% else %}
+                        <span class="status-badge {{ verification.status }}">
+                            {% if verification.status == 'verified' %}
+                            <i class="fas fa-check-circle"></i> Verified
+                            {% elif verification.status == 'rejected' %}
+                            <i class="fas fa-times-circle"></i> Rejected
+                            {% endif %}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h3>No verification requests</h3>
+                <p>New verification requests will appear here.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // Filter tabs
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                const filter = tab.getAttribute('data-filter');
+                const items = document.querySelectorAll('.verification-item');
+                
+                items.forEach(item => {
+                    if (filter === 'all' || item.getAttribute('data-status') === filter) {
+                        item.style.display = 'grid';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+        
+        // Approve verification
+        async function approveVerification(verificationId) {
+            if (!confirm('Approve this verification request?')) return;
+            
+            try {
+                const response = await fetch(`/api/admin/verification/${verificationId}/approve`, {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert('Verification approved successfully!');
+                    location.reload();
+                } else {
+                    alert(result.error || 'Failed to approve verification');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Network error. Please try again.');
+            }
+        }
+        
+        // Reject verification
+        async function rejectVerification(verificationId) {
+            const reason = prompt('Enter rejection reason:');
+            if (!reason) return;
+            
+            try {
+                const response = await fetch(`/api/admin/verification/${verificationId}/reject`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert('Verification rejected.');
+                    location.reload();
+                } else {
+                    alert(result.error || 'Failed to reject verification');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Network error. Please try again.');
+            }
+        }
+    </script>
+</body>
+</html>

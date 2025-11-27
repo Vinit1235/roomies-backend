@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Roomies</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    {% include 'partials/header.html' %}
+    {% include 'partials/sidebar.html' %}
+
+    <div class="main-content" id="mainContent">
+        <section class="page-section contact-page">
+            <div class="contact-section">
+                <div class="contact-copy">
+                    <h2>Let's collaborate</h2>
+                    <p>Have a campus partnership idea, listing query, or need support? Drop us a note—we respond within one business day.</p>
+                    <div class="contact-meta">
+                        <div>
+                            <strong>Email</strong>
+                            <span>posterpresentation08@gmail.com</span>
+                        </div>
+                        <div>
+                            <strong>Working hours</strong>
+                            <span>Mon–Sat, 9am to 7pm IST</span>
+                        </div>
+                        <div>
+                            <strong>Phone</strong>
+                            <span>+91 98765 43210</span>
+                        </div>
+                        <div>
+                            <strong>Office Address</strong>
+                            <span>Roomies HQ, Andheri East<br>Mumbai, Maharashtra 400069</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-form-card">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}">{{ message }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <form id="contactForm" method="POST" action="/contact">
+                        <div class="form-row">
+                            <label>Name</label>
+                            <input name="name" required>
+                        </div>
+                        <div class="form-row">
+                            <label>Email</label>
+                            <input name="email" type="email" required>
+                        </div>
+                        <div class="form-row">
+                            <label>Subject</label>
+                            <input name="subject" placeholder="Partnership enquiry">
+                        </div>
+                        <div class="form-row">
+                            <label>Message</label>
+                            <textarea name="message" rows="4" required></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary full-width">Send message</button>
+                        <div id="contactFeedback" class="form-feedback"></div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
