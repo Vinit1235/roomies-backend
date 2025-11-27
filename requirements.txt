@@ -13,12 +13,8 @@ geopy
 requests
 pandas
 openpyxl
-google-generativeai
-numpy
-opencv-python-headless
 thefuzz
 feedparser
-easyocr
 reportlab
 gunicorn
 psycopg2-binary
