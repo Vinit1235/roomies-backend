@@ -3753,6 +3753,9 @@ def get_news():
 # ---------------------------------------------------------------------------
 def init_database():
     """Create all tables and seed initial data if needed."""
+    import json
+    import random
+    
     with app.app_context():
         try:
             # Create all tables
@@ -3784,92 +3787,111 @@ def init_database():
                 db.session.add(owner)
                 db.session.commit()
                 print("✅ System owner created")
+            else:
+                owner = Owner.query.filter_by(email="system@roomies.in").first()
             
-            # Check if rooms exist, if not add sample data
+            # Check if rooms exist, if not load from real_data_dump.json
             room_count = Room.query.count()
             if room_count == 0:
-                print("📦 No rooms found. Adding sample data...")
-                sample_rooms = [
-                    Room(
-                        title="Student Hostel Near DJ Sanghvi",
-                        price=12000,
-                        location="Vile Parle West, Mumbai",
-                        college_nearby="DJ Sanghvi College of Engineering",
-                        amenities="WiFi,AC,Laundry,Security",
-                        property_type="Hostel",
-                        capacity_total=4,
-                        capacity_occupied=2,
-                        latitude=19.1075,
-                        longitude=72.8365,
-                        owner_id=owner.id,
-                        verified=True,
-                        images="https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600"
-                    ),
-                    Room(
-                        title="PG Accommodation Near NMIMS",
-                        price=15000,
-                        location="Juhu, Mumbai",
-                        college_nearby="NMIMS University",
-                        amenities="WiFi,Meals,AC,Gym",
-                        property_type="PG",
-                        capacity_total=2,
-                        capacity_occupied=1,
-                        latitude=19.1028,
-                        longitude=72.8371,
-                        owner_id=owner.id,
-                        verified=True,
-                        images="https://images.unsplash.com/photo-1522771753035-4a50354b6063?w=600"
-                    ),
-                    Room(
-                        title="Shared Flat Near IIT Bombay",
-                        price=18000,
-                        location="Powai, Mumbai",
-                        college_nearby="IIT Bombay",
-                        amenities="WiFi,AC,Kitchen,Parking",
-                        property_type="Shared",
-                        capacity_total=3,
-                        capacity_occupied=1,
-                        latitude=19.1334,
-                        longitude=72.9133,
-                        owner_id=owner.id,
-                        verified=True,
-                        images="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600"
-                    ),
-                    Room(
-                        title="Budget Hostel Near Mumbai University",
-                        price=8000,
-                        location="Kalina, Mumbai",
-                        college_nearby="Mumbai University",
-                        amenities="WiFi,Security,Laundry",
-                        property_type="Hostel",
-                        capacity_total=6,
-                        capacity_occupied=3,
-                        latitude=19.0728,
-                        longitude=72.8654,
-                        owner_id=owner.id,
-                        verified=True,
-                        images="https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=600"
-                    ),
-                    Room(
-                        title="Premium PG Near VJTI",
-                        price=14000,
-                        location="Matunga, Mumbai",
-                        college_nearby="VJTI Mumbai",
-                        amenities="WiFi,AC,Meals,Gym,Study Room",
-                        property_type="PG",
-                        capacity_total=2,
-                        capacity_occupied=0,
-                        latitude=19.0225,
-                        longitude=72.8561,
-                        owner_id=owner.id,
-                        verified=True,
-                        images="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600"
-                    ),
+                print("📦 No rooms found. Loading data from real_data_dump.json...")
+                
+                # Room images for variety
+                room_images = [
+                    "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600",
+                    "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=600",
+                    "https://images.unsplash.com/photo-1522771753035-4a50354b6063?w=600",
+                    "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600",
+                    "https://images.unsplash.com/photo-1505693416388-b0346efee539?w=600",
+                    "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=600",
+                    "https://images.unsplash.com/photo-1540518614846-7eded433c457?w=600",
+                    "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600",
                 ]
-                for room in sample_rooms:
-                    db.session.add(room)
-                db.session.commit()
-                print(f"✅ Added {len(sample_rooms)} sample rooms!")
+                
+                try:
+                    # Load data from JSON file
+                    json_path = os.path.join(app.root_path, 'data', 'real_data_dump.json')
+                    with open(json_path, 'r', encoding='utf-8') as f:
+                        colleges_data = json.load(f)
+                    
+                    count = 0
+                    for college_entry in colleges_data:
+                        college_name = college_entry['college']
+                        hostels = college_entry.get('nearby_hostels', [])
+                        
+                        for hostel in hostels:
+                            # Skip hostels with "Unknown" in name
+                            if "Unknown" in hostel['name']:
+                                continue
+                            
+                            # Generate random attributes
+                            price = random.choice([7000, 8000, 9000, 10000, 12000, 14000, 15000, 18000])
+                            capacity = random.choice([2, 3, 4, 6])
+                            occupied = random.randint(0, capacity - 1)
+                            
+                            # Pick random images
+                            selected_images = random.sample(room_images, min(3, len(room_images)))
+                            image_string = ",".join(selected_images)
+                            
+                            room = Room(
+                                title=hostel['name'],
+                                price=price,
+                                location=f"Near {college_name}",
+                                college_nearby=college_name,
+                                amenities="WiFi,AC,Laundry,Security",
+                                property_type="Hostel" if hostel.get('type') == 'hostel' else "PG",
+                                capacity_total=capacity,
+                                capacity_occupied=occupied,
+                                latitude=hostel['lat'],
+                                longitude=hostel['lon'],
+                                owner_id=owner.id,
+                                verified=True,
+                                images=image_string
+                            )
+                            db.session.add(room)
+                            count += 1
+                    
+                    db.session.commit()
+                    print(f"✅ Added {count} hostels/rooms from {len(colleges_data)} colleges!")
+                    
+                except FileNotFoundError:
+                    print("⚠️ real_data_dump.json not found. Adding sample data instead...")
+                    # Fallback sample rooms
+                    sample_rooms = [
+                        Room(
+                            title="Student Hostel Near DJ Sanghvi",
+                            price=12000,
+                            location="Vile Parle West, Mumbai",
+                            college_nearby="DJ Sanghvi College of Engineering",
+                            amenities="WiFi,AC,Laundry,Security",
+                            property_type="Hostel",
+                            capacity_total=4,
+                            capacity_occupied=2,
+                            latitude=19.1075,
+                            longitude=72.8365,
+                            owner_id=owner.id,
+                            verified=True,
+                            images="https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600"
+                        ),
+                        Room(
+                            title="PG Near IIT Bombay",
+                            price=15000,
+                            location="Powai, Mumbai",
+                            college_nearby="IIT Bombay",
+                            amenities="WiFi,Meals,AC,Gym",
+                            property_type="PG",
+                            capacity_total=2,
+                            capacity_occupied=1,
+                            latitude=19.1334,
+                            longitude=72.9133,
+                            owner_id=owner.id,
+                            verified=True,
+                            images="https://images.unsplash.com/photo-1522771753035-4a50354b6063?w=600"
+                        ),
+                    ]
+                    for room in sample_rooms:
+                        db.session.add(room)
+                    db.session.commit()
+                    print(f"✅ Added {len(sample_rooms)} sample rooms!")
             else:
                 print(f"📦 Found {room_count} existing rooms.")
                 
