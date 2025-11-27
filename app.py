@@ -44,7 +44,19 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.exc import SQLAlchemyError
 from functools import wraps
 from search_engine import SearchTrie
-from agents.chatbot import chatbot
+# from agents.chatbot import chatbot  <-- Disabled for Render if missing
+try:
+    from agents.chatbot import chatbot
+except ImportError:
+    # Mock chatbot if agents module is missing or fails to load
+    class MockChatbot:
+        def get_response(self, msg):
+            return "Chatbot is currently disabled."
+        def set_room_provider(self, func):
+            pass
+    chatbot = MockChatbot()
+    print("Warning: Could not import agents.chatbot. Chat functionality disabled.")
+
 from utils.verification import process_verification  # Import verification logic
 from services.news_service import NewsService
 
