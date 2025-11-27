@@ -3747,5 +3747,140 @@ def get_news():
         app.logger.error(f"News API error: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
 
+
+# ---------------------------------------------------------------------------
+# Database Initialization (Auto-create tables on startup)
+# ---------------------------------------------------------------------------
+def init_database():
+    """Create all tables and seed initial data if needed."""
+    with app.app_context():
+        try:
+            # Create all tables
+            db.create_all()
+            print("✅ Database tables created successfully!")
+            
+            # Create admin if not exists
+            admin = Admin.query.filter_by(email="admin@roomies.in").first()
+            if not admin:
+                admin = Admin(
+                    email="admin@roomies.in",
+                    name="System Admin",
+                    role="admin"
+                )
+                admin.set_password("admin123")
+                db.session.add(admin)
+                db.session.commit()
+                print("✅ Admin user created: admin@roomies.in / admin123")
+            
+            # Create system owner if not exists
+            owner = Owner.query.filter_by(email="system@roomies.in").first()
+            if not owner:
+                owner = Owner(
+                    email="system@roomies.in",
+                    name="Roomies System",
+                    kyc_verified=True
+                )
+                owner.set_password("system123")
+                db.session.add(owner)
+                db.session.commit()
+                print("✅ System owner created")
+            
+            # Check if rooms exist, if not add sample data
+            room_count = Room.query.count()
+            if room_count == 0:
+                print("📦 No rooms found. Adding sample data...")
+                sample_rooms = [
+                    Room(
+                        title="Student Hostel Near DJ Sanghvi",
+                        price=12000,
+                        location="Vile Parle West, Mumbai",
+                        college_nearby="DJ Sanghvi College of Engineering",
+                        amenities="WiFi,AC,Laundry,Security",
+                        property_type="Hostel",
+                        capacity_total=4,
+                        capacity_occupied=2,
+                        latitude=19.1075,
+                        longitude=72.8365,
+                        owner_id=owner.id,
+                        verified=True,
+                        images="https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600"
+                    ),
+                    Room(
+                        title="PG Accommodation Near NMIMS",
+                        price=15000,
+                        location="Juhu, Mumbai",
+                        college_nearby="NMIMS University",
+                        amenities="WiFi,Meals,AC,Gym",
+                        property_type="PG",
+                        capacity_total=2,
+                        capacity_occupied=1,
+                        latitude=19.1028,
+                        longitude=72.8371,
+                        owner_id=owner.id,
+                        verified=True,
+                        images="https://images.unsplash.com/photo-1522771753035-4a50354b6063?w=600"
+                    ),
+                    Room(
+                        title="Shared Flat Near IIT Bombay",
+                        price=18000,
+                        location="Powai, Mumbai",
+                        college_nearby="IIT Bombay",
+                        amenities="WiFi,AC,Kitchen,Parking",
+                        property_type="Shared",
+                        capacity_total=3,
+                        capacity_occupied=1,
+                        latitude=19.1334,
+                        longitude=72.9133,
+                        owner_id=owner.id,
+                        verified=True,
+                        images="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600"
+                    ),
+                    Room(
+                        title="Budget Hostel Near Mumbai University",
+                        price=8000,
+                        location="Kalina, Mumbai",
+                        college_nearby="Mumbai University",
+                        amenities="WiFi,Security,Laundry",
+                        property_type="Hostel",
+                        capacity_total=6,
+                        capacity_occupied=3,
+                        latitude=19.0728,
+                        longitude=72.8654,
+                        owner_id=owner.id,
+                        verified=True,
+                        images="https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=600"
+                    ),
+                    Room(
+                        title="Premium PG Near VJTI",
+                        price=14000,
+                        location="Matunga, Mumbai",
+                        college_nearby="VJTI Mumbai",
+                        amenities="WiFi,AC,Meals,Gym,Study Room",
+                        property_type="PG",
+                        capacity_total=2,
+                        capacity_occupied=0,
+                        latitude=19.0225,
+                        longitude=72.8561,
+                        owner_id=owner.id,
+                        verified=True,
+                        images="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600"
+                    ),
+                ]
+                for room in sample_rooms:
+                    db.session.add(room)
+                db.session.commit()
+                print(f"✅ Added {len(sample_rooms)} sample rooms!")
+            else:
+                print(f"📦 Found {room_count} existing rooms.")
+                
+        except Exception as e:
+            print(f"❌ Database initialization error: {e}")
+            import traceback
+            traceback.print_exc()
+
+# Auto-initialize on startup
+init_database()
+
+
 if __name__ == "__main__":
     app.run(debug=True)
