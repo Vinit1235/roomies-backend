@@ -108,6 +108,7 @@
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
             margin-bottom: 60px;
+            min-height: 400px;
         }
         
         .pricing-card {
@@ -298,7 +299,7 @@
     {% include 'partials/header.html' %}
     {% include 'partials/sidebar.html' %}
     
-    <div class="main-content" id="mainContent">
+    <div class="main-content" id="mainContent" style="overflow-y: auto; padding-bottom: 50px;">
     <div class="pricing-container">
         <!-- Header -->
         <div class="pricing-header">
@@ -522,6 +523,9 @@
             loadServices();
         });
     </script>
+    
+    <!-- AI Chatbot Widget -->
+    {% include 'partials/chatbot.html' %}
     
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     </div>
