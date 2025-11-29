@@ -3894,6 +3894,134 @@ def init_database():
                     print(f"✅ Added {len(sample_rooms)} sample rooms!")
             else:
                 print(f"📦 Found {room_count} existing rooms.")
+            
+            # Create subscription plans if they don't exist
+            plan_count = SubscriptionPlan.query.count()
+            if plan_count == 0:
+                print("💰 Creating subscription plans...")
+                
+                # Student Plans
+                student_plans = [
+                    SubscriptionPlan(
+                        name="Free",
+                        user_type="student",
+                        price_monthly=0,
+                        price_yearly=0,
+                        features=json.dumps({
+                            "property_inquiries": "5 per month",
+                            "saved_properties": "10",
+                            "chat_support": True,
+                            "verified_listings": False,
+                            "priority_responses": False,
+                            "virtual_tours": False
+                        }),
+                        display_order=1,
+                        commission_discount=0,
+                        is_active=True
+                    ),
+                    SubscriptionPlan(
+                        name="Basic",
+                        user_type="student",
+                        price_monthly=299,
+                        price_yearly=2999,
+                        features=json.dumps({
+                            "property_inquiries": "20 per month",
+                            "saved_properties": "50",
+                            "chat_support": True,
+                            "verified_listings": True,
+                            "priority_responses": True,
+                            "virtual_tours": False
+                        }),
+                        display_order=2,
+                        commission_discount=5,
+                        is_active=True
+                    ),
+                    SubscriptionPlan(
+                        name="Premium",
+                        user_type="student",
+                        price_monthly=599,
+                        price_yearly=5999,
+                        features=json.dumps({
+                            "property_inquiries": "Unlimited",
+                            "saved_properties": "Unlimited",
+                            "chat_support": True,
+                            "verified_listings": True,
+                            "priority_responses": True,
+                            "virtual_tours": True,
+                            "dedicated_support": True,
+                            "move_in_assistance": True
+                        }),
+                        display_order=3,
+                        commission_discount=10,
+                        is_active=True
+                    ),
+                ]
+                
+                # Owner Plans
+                owner_plans = [
+                    SubscriptionPlan(
+                        name="Free",
+                        user_type="owner",
+                        price_monthly=0,
+                        price_yearly=0,
+                        features=json.dumps({
+                            "active_listings": "2",
+                            "commission_rate": 15,
+                            "listing_fee_required": True,
+                            "featured_listings": False,
+                            "analytics_dashboard": False
+                        }),
+                        display_order=1,
+                        commission_discount=0,
+                        is_active=True
+                    ),
+                    SubscriptionPlan(
+                        name="Standard",
+                        user_type="owner",
+                        price_monthly=999,
+                        price_yearly=9999,
+                        features=json.dumps({
+                            "active_listings": "10",
+                            "commission_rate": 10,
+                            "listing_fee_required": False,
+                            "featured_listings": True,
+                            "analytics_dashboard": True,
+                            "priority_support": True
+                        }),
+                        display_order=2,
+                        commission_discount=0,
+                        is_active=True
+                    ),
+                    SubscriptionPlan(
+                        name="Professional",
+                        user_type="owner",
+                        price_monthly=1999,
+                        price_yearly=19999,
+                        features=json.dumps({
+                            "active_listings": "Unlimited",
+                            "commission_rate": 5,
+                            "listing_fee_required": False,
+                            "featured_listings": True,
+                            "analytics_dashboard": True,
+                            "priority_support": True,
+                            "auto_promotion": True,
+                            "dedicated_account_manager": True,
+                            "advanced_analytics": True,
+                            "bulk_operations": True
+                        }),
+                        display_order=3,
+                        commission_discount=0,
+                        is_active=True
+                    ),
+                ]
+                
+                for plan in student_plans + owner_plans:
+                    db.session.add(plan)
+                
+                db.session.commit()
+                print(f"✅ Created {len(student_plans)} student plans and {len(owner_plans)} owner plans!")
+            else:
+                print(f"💰 Found {plan_count} existing subscription plans.")
                 
         except Exception as e:
             print(f"❌ Database initialization error: {e}")
