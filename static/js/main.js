@@ -32,8 +32,37 @@ if (menuToggle && sidebar && mainContent) {
     menuToggle.addEventListener("click", () => {
         sidebar.classList.toggle("collapsed");
         mainContent.classList.toggle("expanded");
+        
+        // For mobile, use 'show' class instead
+        if (window.innerWidth <= 768) {
+            sidebar.classList.toggle("show");
+        }
     });
+    
+    // Close sidebar when clicking outside on mobile
+    if (window.innerWidth <= 768) {
+        document.addEventListener("click", (e) => {
+            if (!sidebar.contains(e.target) && !menuToggle.contains(e.target) && sidebar.classList.contains("show")) {
+                sidebar.classList.remove("show");
+            }
+        });
+    }
 }
+
+// Handle window resize for sidebar
+let resizeTimer;
+window.addEventListener("resize", () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        if (window.innerWidth > 768 && sidebar) {
+            sidebar.classList.remove("show");
+            sidebar.classList.remove("collapsed");
+        } else if (window.innerWidth <= 768 && sidebar) {
+            sidebar.classList.add("collapsed");
+            sidebar.classList.remove("show");
+        }
+    }, 250);
+});
 
 // Sync global search with main search
 if (globalSearch && searchInput) {
@@ -53,8 +82,9 @@ if (globalSearch && searchInput) {
 const sidebarItems = document.querySelectorAll(".sidebar-item");
 sidebarItems.forEach(item => {
     item.addEventListener("click", function() {
-        // Let the browser handle navigation, just toggle mobile sidebar
+        // Auto-close mobile sidebar after clicking a link
         if (window.innerWidth <= 768 && sidebar) {
+            sidebar.classList.remove("show");
             sidebar.classList.add("collapsed");
         }
     });
