@@ -344,11 +344,27 @@
         // Load subscription plans
         async function loadPlans() {
             try {
+                console.log('Loading plans for:', currentUserType);
                 const response = await fetch(`/api/subscription-plans?user_type=${currentUserType}`);
-                plans = await response.json();
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Plans data:', data);
+                plans = data;
                 renderPricingCards();
             } catch (error) {
                 console.error('Error loading plans:', error);
+                // Show fallback message
+                document.getElementById('pricingGrid').innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                        <p style="color: #e74c3c; font-size: 1.2em;">Unable to load pricing plans. Please refresh the page.</p>
+                        <p style="color: #7f8c8d; margin-top: 10px;">Error: ${error.message}</p>
+                    </div>
+                `;
             }
         }
         
@@ -384,9 +400,22 @@
         // Render pricing cards
         function renderPricingCards() {
             const grid = document.getElementById('pricingGrid');
+            console.log('Rendering cards. Plans object:', plans);
+            
+            if (!plans || !plans.plans || plans.plans.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                        <p style="color: #e74c3c; font-size: 1.2em;">No pricing plans available for ${currentUserType}s.</p>
+                        <p style="color: #7f8c8d; margin-top: 10px;">Please check back later or contact support.</p>
+                    </div>
+                `;
+                return;
+            }
+            
             grid.innerHTML = '';
             
             const sortedPlans = (plans.plans || []).sort((a, b) => a.display_order - b.display_order);
+            console.log('Sorted plans:', sortedPlans);
             
             sortedPlans.forEach((plan, index) => {
                 const price = currentBilling === 'monthly' ? plan.price_monthly : plan.price_yearly;
