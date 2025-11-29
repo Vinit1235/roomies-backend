@@ -18,3 +18,5 @@ feedparser
 reportlab
 gunicorn
 psycopg2-binary
+sentence-transformers
+faiss-cpu
