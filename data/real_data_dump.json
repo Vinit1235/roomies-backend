@@ -1,5 +1,407 @@
 [
   {
+    "college": "Vivekanand Education Society Institute of Technology (VESIT)",
+    "location": {
+      "lat": 19.0442,
+      "lon": 72.8200
+    },
+    "nearby_hostels": [
+      {
+        "name": "VES Hostel (Hashu Advani Complex)",
+        "lat": 19.0445,
+        "lon": 72.8205,
+        "type": "hostel"
+      },
+      {
+        "name": "Vesit Hostel (Private)",
+        "lat": 19.0440,
+        "lon": 72.8198,
+        "type": "hostel"
+      },
+      {
+        "name": "Nidhaan Nest",
+        "lat": 19.0450,
+        "lon": 72.8210,
+        "type": "pg"
+      },
+      {
+        "name": "Stanza Living Chembur",
+        "lat": 19.0470,
+        "lon": 72.8990,
+        "type": "pg"
+      }
+    ]
+  },
+  {
+    "college": "Shah and Anchor Kutchhi Engineering College",
+    "location": {
+      "lat": 19.0520,
+      "lon": 72.8900
+    },
+    "nearby_hostels": [
+      {
+        "name": "Nidhaan Nest Girls Co-Living",
+        "lat": 19.0525,
+        "lon": 72.8905,
+        "type": "pg"
+      },
+      {
+        "name": "Abhinash Student Hostel",
+        "lat": 19.0515,
+        "lon": 72.8895,
+        "type": "hostel"
+      },
+      {
+        "name": "Amit PG",
+        "lat": 19.0530,
+        "lon": 72.8910,
+        "type": "pg"
+      },
+      {
+        "name": "Stanza Living Chembur",
+        "lat": 19.0470,
+        "lon": 72.8990,
+        "type": "pg"
+      }
+    ]
+  },
+  {
+    "college": "Thadomal Shahani Engineering College",
+    "location": {
+      "lat": 19.1065,
+      "lon": 72.8365
+    },
+    "nearby_hostels": [
+      {
+        "name": "Bkc Corporate Hostel",
+        "lat": 19.0720,
+        "lon": 72.8680,
+        "type": "hostel"
+      },
+      {
+        "name": "Elora Dorms",
+        "lat": 19.1070,
+        "lon": 72.8370,
+        "type": "hostel"
+      },
+      {
+        "name": "Manuel Gonsalves Women's Hostel",
+        "lat": 19.0565,
+        "lon": 72.8295,
+        "type": "hostel"
+      },
+      {
+        "name": "Youth's Den Hostel",
+        "lat": 19.1075,
+        "lon": 72.8375,
+        "type": "hostel"
+      }
+    ]
+  },
+  {
+    "college": "Pillai College of Engineering",
+    "location": {
+      "lat": 19.0440,
+      "lon": 73.0297
+    },
+    "nearby_hostels": [
+      {
+        "name": "Pillai Girls Hostel (On-campus)",
+        "lat": 19.0442,
+        "lon": 73.0300,
+        "type": "hostel"
+      },
+      {
+        "name": "Pillai Boys Hostel (On-campus)",
+        "lat": 19.0438,
+        "lon": 73.0295,
+        "type": "hostel"
+      },
+      {
+        "name": "Vatsalya PG",
+        "lat": 19.0445,
+        "lon": 73.0290,
+        "type": "pg"
+      },
+      {
+        "name": "Arvind PG",
+        "lat": 19.0435,
+        "lon": 73.0305,
+        "type": "pg"
+      }
+    ]
+  },
+  {
+    "college": "Rizvi College of Engineering",
+    "location": {
+      "lat": 19.1185,
+      "lon": 72.8490
+    },
+    "nearby_hostels": [
+      {
+        "name": "Rizvi Boys Hostel (On-campus)",
+        "lat": 19.1187,
+        "lon": 72.8492,
+        "type": "hostel"
+      },
+      {
+        "name": "Rizvi Girls Hostel (On-campus)",
+        "lat": 19.1183,
+        "lon": 72.8488,
+        "type": "hostel"
+      },
+      {
+        "name": "Red Chillihouse Hostel",
+        "lat": 19.1190,
+        "lon": 72.8495,
+        "type": "hostel"
+      },
+      {
+        "name": "Manuel Gonsalves Women's Hostel",
+        "lat": 19.0565,
+        "lon": 72.8295,
+        "type": "hostel"
+      }
+    ]
+  },
+  {
+    "college": "Atharva College of Engineering",
+    "location": {
+      "lat": 19.1977249,
+      "lon": 72.8270575
+    },
+    "nearby_hostels": [
+      {
+        "name": "Nest Inn PG",
+        "lat": 19.1980,
+        "lon": 72.8275,
+        "type": "pg"
+      },
+      {
+        "name": "Hotel Nice Stay",
+        "lat": 19.1975,
+        "lon": 72.8268,
+        "type": "pg"
+      },
+      {
+        "name": "Knockwood Homestay",
+        "lat": 19.1985,
+        "lon": 72.8280,
+        "type": "pg"
+      },
+      {
+        "name": "Stanza Living Malad",
+        "lat": 19.1870,
+        "lon": 72.8480,
+        "type": "pg"
+      }
+    ]
+  },
+  {
+    "college": "Vidyalankar Institute of Technology",
+    "location": {
+      "lat": 19.0216175,
+      "lon": 72.8709125
+    },
+    "nearby_hostels": [
+      {
+        "name": "Soham PG",
+        "lat": 19.0220,
+        "lon": 72.8715,
+        "type": "pg"
+      },
+      {
+        "name": "Zolo Logan",
+        "lat": 19.0212,
+        "lon": 72.8705,
+        "type": "pg"
+      },
+      {
+        "name": "Llodha New Cuffe Parade Hostel",
+        "lat": 18.9245,
+        "lon": 72.8180,
+        "type": "hostel"
+      },
+      {
+        "name": "Stanza Living Wadala",
+        "lat": 19.0176,
+        "lon": 72.8561,
+        "type": "pg"
+      }
+    ]
+  },
+  {
+    "college": "Mukesh Patel School of Technology Management and Engineering",
+    "location": {
+      "lat": 19.1100909,
+      "lon": 72.837774
+    },
+    "nearby_hostels": [
+      {
+        "name": "Aurus Life",
+        "lat": 19.1105,
+        "lon": 72.8382,
+        "type": "pg"
+      },
+      {
+        "name": "Your-Space Vile Parle",
+        "lat": 19.1098,
+        "lon": 72.8373,
+        "type": "pg"
+      },
+      {
+        "name": "The Hive Hostels",
+        "lat": 19.1110,
+        "lon": 72.8385,
+        "type": "hostel"
+      },
+      {
+        "name": "Ivy League House",
+        "lat": 19.1095,
+        "lon": 72.8370,
+        "type": "pg"
+      }
+    ]
+  },
+  {
+    "college": "Thakur College of Engineering and Technology",
+    "location": {
+      "lat": 19.2183,
+      "lon": 72.8492
+    },
+    "nearby_hostels": [
+      {
+        "name": "Thakur Aspire Hostel",
+        "lat": 19.2185,
+        "lon": 72.8495,
+        "type": "hostel"
+      },
+      {
+        "name": "Guru Krupa Student Hostel",
+        "lat": 19.2180,
+        "lon": 72.8488,
+        "type": "hostel"
+      },
+      {
+        "name": "Suraj Paying Guest",
+        "lat": 19.2190,
+        "lon": 72.8500,
+        "type": "pg"
+      },
+      {
+        "name": "Kohinoor Dormitory",
+        "lat": 19.2175,
+        "lon": 72.8485,
+        "type": "hostel"
+      }
+    ]
+  },
+  {
+    "college": "K.J. Somaiya College of Engineering",
+    "location": {
+      "lat": 19.0728,
+      "lon": 72.8990
+    },
+    "nearby_hostels": [
+      {
+        "name": "Sandipani Hostel",
+        "lat": 19.0730,
+        "lon": 72.8995,
+        "type": "hostel"
+      },
+      {
+        "name": "Maitreyi Hostel",
+        "lat": 19.0725,
+        "lon": 72.8985,
+        "type": "hostel"
+      },
+      {
+        "name": "Polytechnic Hostel",
+        "lat": 19.0735,
+        "lon": 72.9000,
+        "type": "hostel"
+      },
+      {
+        "name": "Ashtavakra Hostel",
+        "lat": 19.0720,
+        "lon": 72.8980,
+        "type": "hostel"
+      },
+      {
+        "name": "OXOTEL PG",
+        "lat": 19.0740,
+        "lon": 72.9005,
+        "type": "pg"
+      }
+    ]
+  },
+  {
+    "college": "Veermata Jijabai Technological Institute (VJTI)",
+    "location": {
+      "lat": 19.0225,
+      "lon": 72.8561
+    },
+    "nearby_hostels": [
+      {
+        "name": "VJTI Girls Hostel",
+        "lat": 19.0228,
+        "lon": 72.8565,
+        "type": "hostel"
+      },
+      {
+        "name": "Anushka P G",
+        "lat": 19.0222,
+        "lon": 72.8558,
+        "type": "pg"
+      },
+      {
+        "name": "Krishna Kunj Apartment",
+        "lat": 19.0230,
+        "lon": 72.8570,
+        "type": "pg"
+      },
+      {
+        "name": "Boy And Girl Student Hostel",
+        "lat": 19.0220,
+        "lon": 72.8555,
+        "type": "hostel"
+      }
+    ]
+  },
+  {
+    "college": "D.J. Sanghvi College of Engineering",
+    "location": {
+      "lat": 19.1075,
+      "lon": 72.8365
+    },
+    "nearby_hostels": [
+      {
+        "name": "Tribe Vile Parle",
+        "lat": 19.1080,
+        "lon": 72.8370,
+        "type": "pg"
+      },
+      {
+        "name": "WISH Student Accommodation",
+        "lat": 19.1070,
+        "lon": 72.8360,
+        "type": "hostel"
+      },
+      {
+        "name": "SAFE Student Housing",
+        "lat": 19.1085,
+        "lon": 72.8375,
+        "type": "hostel"
+      },
+      {
+        "name": "Student Housing (Ganga Niwas)",
+        "lat": 19.1065,
+        "lon": 72.8355,
+        "type": "hostel"
+      }
+    ]
+  },
+  {
     "college": "Sardar Patel College of Engineering",
     "location": {
       "lat": 19.1234149,
@@ -27,12 +429,6 @@
       "lon": 72.8206506
     },
     "nearby_hostels": [
-      {
-        "name": "Unknown Hostel",
-        "lat": 19.0532539,
-        "lon": 72.8284156,
-        "type": "hostel"
-      },
       {
         "name": "Manuel Gonsalves Ladies Hostel",
         "lat": 19.0565554,
@@ -67,30 +463,6 @@
         "type": "hostel"
       }
     ]
-  },
-  {
-    "college": "Atharva College of Engineering",
-    "location": {
-      "lat": 19.1977249,
-      "lon": 72.8270575
-    },
-    "nearby_hostels": []
-  },
-  {
-    "college": "Vidyalankar Institute of Technology",
-    "location": {
-      "lat": 19.0216175,
-      "lon": 72.8709125
-    },
-    "nearby_hostels": []
-  },
-  {
-    "college": "Mukesh Patel School of Technology Management and Engineering",
-    "location": {
-      "lat": 19.1100909,
-      "lon": 72.837774
-    },
-    "nearby_hostels": []
   },
   {
     "college": "Indian Institute of Technology Bombay",
