@@ -93,12 +93,28 @@ app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", getattr(config, "SECRET_
 
 # Database Configuration
 database_url = os.environ.get("DATABASE_URL", getattr(config, "DATABASE_URL", "sqlite:///roomies.db"))
+
+# Debug: Print which database is being used
+print(f"🔧 DATABASE_URL from env: {'SET' if os.environ.get('DATABASE_URL') else 'NOT SET'}")
+print(f"🔧 Using database: {'PostgreSQL' if 'postgres' in database_url.lower() else 'SQLite'}")
+
 # Fix for Render's postgres:// usage (SQLAlchemy requires postgresql://)
 if database_url and database_url.startswith("postgres://"):
     database_url = database_url.replace("postgres://", "postgresql://", 1)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+# Add SSL requirement for Supabase/PostgreSQL connections
+if "postgresql" in database_url or "postgres" in database_url:
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+        "connect_args": {
+            "sslmode": "require"
+        },
+        "pool_pre_ping": True,  # Check connection health before use
+        "pool_recycle": 300,    # Recycle connections every 5 minutes
+    }
+    print("🔒 SSL mode enabled for PostgreSQL connection")
 
 # Initialize Search Trie
 search_trie = SearchTrie()
@@ -3758,6 +3774,16 @@ def init_database():
     
     with app.app_context():
         try:
+            # Show connection info (hide password)
+            db_uri = app.config.get("SQLALCHEMY_DATABASE_URI", "")
+            if "postgresql" in db_uri:
+                # Parse and hide password for logging
+                import re
+                safe_uri = re.sub(r':[^:@]+@', ':****@', db_uri)
+                print(f"🗄️ Connecting to PostgreSQL: {safe_uri[:80]}...")
+            else:
+                print(f"🗄️ Using SQLite database")
+            
             # Create all tables
             db.create_all()
             print("✅ Database tables created successfully!")
