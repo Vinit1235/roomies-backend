@@ -324,12 +324,12 @@
         <div class="room-info">
             <div class="host-info">
                 <div class="host-details">
-                    <h3>Hosted by {{ room.owner.name }}</h3>
+                    <h3>Hosted by {{ room.owner.name if room.owner else 'Roomies Partner' }}</h3>
                     <p>{% if room.verified %}Verified Listing ✅{% else %}Unverified Listing ⚠️{% endif %}</p>
                 </div>
                 <div
                     style="width: 48px; height: 48px; background: #222; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600;">
-                    {{ room.owner.name[0] }}
+                    {{ room.owner.name[0] if room.owner and room.owner.name else 'R' }}
                 </div>
             </div>
 

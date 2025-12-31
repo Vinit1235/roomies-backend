@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,7 +32,7 @@
         .confirmation-card {
             background: white;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
 
@@ -55,7 +56,7 @@
         .checkmark {
             width: 60px;
             height: 60px;
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.2);
             border: 3px solid white;
             border-radius: 50%;
             display: flex;
@@ -233,6 +234,7 @@
         }
     </style>
 </head>
+
 <body>
     {% include 'partials/header.html' %}
 
@@ -255,7 +257,8 @@
                 {% elif booking.room_availability_status == 'yellow' %}
                 <div class="status-info-box">
                     <strong>Pending Owner Approval</strong>
-                    Your booking is pending approval from the room owner. You'll receive an email notification within 24 hours.
+                    Your booking is pending approval from the room owner. You'll receive an email notification within 24
+                    hours.
                 </div>
                 {% endif %}
 
@@ -279,9 +282,9 @@
                         <div class="detail-section">
                             <div class="detail-label">Status</div>
                             {% if booking.booking_status == 'confirmed' %}
-                                <span class="status-badge status-approved">Approved</span>
+                            <span class="status-badge status-approved">Approved</span>
                             {% else %}
-                                <span class="status-badge status-pending">Pending Approval</span>
+                            <span class="status-badge status-pending">Pending Approval</span>
                             {% endif %}
                         </div>
                     </div>
@@ -292,9 +295,9 @@
                             <div class="detail-label">Check-in Date</div>
                             <div class="detail-value">
                                 {% if booking.contract_start_date %}
-                                    {{ booking.contract_start_date.strftime('%b %d, %Y') }}
+                                {{ booking.contract_start_date.strftime('%b %d, %Y') }}
                                 {% else %}
-                                    TBD
+                                TBD
                                 {% endif %}
                             </div>
                         </div>
@@ -303,9 +306,9 @@
                             <div class="detail-label">Check-out Date</div>
                             <div class="detail-value">
                                 {% if booking.contract_end_date %}
-                                    {{ booking.contract_end_date.strftime('%b %d, %Y') }}
+                                {{ booking.contract_end_date.strftime('%b %d, %Y') }}
                                 {% else %}
-                                    TBD
+                                TBD
                                 {% endif %}
                             </div>
                         </div>
@@ -363,7 +366,8 @@
                         <i class="fas fa-list"></i> View All Bookings
                     </a>
                     {% if booking.room_availability_status == 'green' %}
-                    <a href="/payment?booking_id={{ booking.id }}" class="btn btn-primary">
+                    <a href="/payment?booking_id={{ booking.id }}&amount={{ (booking.calculate_total_due() * 100)|int }}"
+                        class="btn btn-primary">
                         <i class="fas fa-credit-card"></i> Proceed to Payment
                     </a>
                     {% else %}
@@ -376,4 +380,5 @@
         </div>
     </div>
 </body>
+
 </html>
