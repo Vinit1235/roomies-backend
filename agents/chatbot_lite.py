@@ -91,19 +91,101 @@ class ChatbotLite:
             except Exception as e:
                 print(f"Room provider error: {e}")
         
-        # 3. Website Info (always included)
+        # 3. Website Info (always included - comprehensive context)
         website_context = """
-🌐 Roomies Website Information:
-- Roomies is a student housing platform for finding hostels, PGs, and flats in India.
-- Key Pages:
-  • /explore - Search for rooms with filters (location, price, property type)
-  • /findmate - AI-powered roommate matching based on lifestyle preferences
-  • /list-room - For property owners to list their rooms
-  • /dashboard - Manage bookings, profile, and saved listings
-  • /flash-deals - Limited-time discounts on select properties
-- Supported Cities: Mumbai, Pune, Bangalore, Delhi, Chennai, Hyderabad, Kota
-- Contact: support@roomies.in
-- Features: Verified listings, Safety audits, Mess menu info, Direct booking
+🌐 ROOMIES PLATFORM - COMPLETE GUIDE:
+
+📌 WHAT IS ROOMIES?
+Roomies is India's leading student housing platform that helps students find hostels, PGs (Paying Guest accommodations), flats, and compatible roommates using AI-powered matching technology.
+
+🏠 PROPERTY TYPES AVAILABLE:
+- Hostel: Shared dormitory-style accommodation with common facilities
+- PG (Paying Guest): Private or shared rooms in residential buildings, often with meals included
+- Flat/Apartment: Independent rooms or entire flats for rent
+- Shared Room: Share a room with other students to save costs
+
+📍 KEY PAGES & FEATURES:
+• /explore - Browse and search all available rooms with filters for location, price range, property type, and amenities
+• /findmate - AI-powered roommate matching based on lifestyle preferences (sleep schedule, study habits, food preferences, etc.)
+• /list-room - Property owners can list their rooms for FREE (basic listing) or with premium features
+• /dashboard - Students can manage their profile, bookings, saved listings, and verification status
+• /flash-deals - 24-hour limited-time discounts on select properties (owners pay ₹29 to create flash deals)
+• /faq - Frequently asked questions about the platform
+• /contact - Get in touch with support team
+
+🏙️ SUPPORTED CITIES:
+Mumbai, Pune, Bangalore, Delhi, Chennai, Hyderabad, Kota (major education hubs in India)
+
+💰 PRICING & FEES:
+- Searching for rooms: FREE for all users
+- Booking Fee: ₹999 one-time fee when booking a room
+- Security Deposit: 2x monthly rent (refundable at end of stay)
+- Platform Fee: 2% of first month's rent
+- Flash Deal Fee: ₹29 for owners to create 24-hour flash deals
+- Owner Pro Subscription: ₹199/month for premium features
+
+📋 BOOKING PROCESS:
+1. Browse rooms on /explore page
+2. Click "View Details" on a room you like
+3. Click "Reserve" or "Contact Owner"
+4. Pay the booking fee (₹999) + security deposit + first month rent
+5. Sign the digital contract
+6. Move in on your scheduled date!
+
+✅ VERIFICATION SYSTEM:
+- Students: Need College ID + Government ID (Aadhar/PAN)
+- Owners: Need Government ID + Electricity Bill for the property
+- Verified listings show a "Verified" badge
+- Our team reviews documents within 24-48 hours
+
+🔒 SAFETY FEATURES:
+- All listings undergo safety audits (fire extinguisher, CCTV, security guard checks)
+- Safety score displayed on each listing
+- Report fake listings using the "Report" button
+- Chats are monitored for harassment
+
+🍽️ MESS/FOOD:
+Some PGs and hostels include meals. Look for "Food" or "Mess" amenity icon. We display weekly mess menus where available.
+
+👥 ROOMMATE MATCHING (FINDMATE):
+Our AI analyzes your profile including:
+- Sleep schedule (early bird vs night owl)
+- Study habits
+- Food preferences (vegetarian/non-vegetarian)
+- Personality (introvert/extrovert)
+- Cleanliness preferences
+And suggests compatible roommates with a compatibility score!
+
+💳 PAYMENT METHODS:
+UPI, Credit/Debit Cards, Net Banking via secure Razorpay gateway
+
+📞 CONTACT & SUPPORT:
+- Email: support@roomies.in
+- Technical issues: tech@roomies.in
+- Response time: Within 24 hours
+- Emergency: Dial 100 (Police) or 112
+
+🏷️ SUBSCRIPTION PLANS:
+FOR STUDENTS (Roomies Premium):
+- Unlimited property inquiries
+- Priority customer support
+- Waived booking fees
+- Early access to flash deals
+
+FOR OWNERS (Owner Pro - ₹199/month):
+- Unlimited listings
+- Featured placement in search results
+- Advanced analytics dashboard
+- Reduced commission rates
+- Priority support
+
+💡 QUICK TIPS:
+- Create a complete profile for better roommate matches
+- Verify your account to build trust
+- Schedule property visits before booking
+- Read reviews from other students
+- Check the safety audit score
+- Look for the "Verified" badge on listings
 """
         context_parts.append(website_context)
         
@@ -137,20 +219,27 @@ class ChatbotLite:
             try:
                 context = self._build_context(user_message)
                 
-                prompt = f"""You are 'Roomies AI', a friendly and helpful assistant for a student housing platform in India.
+                prompt = f"""You are 'Roomies AI', a knowledgeable and friendly customer support assistant for Roomies - India's leading student housing platform.
 
-CONTEXT INFORMATION:
+IMPORTANT: You have COMPLETE knowledge about the Roomies platform from the context below. Use this information to answer ALL questions accurately.
+
+CONTEXT INFORMATION (This is your knowledge base - USE IT!):
 {context}
 
 USER QUESTION: {user_message}
 
 INSTRUCTIONS:
-1. Answer based on the context provided above.
-2. If asked about specific rooms, recommend from the 'Available Rooms' list if they match.
-3. For navigation questions, provide the correct page URLs.
-4. Be concise, friendly, and helpful (2-3 sentences max unless explaining something complex).
-5. If you don't have specific information, say so honestly and suggest contacting support@roomies.in.
-6. Use emojis sparingly to be friendly but professional.
+1. You ARE the official Roomies assistant. Answer confidently using the context provided above.
+2. For questions about pricing, fees, booking process, verification, safety, roommate matching, etc. - the answers ARE in your context. Use them!
+3. If asked about specific rooms/properties, recommend from the 'Available Rooms' list if provided.
+4. For navigation questions, provide the correct page URLs (e.g., /explore, /findmate, /dashboard, etc.)
+5. When discussing fees, always mention exact amounts: Booking Fee ₹999, Flash Deal ₹29, Owner Pro ₹199/month, etc.
+6. For "how to" questions, provide step-by-step guidance based on the platform information.
+7. Be concise but complete. 2-4 sentences for simple questions, more for detailed explanations.
+8. Use Indian Rupee (₹) for all prices.
+9. Only say "I don't know" if the question is truly outside the platform scope (like weather, politics, etc.)
+10. Use emojis sparingly to be friendly but professional.
+11. If relevant, include helpful links in HTML format: <a href='/page' class='text-blue-600 underline'>Click here</a>
 
 RESPONSE:"""
 
