@@ -885,7 +885,9 @@
 
         async function verifyPayment(response) {
             try {
-                const verifyResponse = await fetch('/api/payment/verify', {
+                // Determine endpoint based on payment purpose (booking fee vs completion)
+                // For now assuming this is the initial booking fee payment
+                const verifyResponse = await fetch(`/api/bookings/${bookingId}/pay-booking-fee`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -893,8 +895,7 @@
                     body: JSON.stringify({
                         razorpay_order_id: response.razorpay_order_id,
                         razorpay_payment_id: response.razorpay_payment_id,
-                        razorpay_signature: response.razorpay_signature,
-                        booking_id: bookingId
+                        razorpay_signature: response.razorpay_signature
                     })
                 });
 

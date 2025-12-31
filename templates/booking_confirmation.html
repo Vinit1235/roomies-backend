@@ -365,16 +365,10 @@
                     <a href="/my-bookings" class="btn btn-secondary">
                         <i class="fas fa-list"></i> View All Bookings
                     </a>
-                    {% if booking.room_availability_status == 'green' %}
-                    <a href="/payment?booking_id={{ booking.id }}&amount={{ (booking.calculate_total_due() * 100)|int }}"
+                    <a href="/payment?booking_id={{ booking.id }}&amount={{ (booking.booking_amount * 100)|int }}"
                         class="btn btn-primary">
-                        <i class="fas fa-credit-card"></i> Proceed to Payment
+                        <i class="fas fa-credit-card"></i> Pay Booking Fee (Rs. {{ booking.booking_amount|int }})
                     </a>
-                    {% else %}
-                    <a href="/" class="btn btn-primary">
-                        <i class="fas fa-home"></i> Back to Home
-                    </a>
-                    {% endif %}
                 </div>
             </div>
         </div>
