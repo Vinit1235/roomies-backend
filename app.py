@@ -3054,15 +3054,26 @@ except ImportError as e:
 @login_required
 def create_razorpay_order():
     """Create a Razorpay order for payment."""
-    if razorpay_client is None:
-        return jsonify({"error": "Payment gateway not configured"}), 503
-    
     data = request.get_json()
     amount = data.get("amount")  # Amount in paise (₹999 = 99900 paise)
     booking_id = data.get("booking_id")
     
     if not amount:
         return jsonify({"error": "Amount is required"}), 400
+    
+    # Demo mode: If Razorpay is not configured, return a mock order for testing
+    if razorpay_client is None:
+        app.logger.info("Razorpay not configured - using DEMO mode for payment")
+        demo_order_id = f"demo_order_{booking_id}_{datetime.utcnow().timestamp()}"
+        return jsonify({
+            "success": True,
+            "demo_mode": True,
+            "order_id": demo_order_id,
+            "amount": int(amount),
+            "currency": "INR",
+            "key": "demo_key",
+            "message": "Demo mode: Razorpay not configured. Payment will be simulated."
+        })
     
     try:
         # Create Razorpay order
@@ -3269,14 +3280,22 @@ def pay_booking_fee(booking_id):
     
     if owner:
         try:
-            email_service.send_booking_request_to_owner(booking, room, student, owner)
-            booking.owner_notified = True
-            booking.owner_notification_sent_at = datetime.utcnow()
+            app.logger.info(f"Attempting to send booking notification to owner: {owner.email}")
+            result = email_service.send_booking_request_to_owner(booking, room, student, owner)
+            if result:
+                app.logger.info(f"Successfully sent notification to owner: {owner.email}")
+                booking.owner_notified = True
+                booking.owner_notification_sent_at = datetime.utcnow()
+            else:
+                app.logger.warning(f"Email service returned False for owner notification")
         except Exception as e:
             app.logger.error(f"Failed to send owner notification: {e}")
+    else:
+        app.logger.warning(f"No owner found for room {room.id}, skipping owner notification")
     
     # Send confirmation to student
     try:
+        app.logger.info(f"Attempting to send booking confirmation to student: {student.email}")
         subject = f"Booking Request Sent: {room.title}"
         html_content = f"""
         <h2>Booking Request Submitted! 🎉</h2>
@@ -3291,9 +3310,13 @@ def pay_booking_fee(booking_id):
         <p>Booking Fee Paid: ₹{booking.booking_amount:,.2f}</p>
         <p>Track your booking status at: <a href="{os.getenv('APP_URL')}/my-bookings">My Bookings</a></p>
         """
-        email_service.send_email(student.email, subject, html_content)
-        booking.student_notified = True
-        booking.student_notification_sent_at = datetime.utcnow()
+        result = email_service.send_email(student.email, subject, html_content)
+        if result:
+            app.logger.info(f"Successfully sent confirmation to student: {student.email}")
+            booking.student_notified = True
+            booking.student_notification_sent_at = datetime.utcnow()
+        else:
+            app.logger.warning(f"Email service returned False for student notification")
     except Exception as e:
         app.logger.error(f"Failed to send student notification: {e}")
     

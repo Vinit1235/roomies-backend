@@ -821,6 +821,22 @@
                     return;
                 }
 
+                // DEMO MODE: If Razorpay is not configured, simulate payment success
+                if (orderData.demo_mode) {
+                    console.log('Demo mode detected - simulating payment success');
+                    alert('Demo Mode: Razorpay is not configured. Simulating successful payment...');
+
+                    // Simulate payment response and call verify endpoint
+                    const demoResponse = {
+                        razorpay_order_id: orderData.order_id,
+                        razorpay_payment_id: 'demo_pay_' + Date.now(),
+                        razorpay_signature: 'demo_signature'
+                    };
+
+                    await verifyPayment(demoResponse);
+                    return;
+                }
+
                 // Configure Razorpay options
                 const options = {
                     key: orderData.key || '{{ razorpay_key }}',
