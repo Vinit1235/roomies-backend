@@ -1,22 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Roomies - Find affordable student housing with zero broker fees. Roommate matching, flash deals, and more!">
+    <meta name="description"
+        content="Roomies - Find affordable student housing with zero broker fees. Roommate matching, flash deals, and more!">
     <meta name="theme-color" content="#dc2626">
     <title>Roomies - Zero-Broker Student Homes</title>
-    
+
     <!-- PWA Manifest -->
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
-    
+
     <!-- Stylesheets -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-fixes.css') }}">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-sA+4JpCfG+ablGgVgi4mSxk0n5Y38p2TfFvPr1xumL0=" crossorigin="" />
+    <!-- Google Maps will be loaded at the bottom -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
     {% include 'partials/header.html' %}
 
@@ -25,330 +28,344 @@
     <!-- Main Content Wrapper -->
     <div class="main-content" id="mainContent">
 
-    <!-- Hero Section -->
-    <section id="home" class="hero">
-        <img src="{{ url_for('static', filename='images/hero.jpg') }}" alt="Students in new home" class="hero-bg">
-        <div class="hero-content">
-            <h1>Zero-broker student living that feels like home.</h1>
-            <p>Verified hosts, transparent pricing, and roommate matching engineered for campus life.</p>
+        <!-- Hero Section -->
+        <section id="home" class="hero">
+            <img src="{{ url_for('static', filename='images/hero.jpg') }}" alt="Students in new home" class="hero-bg">
+            <div class="hero-content">
+                <h1>Zero-broker student living that feels like home.</h1>
+                <p>Verified hosts, transparent pricing, and roommate matching engineered for campus life.</p>
 
-            <form id="searchForm" class="search-panel">
-                <div class="field">
-                    <label for="searchInput">College / City</label>
-                    <input id="searchInput" type="text" placeholder="Search by college, neighbourhood or listing name">
-                </div>
-                <div class="field">
-                    <label for="propertyTypeFilter">Property Type</label>
-                    <select id="propertyTypeFilter">
-                        <option value="">Any</option>
-                        <option value="private">Private Room</option>
-                        <option value="shared">Shared Apartment</option>
-                        <option value="studio">Studio</option>
-                        <option value="hostel">Hostel</option>
-                    </select>
-                </div>
-                <div class="field range">
-                    <label for="budgetSlider">Budget</label>
-                    <div class="range-wrapper">
-                        <input type="range" id="budgetSlider" min="3000" max="25000" value="12000">
-                        <span id="budgetValue">₹12,000</span>
+                <form id="searchForm" class="search-panel">
+                    <div class="field">
+                        <label for="searchInput">College / City</label>
+                        <input id="searchInput" type="text"
+                            placeholder="Search by college, neighbourhood or listing name">
                     </div>
-                </div>
-                <div class="field">
-                    <label for="sortFilter">Sort By</label>
-                    <select id="sortFilter">
-                        <option value="price_asc">Price: Low to High</option>
-                        <option value="price_desc">Price: High to Low</option>
-                        <option value="newest">Newest first</option>
-                        <option value="slots_desc">Most available roommates</option>
-                    </select>
-                </div>
-                <div class="actions">
-                    <button type="submit" class="btn-primary">Search inventory</button>
-                    <button type="button" id="clearFilters" class="btn-outline">Reset</button>
-                </div>
-            </form>
-            <div id="searchSummary" class="search-summary"></div>
-        </div>
-    </section>
-
-    <!-- Discover Section -->
-    <section id="discover" class="discover-section">
-        <div class="section-heading">
-            <div>
-                <h2>Discover Premium Accommodations</h2>
-                <p>Hand-picked premium listings from our verified partner properties.</p>
-            </div>
-        </div>
-        <div class="discover-grid">
-            <div class="discover-card featured">
-                <div class="discover-image" style="background-image: url('https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800')"></div>
-                <div class="discover-badge">Featured</div>
-                <div class="discover-content">
-                    <h3>Luxury Student Apartments</h3>
-                    <p>Premium furnished apartments near top colleges with all amenities included.</p>
-                    <a href="#roomsExplorer" class="discover-link">Explore Now →</a>
-                </div>
-            </div>
-            <div class="discover-card">
-                <div class="discover-image" style="background-image: url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800')"></div>
-                <div class="discover-content">
-                    <h3>Co-living Spaces</h3>
-                    <p>Modern co-living with community events and networking opportunities.</p>
-                    <a href="#roomsExplorer" class="discover-link">View Spaces →</a>
-                </div>
-            </div>
-            <div class="discover-card">
-                <div class="discover-image" style="background-image: url('https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800')"></div>
-                <div class="discover-content">
-                    <h3>Budget-Friendly Hostels</h3>
-                    <p>Affordable hostel rooms perfect for students on a tight budget.</p>
-                    <a href="#roomsExplorer" class="discover-link">Browse Hostels →</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Discover Rooms -->
-    <section id="roomsExplorer" class="rooms-section">
-        <div class="section-heading">
-            <div>
-                <h2>Curated homes near your campus</h2>
-                <p>Verified owners, transparent pricing, real-time availability.</p>
-            </div>
-            <div class="toggle-group">
-                <label class="toggle">
-                    <input type="checkbox" id="includeUnverified">
-                    <span>Include unverified listings</span>
-                </label>
-                <label class="toggle">
-                    <input type="checkbox" id="filterFindmates" checked>
-                    <span>Only show rooms with open roommate slots</span>
-                </label>
-            </div>
-        </div>
-        <div class="rooms-grid" id="roomsGrid"></div>
-    </section>
-
-    <!-- AI Matching Section -->
-    <section id="aiMatching" class="ai-matching-section">
-        <div class="ai-container">
-            <div class="ai-content">
-                <div class="ai-icon">
-                    <i class="fas fa-brain"></i>
-                </div>
-                <h2>AI-Powered Roommate Matching</h2>
-                <p>Our intelligent matching algorithm considers your lifestyle, study habits, budget preferences, and personality traits to find compatible roommates.</p>
-                <div class="ai-features">
-                    <div class="ai-feature">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Personality compatibility analysis</span>
-                    </div>
-                    <div class="ai-feature">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Study schedule alignment</span>
-                    </div>
-                    <div class="ai-feature">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Lifestyle & habits matching</span>
-                    </div>
-                    <div class="ai-feature">
-                        <i class="fas fa-check-circle"></i>
-                        <span>Budget range optimization</span>
-                    </div>
-                </div>
-                <button class="btn-ai-start">
-                    <i class="fas fa-magic"></i>
-                    Start AI Matching
-                </button>
-            </div>
-            <div class="ai-visual">
-                <div class="ai-circle pulse"></div>
-                <div class="ai-stats">
-                    <div class="stat-item">
-                        <h3>98%</h3>
-                        <p>Match Success Rate</p>
-                    </div>
-                    <div class="stat-item">
-                        <h3>5000+</h3>
-                        <p>Happy Roommates</p>
-                    </div>
-                    <div class="stat-item">
-                        <h3>&lt;2min</h3>
-                        <p>Match Time</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Map Overview -->
-    <section id="mapSection" class="map-section">
-        <div class="section-heading">
-            <div>
-                <h2>Map overview</h2>
-                <p>See walkable options and commute-friendly choices on a live map.</p>
-            </div>
-            <button class="btn-outline" id="recenterMap">Re-center to results</button>
-        </div>
-        <div id="mapView"></div>
-    </section>
-
-    <!-- Findmates Spotlight -->
-    <section id="findmates" class="findmates-section">
-        <div class="section-heading">
-            <div>
-                <h2>Findmates looking for you</h2>
-                <p>Shortlisted rooms actively searching for compatible roommates.</p>
-            </div>
-            <button class="btn-primary" id="refreshFindmates">Refresh recommendations</button>
-        </div>
-        <div class="rooms-grid" id="findmatesGrid"></div>
-    </section>
-
-    <!-- Owner tools -->
-    <section id="owners" class="owners-section">
-        <div class="owners-copy">
-            <h2>Trusted by campus landlords & hostel owners</h2>
-            <p>List once, reach curated student demand. We verify every student, automate payments, and surface real-time availability.</p>
-            <ul>
-                <li>Self-serve property onboarding</li>
-                <li>Digital KYC and agreement workflows</li>
-                <li>Integrated roommate matching to keep beds full</li>
-            </ul>
-        </div>
-        <div class="owners-form-card">
-            <h3>Publish a new listing</h3>
-            <p class="muted">Signed-in owners can post directly. Others will be asked to sign in.</p>
-            <form id="ownerListingForm">
-                <div class="form-row">
-                    <label>Listing title</label>
-                    <input name="title" required placeholder="Premium 2-sharing near NMIMS">
-                </div>
-                <div class="form-row">
-                    <label>Monthly rent (₹)</label>
-                    <input name="price" type="number" min="1000" step="500" required>
-                </div>
-                <div class="form-row">
-                    <label>Location</label>
-                    <input name="location" required placeholder="Vile Parle East, Mumbai">
-                </div>
-                <div class="form-row">
-                    <label>Nearest college</label>
-                    <input name="college" required placeholder="NMIMS Mumbai">
-                </div>
-                <div class="form-row two-up">
-                    <div>
-                        <label>Property type</label>
-                        <select name="property_type" required>
-                            <option value="shared">Shared</option>
-                            <option value="private">Private</option>
+                    <div class="field">
+                        <label for="propertyTypeFilter">Property Type</label>
+                        <select id="propertyTypeFilter">
+                            <option value="">Any</option>
+                            <option value="private">Private Room</option>
+                            <option value="shared">Shared Apartment</option>
                             <option value="studio">Studio</option>
                             <option value="hostel">Hostel</option>
                         </select>
                     </div>
-                    <div>
-                        <label>Total capacity</label>
-                        <input name="capacity_total" type="number" min="1" value="2" required>
+                    <div class="field range">
+                        <label for="budgetSlider">Budget</label>
+                        <div class="range-wrapper">
+                            <input type="range" id="budgetSlider" min="3000" max="25000" value="12000">
+                            <span id="budgetValue">₹12,000</span>
+                        </div>
                     </div>
-                    <div>
-                        <label>Currently occupied</label>
-                        <input name="capacity_occupied" type="number" min="0" value="0">
+                    <div class="field">
+                        <label for="sortFilter">Sort By</label>
+                        <select id="sortFilter">
+                            <option value="price_asc">Price: Low to High</option>
+                            <option value="price_desc">Price: High to Low</option>
+                            <option value="newest">Newest first</option>
+                            <option value="slots_desc">Most available roommates</option>
+                        </select>
                     </div>
-                </div>
-                <div class="form-row two-up">
-                    <div>
-                        <label>Latitude</label>
-                        <input name="latitude" type="number" step="0.0001" placeholder="19.0728">
+                    <div class="actions">
+                        <button type="submit" class="btn-primary">Search inventory</button>
+                        <button type="button" id="clearFilters" class="btn-outline">Reset</button>
                     </div>
-                    <div>
-                        <label>Longitude</label>
-                        <input name="longitude" type="number" step="0.0001" placeholder="72.9009">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <label>Amenities (comma separated)</label>
-                    <input name="amenities" placeholder="wifi, meals, laundry">
-                </div>
-                <div class="form-row">
-                    <label>Images (comma separated URLs)</label>
-                    <input name="images" placeholder="https://...">
-                </div>
-                <button type="submit" class="btn-primary full-width">Submit listing</button>
-                <div id="ownerListingFeedback" class="form-feedback"></div>
-            </form>
-        </div>
-    </section>
+                </form>
+                <div id="searchSummary" class="search-summary"></div>
+            </div>
+        </section>
 
-    <!-- About us -->
-    <section id="about" class="about-section">
-        <h2>Built by student founders, scaled with university partners</h2>
-        <div class="about-grid">
-            <div class="about-card">
-                <h3>Campus verified</h3>
-                <p>Every owner pass KYC and property checks. Students verify with college IDs before move-in.</p>
-            </div>
-            <div class="about-card">
-                <h3>Roommate chemistry</h3>
-                <p>Our Findmates engine factors lifestyle, budgets, and study rhythms to avoid mismatches.</p>
-            </div>
-            <div class="about-card">
-                <h3>Nationwide roll-out</h3>
-                <p>We currently serve Mumbai, Pune, Bengaluru and NCR with 24x7 support desks.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact -->
-    <section id="contact" class="contact-section">
-        <div class="contact-copy">
-            <h2>Let's collaborate</h2>
-            <p>Have a campus partnership idea, listing query, or need support? Drop us a note—we respond within one business day.</p>
-            <div class="contact-meta">
+        <!-- Discover Section -->
+        <section id="discover" class="discover-section">
+            <div class="section-heading">
                 <div>
-                    <strong>Email</strong>
-                    <span>support@roomies.in</span>
-                </div>
-                <div>
-                    <strong>Working hours</strong>
-                    <span>Mon–Sat, 9am to 7pm IST</span>
+                    <h2>Discover Premium Accommodations</h2>
+                    <p>Hand-picked premium listings from our verified partner properties.</p>
                 </div>
             </div>
-        </div>
-        <div class="contact-form-card">
-            <form id="contactForm">
-                <div class="form-row">
-                    <label>Name</label>
-                    <input name="name" required>
+            <div class="discover-grid">
+                <div class="discover-card featured">
+                    <div class="discover-image"
+                        style="background-image: url('https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800')">
+                    </div>
+                    <div class="discover-badge">Featured</div>
+                    <div class="discover-content">
+                        <h3>Luxury Student Apartments</h3>
+                        <p>Premium furnished apartments near top colleges with all amenities included.</p>
+                        <a href="#roomsExplorer" class="discover-link">Explore Now →</a>
+                    </div>
                 </div>
-                <div class="form-row">
-                    <label>Email</label>
-                    <input name="email" type="email" required>
+                <div class="discover-card">
+                    <div class="discover-image"
+                        style="background-image: url('https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800')">
+                    </div>
+                    <div class="discover-content">
+                        <h3>Co-living Spaces</h3>
+                        <p>Modern co-living with community events and networking opportunities.</p>
+                        <a href="#roomsExplorer" class="discover-link">View Spaces →</a>
+                    </div>
                 </div>
-                <div class="form-row">
-                    <label>Subject</label>
-                    <input name="subject" placeholder="Partnership enquiry">
+                <div class="discover-card">
+                    <div class="discover-image"
+                        style="background-image: url('https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800')">
+                    </div>
+                    <div class="discover-content">
+                        <h3>Budget-Friendly Hostels</h3>
+                        <p>Affordable hostel rooms perfect for students on a tight budget.</p>
+                        <a href="#roomsExplorer" class="discover-link">Browse Hostels →</a>
+                    </div>
                 </div>
-                <div class="form-row">
-                    <label>Message</label>
-                    <textarea name="message" rows="4" required></textarea>
-                </div>
-                <button type="submit" class="btn-primary full-width">Send message</button>
-                <div id="contactFeedback" class="form-feedback"></div>
-            </form>
-        </div>
-    </section>
+            </div>
+        </section>
 
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2025 Roomies. Purpose-built housing for students & young professionals.</p>
-    </footer>
+        <!-- Discover Rooms -->
+        <section id="roomsExplorer" class="rooms-section">
+            <div class="section-heading">
+                <div>
+                    <h2>Curated homes near your campus</h2>
+                    <p>Verified owners, transparent pricing, real-time availability.</p>
+                </div>
+                <div class="toggle-group">
+                    <label class="toggle">
+                        <input type="checkbox" id="includeUnverified">
+                        <span>Include unverified listings</span>
+                    </label>
+                    <label class="toggle">
+                        <input type="checkbox" id="filterFindmates" checked>
+                        <span>Only show rooms with open roommate slots</span>
+                    </label>
+                </div>
+            </div>
+            <div class="rooms-grid" id="roomsGrid"></div>
+        </section>
+
+        <!-- AI Matching Section -->
+        <section id="aiMatching" class="ai-matching-section">
+            <div class="ai-container">
+                <div class="ai-content">
+                    <div class="ai-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h2>AI-Powered Roommate Matching</h2>
+                    <p>Our intelligent matching algorithm considers your lifestyle, study habits, budget preferences,
+                        and personality traits to find compatible roommates.</p>
+                    <div class="ai-features">
+                        <div class="ai-feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Personality compatibility analysis</span>
+                        </div>
+                        <div class="ai-feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Study schedule alignment</span>
+                        </div>
+                        <div class="ai-feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Lifestyle & habits matching</span>
+                        </div>
+                        <div class="ai-feature">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Budget range optimization</span>
+                        </div>
+                    </div>
+                    <button class="btn-ai-start">
+                        <i class="fas fa-magic"></i>
+                        Start AI Matching
+                    </button>
+                </div>
+                <div class="ai-visual">
+                    <div class="ai-circle pulse"></div>
+                    <div class="ai-stats">
+                        <div class="stat-item">
+                            <h3>98%</h3>
+                            <p>Match Success Rate</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3>5000+</h3>
+                            <p>Happy Roommates</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3>&lt;2min</h3>
+                            <p>Match Time</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Map Overview -->
+        <section id="mapSection" class="map-section">
+            <div class="section-heading">
+                <div>
+                    <h2>Map overview</h2>
+                    <p>See walkable options and commute-friendly choices on a live map.</p>
+                </div>
+                <button class="btn-outline" id="recenterMap">Re-center to results</button>
+            </div>
+            <div id="mapView"></div>
+        </section>
+
+        <!-- Findmates Spotlight -->
+        <section id="findmates" class="findmates-section">
+            <div class="section-heading">
+                <div>
+                    <h2>Findmates looking for you</h2>
+                    <p>Shortlisted rooms actively searching for compatible roommates.</p>
+                </div>
+                <button class="btn-primary" id="refreshFindmates">Refresh recommendations</button>
+            </div>
+            <div class="rooms-grid" id="findmatesGrid"></div>
+        </section>
+
+        <!-- Owner tools -->
+        <section id="owners" class="owners-section">
+            <div class="owners-copy">
+                <h2>Trusted by campus landlords & hostel owners</h2>
+                <p>List once, reach curated student demand. We verify every student, automate payments, and surface
+                    real-time availability.</p>
+                <ul>
+                    <li>Self-serve property onboarding</li>
+                    <li>Digital KYC and agreement workflows</li>
+                    <li>Integrated roommate matching to keep beds full</li>
+                </ul>
+            </div>
+            <div class="owners-form-card">
+                <h3>Publish a new listing</h3>
+                <p class="muted">Signed-in owners can post directly. Others will be asked to sign in.</p>
+                <form id="ownerListingForm">
+                    <div class="form-row">
+                        <label>Listing title</label>
+                        <input name="title" required placeholder="Premium 2-sharing near NMIMS">
+                    </div>
+                    <div class="form-row">
+                        <label>Monthly rent (₹)</label>
+                        <input name="price" type="number" min="1000" step="500" required>
+                    </div>
+                    <div class="form-row">
+                        <label>Location</label>
+                        <input name="location" required placeholder="Vile Parle East, Mumbai">
+                    </div>
+                    <div class="form-row">
+                        <label>Nearest college</label>
+                        <input name="college" required placeholder="NMIMS Mumbai">
+                    </div>
+                    <div class="form-row two-up">
+                        <div>
+                            <label>Property type</label>
+                            <select name="property_type" required>
+                                <option value="shared">Shared</option>
+                                <option value="private">Private</option>
+                                <option value="studio">Studio</option>
+                                <option value="hostel">Hostel</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Total capacity</label>
+                            <input name="capacity_total" type="number" min="1" value="2" required>
+                        </div>
+                        <div>
+                            <label>Currently occupied</label>
+                            <input name="capacity_occupied" type="number" min="0" value="0">
+                        </div>
+                    </div>
+                    <div class="form-row two-up">
+                        <div>
+                            <label>Latitude</label>
+                            <input name="latitude" type="number" step="0.0001" placeholder="19.0728">
+                        </div>
+                        <div>
+                            <label>Longitude</label>
+                            <input name="longitude" type="number" step="0.0001" placeholder="72.9009">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label>Amenities (comma separated)</label>
+                        <input name="amenities" placeholder="wifi, meals, laundry">
+                    </div>
+                    <div class="form-row">
+                        <label>Images (comma separated URLs)</label>
+                        <input name="images" placeholder="https://...">
+                    </div>
+                    <button type="submit" class="btn-primary full-width">Submit listing</button>
+                    <div id="ownerListingFeedback" class="form-feedback"></div>
+                </form>
+            </div>
+        </section>
+
+        <!-- About us -->
+        <section id="about" class="about-section">
+            <h2>Built by student founders, scaled with university partners</h2>
+            <div class="about-grid">
+                <div class="about-card">
+                    <h3>Campus verified</h3>
+                    <p>Every owner pass KYC and property checks. Students verify with college IDs before move-in.</p>
+                </div>
+                <div class="about-card">
+                    <h3>Roommate chemistry</h3>
+                    <p>Our Findmates engine factors lifestyle, budgets, and study rhythms to avoid mismatches.</p>
+                </div>
+                <div class="about-card">
+                    <h3>Nationwide roll-out</h3>
+                    <p>We currently serve Mumbai, Pune, Bengaluru and NCR with 24x7 support desks.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact -->
+        <section id="contact" class="contact-section">
+            <div class="contact-copy">
+                <h2>Let's collaborate</h2>
+                <p>Have a campus partnership idea, listing query, or need support? Drop us a note—we respond within one
+                    business day.</p>
+                <div class="contact-meta">
+                    <div>
+                        <strong>Email</strong>
+                        <span>support@roomies.in</span>
+                    </div>
+                    <div>
+                        <strong>Working hours</strong>
+                        <span>Mon–Sat, 9am to 7pm IST</span>
+                    </div>
+                </div>
+            </div>
+            <div class="contact-form-card">
+                <form id="contactForm">
+                    <div class="form-row">
+                        <label>Name</label>
+                        <input name="name" required>
+                    </div>
+                    <div class="form-row">
+                        <label>Email</label>
+                        <input name="email" type="email" required>
+                    </div>
+                    <div class="form-row">
+                        <label>Subject</label>
+                        <input name="subject" placeholder="Partnership enquiry">
+                    </div>
+                    <div class="form-row">
+                        <label>Message</label>
+                        <textarea name="message" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary full-width">Send message</button>
+                    <div id="contactFeedback" class="form-feedback"></div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <p>&copy; 2025 Roomies. Purpose-built housing for students & young professionals.</p>
+        </footer>
     </div>
 
     <!-- AI Chatbot Widget -->
     {% include 'partials/chatbot.html' %}
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-o9N1j7kGStnHtLF8ZjH6ECrBwtYzuZEwO8gExc3l6P8=" crossorigin=""></script>
+    <!-- Google Maps API -->
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key={{ config.get('GOOGLE_MAPS_API_KEY', '') }}&callback=initIndexMap"
+        async defer></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
+
 </html>

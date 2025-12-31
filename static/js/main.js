@@ -32,13 +32,13 @@ if (menuToggle && sidebar && mainContent) {
     menuToggle.addEventListener("click", () => {
         sidebar.classList.toggle("collapsed");
         mainContent.classList.toggle("expanded");
-        
+
         // For mobile, use 'show' class instead
         if (window.innerWidth <= 768) {
             sidebar.classList.toggle("show");
         }
     });
-    
+
     // Close sidebar when clicking outside on mobile
     if (window.innerWidth <= 768) {
         document.addEventListener("click", (e) => {
@@ -81,7 +81,7 @@ if (globalSearch && searchInput) {
 // Sidebar active state
 const sidebarItems = document.querySelectorAll(".sidebar-item");
 sidebarItems.forEach(item => {
-    item.addEventListener("click", function() {
+    item.addEventListener("click", function () {
         // Auto-close mobile sidebar after clicking a link
         if (window.innerWidth <= 768 && sidebar) {
             sidebar.classList.remove("show");
@@ -165,28 +165,57 @@ const renderRooms = (rooms, target) => {
 
 const plotRoomsOnMap = (rooms) => {
     if (!mapInstance || !mapMarkers) return;
-    mapMarkers.clearLayers();
 
-    const points = [];
+    // Clear existing markers
+    mapMarkers.forEach(marker => marker.setMap(null));
+    mapMarkers = [];
+
+    const bounds = new google.maps.LatLngBounds();
     rooms.forEach((room) => {
         if (room.latitude && room.longitude) {
-            const marker = L.marker([room.latitude, room.longitude]).bindPopup(`
-                <strong>${room.title}</strong><br>
-                ${room.location}<br>
-                ${formatCurrency(room.price)} · ${formatCapacity(room)}
-            `);
-            marker.addTo(mapMarkers);
-            points.push([room.latitude, room.longitude]);
+            const position = { lat: room.latitude, lng: room.longitude };
+            const marker = new google.maps.Marker({
+                position: position,
+                map: mapInstance,
+                title: room.title,
+                icon: {
+                    url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                        <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M16 0C9 0 4 5 4 12c0 9 12 20 12 20s12-11 12-20c0-7-5-12-12-12z" fill="#dc2626"/>
+                            <circle cx="16" cy="12" r="5" fill="white"/>
+                        </svg>
+                    `),
+                    scaledSize: new google.maps.Size(32, 32),
+                    anchor: new google.maps.Point(16, 32)
+                }
+            });
+
+            const infoWindow = new google.maps.InfoWindow({
+                content: `
+                    <div style="padding: 8px; min-width: 180px;">
+                        <strong>${room.title}</strong><br>
+                        ${room.location}<br>
+                        ${formatCurrency(room.price)} · ${formatCapacity(room)}
+                    </div>
+                `
+            });
+
+            marker.addListener('click', () => {
+                infoWindow.open(mapInstance, marker);
+            });
+
+            mapMarkers.push(marker);
+            bounds.extend(position);
         }
     });
 
-    if (points.length) {
-        const bounds = L.latLngBounds(points);
-        mapInstance.fitBounds(bounds, { padding: [40, 40] });
+    if (mapMarkers.length > 0) {
+        mapInstance.fitBounds(bounds);
     }
 };
 
-const initMap = () => {
+// Google Maps initialization function (called by API callback)
+window.initIndexMap = function () {
     const mapContainer = document.getElementById("mapView");
     if (!mapContainer) {
         console.log("[Map] Map container not found on this page");
@@ -199,39 +228,33 @@ const initMap = () => {
         return;
     }
 
-    // Wait for Leaflet to be loaded
-    if (typeof L === 'undefined') {
-        console.error("[Map] Leaflet library not loaded - retrying...");
-        setTimeout(initMap, 200);
-        return;
-    }
-
     try {
-        console.log("[Map] Initializing map...");
-        
-        // Clear any existing map
-        mapContainer.innerHTML = '';
-        
-        // Initialize map centered on Mumbai
-        mapInstance = L.map('mapView', { 
-            scrollWheelZoom: false,
-            zoomControl: true
-        }).setView([19.076, 72.8777], 12);
-        
-        // Add OpenStreetMap tiles
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-            maxZoom: 19
-        }).addTo(mapInstance);
-        
-        console.log("[Map] Map initialized successfully");
-        
-        // Create marker layer
-        mapMarkers = L.layerGroup().addTo(mapInstance);
-        
+        console.log("[Map] Initializing Google Maps...");
+
+        // Initialize Google Map centered on Mumbai
+        mapInstance = new google.maps.Map(mapContainer, {
+            center: { lat: 19.076, lng: 72.8777 },
+            zoom: 12,
+            mapTypeControl: false,
+            streetViewControl: false,
+            fullscreenControl: true,
+            styles: [
+                {
+                    featureType: "poi",
+                    elementType: "labels",
+                    stylers: [{ visibility: "off" }]
+                }
+            ]
+        });
+
+        console.log("[Map] Google Map initialized successfully");
+
+        // Initialize markers array
+        mapMarkers = [];
+
         // Add sample markers for demonstration
         addSampleMarkers();
-        
+
         // Request user's location
         if (navigator.geolocation) {
             console.log("[Map] Requesting GPS location...");
@@ -240,47 +263,46 @@ const initMap = () => {
                     const userLat = position.coords.latitude;
                     const userLng = position.coords.longitude;
                     console.log(`[Map] User location: ${userLat}, ${userLng}`);
-                    
+
                     // Add user location marker with custom blue icon
-                    const userIcon = L.divIcon({
-                        className: 'user-location-marker',
-                        html: '<div style="background: #3b82f6; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);"></div>',
-                        iconSize: [22, 22],
-                        iconAnchor: [11, 11]
+                    const userMarker = new google.maps.Marker({
+                        position: { lat: userLat, lng: userLng },
+                        map: mapInstance,
+                        title: 'Your Location',
+                        icon: {
+                            path: google.maps.SymbolPath.CIRCLE,
+                            scale: 10,
+                            fillColor: '#3b82f6',
+                            fillOpacity: 1,
+                            strokeColor: '#ffffff',
+                            strokeWeight: 3
+                        }
                     });
-                    
-                    L.marker([userLat, userLng], { icon: userIcon })
-                        .addTo(mapMarkers)
-                        .bindPopup('<strong>📍 Your Location</strong><br>You are here')
-                        .openPopup();
-                    
-                    // Center map on user location
-                    mapInstance.setView([userLat, userLng], 13);
+
+                    const infoWindow = new google.maps.InfoWindow({
+                        content: '<strong>📍 Your Location</strong><br>You are here'
+                    });
+                    infoWindow.open(mapInstance, userMarker);
+
+                    mapInstance.setCenter({ lat: userLat, lng: userLng });
+                    mapInstance.setZoom(13);
                 },
                 (error) => {
                     console.warn("[Map] Location access denied:", error.message);
-                    // Keep default Mumbai center if location denied
                 },
                 { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
             );
         } else {
             console.warn("[Map] Geolocation not supported by browser");
         }
-        
-        // Force a resize to ensure proper display
-        setTimeout(() => {
-            if (mapInstance) {
-                mapInstance.invalidateSize();
-            }
-        }, 100);
     } catch (error) {
         console.error("[Map] Error initializing map:", error);
     }
 };
 
 const addSampleMarkers = () => {
-    if (!mapInstance || !mapMarkers) return;
-    
+    if (!mapInstance) return;
+
     const sampleLocations = [
         { lat: 19.0760, lng: 72.8777, title: "Andheri East PG", price: "₹8,500" },
         { lat: 19.1136, lng: 72.8697, title: "Malad West Hostel", price: "₹6,000" },
@@ -288,14 +310,40 @@ const addSampleMarkers = () => {
         { lat: 19.0596, lng: 72.8295, title: "Juhu Beach Studio", price: "₹15,000" },
         { lat: 19.1197, lng: 72.9080, title: "Powai Lake View", price: "₹10,500" },
     ];
-    
+
     sampleLocations.forEach(loc => {
-        const marker = L.marker([loc.lat, loc.lng]).bindPopup(`
-            <strong>${loc.title}</strong><br>
-            ${loc.price}/month<br>
-            <a href="/explore">View Details</a>
-        `);
-        marker.addTo(mapMarkers);
+        const marker = new google.maps.Marker({
+            position: { lat: loc.lat, lng: loc.lng },
+            map: mapInstance,
+            title: loc.title,
+            icon: {
+                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                    <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16 0C9 0 4 5 4 12c0 9 12 20 12 20s12-11 12-20c0-7-5-12-12-12z" fill="#dc2626"/>
+                        <circle cx="16" cy="12" r="5" fill="white"/>
+                    </svg>
+                `),
+                scaledSize: new google.maps.Size(32, 32),
+                anchor: new google.maps.Point(16, 32)
+            }
+        });
+
+        const infoWindow = new google.maps.InfoWindow({
+            content: `
+                <div style="padding: 8px;">
+                    <strong>${loc.title}</strong><br>
+                    ${loc.price}/month<br>
+                    <a href="/explore">View Details</a>
+                </div>
+            `
+        });
+
+        marker.addListener('click', () => {
+            infoWindow.open(mapInstance, marker);
+        });
+
+        if (!mapMarkers) mapMarkers = [];
+        mapMarkers.push(marker);
     });
 };
 
@@ -495,11 +543,8 @@ if (contactForm) {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-    // Initialize map if on index.html or other pages with mapView
-    // Skip if on explore.html (it has custom initialization)
-    if (!window.location.pathname.includes('explore')) {
-        setTimeout(initMap, 100); // Delay to ensure Leaflet loads
-    }
+    // Map initialization is handled by Google Maps callback (initIndexMap)
+    // Skip manual initialization as Google Maps API calls the callback
     initVoiceSearch();
     initPWA();
     loadFlashDeals();
@@ -633,26 +678,47 @@ function displayFlashDealsOnMap(deals) {
                 if (data.rooms && data.rooms.length > 0) {
                     const room = data.rooms[0];
                     if (room.latitude && room.longitude) {
-                        // Create pulsing marker
-                        const pulsingIcon = L.divIcon({
-                            className: "flash-deal-marker",
-                            html: `<div class="pulse"></div><i class="fas fa-bolt"></i>`,
-                            iconSize: [40, 40],
+                        // Create flash deal marker with bold icon
+                        const marker = new google.maps.Marker({
+                            position: { lat: room.latitude, lng: room.longitude },
+                            map: mapInstance,
+                            title: '⚡ Flash Deal: ' + room.title,
+                            icon: {
+                                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                                    <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="20" cy="20" r="18" fill="#fbbf24" stroke="#f59e0b" stroke-width="2"/>
+                                        <text x="20" y="26" text-anchor="middle" font-size="18" fill="#1f2937">⚡</text>
+                                    </svg>
+                                `),
+                                scaledSize: new google.maps.Size(40, 40),
+                                anchor: new google.maps.Point(20, 20)
+                            },
+                            animation: google.maps.Animation.BOUNCE
                         });
 
-                        const marker = L.marker([room.latitude, room.longitude], {
-                            icon: pulsingIcon,
-                        }).addTo(mapInstance);
+                        // Stop bouncing after 2 seconds
+                        setTimeout(() => {
+                            marker.setAnimation(null);
+                        }, 2000);
 
-                        marker.bindPopup(`
-                            <div class="flash-deal-popup">
-                                <h4>⚡ FLASH DEAL ⚡</h4>
-                                <p><strong>${room.title}</strong></p>
-                                <p><del>₹${deal.original_price}</del> <span class="deal-price">₹${deal.deal_price}</span></p>
-                                <p class="deal-discount">${deal.discount_percent}% OFF</p>
-                                <p class="deal-timer">⏰ ${Math.floor(deal.time_remaining_hours)}h remaining</p>
-                            </div>
-                        `);
+                        const infoWindow = new google.maps.InfoWindow({
+                            content: `
+                                <div style="padding: 12px; min-width: 200px;">
+                                    <h4 style="margin: 0 0 8px 0; color: #f59e0b;">⚡ FLASH DEAL ⚡</h4>
+                                    <p style="margin: 0 0 4px 0;"><strong>${room.title}</strong></p>
+                                    <p style="margin: 0 0 4px 0;">
+                                        <del style="color: #9ca3af;">₹${deal.original_price}</del>
+                                        <span style="color: #dc2626; font-weight: bold; font-size: 18px;"> ₹${deal.deal_price}</span>
+                                    </p>
+                                    <p style="margin: 0 0 4px 0; color: #16a34a; font-weight: bold;">${deal.discount_percent}% OFF</p>
+                                    <p style="margin: 0; color: #64748b;">⏰ ${Math.floor(deal.time_remaining_hours)}h remaining</p>
+                                </div>
+                            `
+                        });
+
+                        marker.addListener('click', () => {
+                            infoWindow.open(mapInstance, marker);
+                        });
                     }
                 }
             });

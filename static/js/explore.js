@@ -1,14 +1,15 @@
-// Explore Page Map Logic - Simplified and Robust
+// Explore Page Map Logic - Google Maps Version
 
-(function() {
-    console.log('[Explore Map] Script loaded');
+(function () {
+    console.log('[Explore Map] Script loaded (Google Maps)');
 
     let map = null;
-    let markersLayer = null;
+    let markers = [];
     let userMarker = null;
+    let infoWindow = null;
 
     function initMap() {
-        console.log('[Explore Map] Initializing...');
+        console.log('[Explore Map] Initializing Google Maps...');
 
         const mapContainer = document.getElementById('mapView');
         if (!mapContainer) {
@@ -16,64 +17,37 @@
             return;
         }
 
-        if (typeof L === 'undefined') {
-            console.error('[Explore Map] Leaflet (L) is not defined. Retrying in 500ms...');
+        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
+            console.error('[Explore Map] Google Maps API not loaded. Retrying in 500ms...');
             setTimeout(initMap, 500);
             return;
         }
 
-        // Cleanup existing map if any
-        if (map) {
-            console.log('[Explore Map] Removing existing map instance');
-            map.remove();
-            map = null;
-        }
-
-        // Check if map is already initialized by another script (safety check)
-        if (mapContainer._leaflet_id) {
-             console.warn('[Explore Map] Map container already has a leaflet ID. Attempting to clear.');
-             mapContainer._leaflet_id = null;
-             mapContainer.innerHTML = '';
-        }
-
         try {
-            // Initialize Map
-            map = L.map('mapView', {
-                center: [19.076, 72.8777], // Mumbai
+            // Initialize Google Map
+            map = new google.maps.Map(mapContainer, {
+                center: { lat: 19.076, lng: 72.8777 }, // Mumbai
                 zoom: 12,
-                scrollWheelZoom: false // Disable scroll zoom by default for better UX
+                mapTypeControl: false,
+                streetViewControl: false,
+                fullscreenControl: true,
+                zoomControl: true,
+                styles: [
+                    {
+                        featureType: "poi",
+                        elementType: "labels",
+                        stylers: [{ visibility: "off" }]
+                    }
+                ]
             });
 
-            // Add Tile Layer - Using CartoDB Voyager for better reliability and aesthetics
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-                subdomains: 'abcd',
-                maxZoom: 19
-            }).addTo(map);
+            // Create a single InfoWindow for reuse
+            infoWindow = new google.maps.InfoWindow();
 
-            // Add Markers Layer Group
-            markersLayer = L.layerGroup().addTo(map);
-
-            console.log('[Explore Map] Map initialized successfully');
-
-            // Add a test marker to verify visibility
-            L.marker([19.076, 72.8777])
-                .addTo(markersLayer)
-                .bindPopup('<b>Mumbai</b><br>Default Center')
-                .openPopup();
+            console.log('[Explore Map] Google Map initialized successfully');
 
             // Load real data
             fetchRoomsAndPlot();
-
-            // Handle window resize
-            window.addEventListener('resize', () => {
-                map.invalidateSize();
-            });
-            
-            // Force a resize after a short delay to fix rendering glitches
-            setTimeout(() => {
-                map.invalidateSize();
-            }, 500);
 
             // Bind Locate Me Button
             const locateBtn = document.getElementById('locateMeBtn');
@@ -106,14 +80,14 @@
                 searchInput.addEventListener('input', (e) => {
                     clearTimeout(debounceTimer);
                     const query = e.target.value.trim();
-                    
+
                     debounceTimer = setTimeout(() => {
                         if (query.length > 0) {
                             fetchSearchResults(query);
                         } else {
                             fetchRoomsAndPlot(); // Reset to all rooms
                         }
-                    }, 300); // 300ms debounce
+                    }, 300);
                 });
             }
 
@@ -147,13 +121,13 @@
             console.log(`[Explore Map] Searching for: ${query}`);
             const response = await fetch(`/api/search/autocomplete?q=${encodeURIComponent(query)}`);
             if (!response.ok) throw new Error('Search failed');
-            
+
             const data = await response.json();
             const rooms = data.results || [];
-            
+
             console.log(`[Explore Map] Found ${rooms.length} matches`);
             plotRooms(rooms);
-            
+
         } catch (error) {
             console.error('[Explore Map] Search error:', error);
         }
@@ -174,24 +148,34 @@
             (position) => {
                 const lat = position.coords.latitude;
                 const lng = position.coords.longitude;
+                const userPos = { lat, lng };
 
                 if (userMarker) {
-                    map.removeLayer(userMarker);
+                    userMarker.setMap(null);
                 }
 
-                // Create a pulsing blue dot for user location
-                const userIcon = L.divIcon({
-                    className: 'user-location-marker',
-                    html: '<div style="background-color: #2563eb; width: 15px; height: 15px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.3);"></div>',
-                    iconSize: [20, 20],
-                    iconAnchor: [10, 10]
+                // Create a blue dot marker for user location
+                userMarker = new google.maps.Marker({
+                    position: userPos,
+                    map: map,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 10,
+                        fillColor: '#2563eb',
+                        fillOpacity: 1,
+                        strokeColor: '#ffffff',
+                        strokeWeight: 3
+                    },
+                    title: 'Your Location'
                 });
 
-                userMarker = L.marker([lat, lng], { icon: userIcon }).addTo(map);
-                userMarker.bindPopup('<b>You are here</b>').openPopup();
+                // Show info window
+                infoWindow.setContent('<b>You are here</b>');
+                infoWindow.open(map, userMarker);
 
-                map.setView([lat, lng], 14);
-                
+                map.setCenter(userPos);
+                map.setZoom(14);
+
                 locateBtn.innerHTML = originalText;
                 locateBtn.disabled = false;
             },
@@ -207,28 +191,28 @@
     async function fetchRoomsAndPlot() {
         try {
             console.log('[Explore Map] Fetching rooms...');
-            
+
             // Gather filter values
             const propertyType = document.getElementById('propertyTypeFilter')?.value || '';
             const sort = document.getElementById('sortFilter')?.value || 'price_asc';
             const maxRent = document.getElementById('budgetSlider')?.value || '';
-            
+
             const params = new URLSearchParams({
                 limit: 50,
                 property_type: propertyType,
                 sort: sort
             });
-            
+
             if (maxRent) {
                 params.append('max_rent', maxRent);
             }
 
             const response = await fetch(`/api/rooms?${params.toString()}`);
             if (!response.ok) throw new Error('Failed to fetch rooms');
-            
+
             const data = await response.json();
             const rooms = data.rooms || [];
-            
+
             console.log(`[Explore Map] Found ${rooms.length} rooms`);
             plotRooms(rooms);
 
@@ -238,32 +222,56 @@
     }
 
     function plotRooms(rooms) {
-        if (!map || !markersLayer) return;
+        if (!map) return;
 
-        markersLayer.clearLayers();
-        const bounds = [];
+        // Clear existing markers
+        markers.forEach(marker => marker.setMap(null));
+        markers = [];
+
+        const bounds = new google.maps.LatLngBounds();
         const listContainer = document.getElementById('roomsList');
         if (listContainer) listContainer.innerHTML = '';
 
         rooms.forEach(room => {
             if (room.latitude && room.longitude) {
-                // 1. Create Marker
-                const marker = L.marker([room.latitude, room.longitude]);
-                
+                const position = { lat: room.latitude, lng: room.longitude };
+
+                // Create custom marker
+                const marker = new google.maps.Marker({
+                    position: position,
+                    map: map,
+                    title: room.title,
+                    icon: {
+                        url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                            <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18 0C10.8 0 5 5.8 5 13c0 9.75 13 23 13 23s13-13.25 13-23c0-7.2-5.8-13-13-13z" fill="#dc2626"/>
+                                <circle cx="18" cy="13" r="6" fill="white"/>
+                            </svg>
+                        `),
+                        scaledSize: new google.maps.Size(36, 36),
+                        anchor: new google.maps.Point(18, 36)
+                    }
+                });
+
+                // InfoWindow content
                 const popupContent = `
-                    <div style="min-width: 200px;">
-                        <h4 style="margin: 0 0 5px 0; color: #dc2626;">${room.title}</h4>
-                        <p style="margin: 0; font-weight: bold;">₹${room.price}/mo</p>
-                        <p style="margin: 5px 0 0 0; font-size: 0.9em; color: #666;">${room.location}</p>
-                        <a href="/room/${room.id}" style="display: block; margin-top: 8px; color: #2563eb; text-decoration: none; font-weight: 600;">View Details &rarr;</a>
+                    <div style="min-width: 200px; padding: 8px;">
+                        <h4 style="margin: 0 0 5px 0; color: #dc2626; font-size: 14px;">${room.title}</h4>
+                        <p style="margin: 0; font-weight: bold; font-size: 16px;">₹${room.price}/mo</p>
+                        <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">${room.location}</p>
+                        <a href="/room/${room.id}" style="display: block; margin-top: 8px; color: #2563eb; text-decoration: none; font-weight: 600;">View Details →</a>
                     </div>
                 `;
-                
-                marker.bindPopup(popupContent);
-                markersLayer.addLayer(marker);
-                bounds.push([room.latitude, room.longitude]);
 
-                // 2. Create Sidebar Card
+                marker.addListener('click', () => {
+                    infoWindow.setContent(popupContent);
+                    infoWindow.open(map, marker);
+                });
+
+                markers.push(marker);
+                bounds.extend(position);
+
+                // Create Sidebar Card
                 if (listContainer) {
                     const card = document.createElement('div');
                     card.className = 'room-card-sidebar';
@@ -281,18 +289,17 @@
                         </div>
                     `;
 
-                    // Interaction: Click card -> Fly to map
+                    // Interaction: Click card -> Pan to map
                     card.addEventListener('click', () => {
                         // Highlight card
                         document.querySelectorAll('.room-card-sidebar').forEach(c => c.classList.remove('active'));
                         card.classList.add('active');
 
-                        // Fly map
-                        map.flyTo([room.latitude, room.longitude], 16, {
-                            animate: true,
-                            duration: 1.5
-                        });
-                        marker.openPopup();
+                        // Pan map
+                        map.panTo(position);
+                        map.setZoom(16);
+                        infoWindow.setContent(popupContent);
+                        infoWindow.open(map, marker);
                     });
 
                     listContainer.appendChild(card);
@@ -300,18 +307,27 @@
             }
         });
 
-        if (bounds.length > 0) {
-            map.fitBounds(bounds, { padding: [50, 50] });
+        if (markers.length > 0) {
+            map.fitBounds(bounds);
         } else if (listContainer) {
             listContainer.innerHTML = '<div style="padding: 2rem; text-align: center; color: #64748b;">No rooms found matching your criteria.</div>';
         }
     }
 
-    // Initialize on load
+    // Expose initMap globally for Google Maps callback
+    window.initExploreMap = initMap;
+
+    // Initialize on load if Google Maps already loaded
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initMap);
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof google !== 'undefined') {
+                initMap();
+            }
+        });
     } else {
-        initMap();
+        if (typeof google !== 'undefined') {
+            initMap();
+        }
     }
 
     // Expose for debugging

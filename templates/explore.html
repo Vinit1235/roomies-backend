@@ -1,42 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#dc2626">
     <title>Explore Rooms - Roomies</title>
-    
+
     <!-- PWA Manifest -->
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
-    
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* CRITICAL: Ensure Leaflet tiles display properly */
-        .leaflet-container {
+        /* Google Maps Container Styles */
+        #mapView {
             background: #f8f9fa;
             font-family: 'Poppins', sans-serif;
             width: 100%;
             height: 100%;
         }
-        
-        /* Fix tile loading issues */
-        .leaflet-tile-container img {
-            max-width: none !important;
-            max-height: none !important;
-        }
 
-        .leaflet-tile {
-            opacity: 1 !important;
-            visibility: visible !important;
-        }
-        
         /* Split Layout Styles */
         .explore-layout {
             display: flex;
-            height: calc(100vh - 60px); /* Full height minus header */
+            height: calc(100vh - 60px);
+            /* Full height minus header */
             overflow: hidden;
             position: relative;
         }
@@ -48,7 +38,7 @@
             display: flex;
             flex-direction: column;
             z-index: 10;
-            box-shadow: 4px 0 24px rgba(0,0,0,0.05);
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.05);
             flex-shrink: 0;
         }
 
@@ -88,7 +78,7 @@
             border-radius: 12px;
             padding: 1rem;
             margin-bottom: 1rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             border: 1px solid #e2e8f0;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -98,7 +88,7 @@
 
         .room-card-sidebar:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
             border-color: #dc2626;
         }
 
@@ -172,7 +162,7 @@
             border: none;
             padding: 0.75rem 1rem;
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             font-weight: 600;
             color: #475569;
             cursor: pointer;
@@ -193,16 +183,19 @@
                 flex-direction: column-reverse;
                 height: auto;
             }
+
             .explore-sidebar-panel {
                 width: 100%;
                 height: 50vh;
             }
+
             .explore-map-wrapper {
                 height: 50vh;
             }
         }
     </style>
 </head>
+
 <body>
     {% include 'partials/header.html' %}
     {% include 'partials/sidebar.html' %}
@@ -214,28 +207,31 @@
                 <div class="sidebar-header">
                     <h1>Explore Rooms</h1>
                     <div class="sidebar-filters">
-                        <input type="text" id="searchInput" placeholder="Search college or area..." 
-                               style="width: 100%; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 8px;">
-                        
+                        <input type="text" id="searchInput" placeholder="Search college or area..."
+                            style="width: 100%; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 8px;">
+
                         <div class="filter-row">
-                            <select id="propertyTypeFilter" style="flex: 1; padding: 0.5rem; border-radius: 6px; border: 1px solid #cbd5e1;">
+                            <select id="propertyTypeFilter"
+                                style="flex: 1; padding: 0.5rem; border-radius: 6px; border: 1px solid #cbd5e1;">
                                 <option value="">All Types</option>
                                 <option value="hostel">Hostel</option>
                                 <option value="pg">PG</option>
                                 <option value="flat">Flat</option>
                             </select>
-                            <select id="sortFilter" style="flex: 1; padding: 0.5rem; border-radius: 6px; border: 1px solid #cbd5e1;">
+                            <select id="sortFilter"
+                                style="flex: 1; padding: 0.5rem; border-radius: 6px; border: 1px solid #cbd5e1;">
                                 <option value="price_asc">Price: Low to High</option>
                                 <option value="price_desc">Price: High to Low</option>
                             </select>
                         </div>
                         <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: #64748b;">
                             <span>Budget: <b id="budgetValue">₹12,000</b></span>
-                            <input type="range" id="budgetSlider" min="3000" max="25000" value="12000" style="width: 60%;">
+                            <input type="range" id="budgetSlider" min="3000" max="25000" value="12000"
+                                style="width: 60%;">
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="sidebar-list" id="roomsList">
                     <!-- List items will be injected here by JS -->
                     <div style="text-align: center; padding: 2rem; color: #94a3b8;">
@@ -263,7 +259,10 @@
     <!-- AI Chatbot Widget -->
     {% include 'partials/chatbot.html' %}
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <!-- Google Maps API - Add your API key -->
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key={{ config.get('GOOGLE_MAPS_API_KEY', '') }}&callback=initExploreMap"
+        async defer></script>
     <script>
         // Set a flag to prevent main.js from initializing the map on this page.
         window.isExplorePage = true;
@@ -271,4 +270,5 @@
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/explore.js') }}"></script>
 </body>
+
 </html>

@@ -1,15 +1,14 @@
 <!doctype html>
 <html lang="en">
- <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ room.title }} - Roomies</title>
-  <script src="/_sdk/element_sdk.js"></script>
-  <script src="/_sdk/data_sdk.js"></script>
-  <!-- Leaflet CSS and JS for OpenStreetMap -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <style>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ room.title }} - Roomies</title>
+    <script src="/_sdk/element_sdk.js"></script>
+    <script src="/_sdk/data_sdk.js"></script>
+    <!-- Google Maps will be loaded at the bottom of the page -->
+    <style>
         body {
             box-sizing: border-box;
             margin: 0;
@@ -198,7 +197,7 @@
             border: 1px solid #dddddd;
             border-radius: 12px;
             padding: 24px;
-            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
             background: white;
         }
 
@@ -263,19 +262,20 @@
             .content-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .gallery-grid {
                 grid-template-columns: 1fr;
                 grid-template-rows: 250px;
             }
-            
+
             .gallery-item:not(.gallery-main) {
                 display: none;
             }
         }
-  </style>
- </head>
- <body>
+    </style>
+</head>
+
+<body>
 
     <!-- Navbar -->
     <nav class="navbar">
@@ -305,195 +305,237 @@
         <div class="gallery-grid">
             {% set images = room.images.split(',') if room.images else [] %}
             {% set main_image = images[0] if images else 'https://placehold.co/800x600?text=No+Image' %}
-            
+
             <div class="gallery-item gallery-main" style="background-image: url('{{ main_image }}')"></div>
-            
+
             {% for img in images[1:3] %}
-                <div class="gallery-item" style="background-image: url('{{ img }}')"></div>
+            <div class="gallery-item" style="background-image: url('{{ img }}')"></div>
             {% endfor %}
-            
-            {% if images|length < 2 %}
-                <div class="gallery-item" style="background-image: url('https://placehold.co/400x300?text=Roomies')"></div>
-                <div class="gallery-item" style="background-image: url('https://placehold.co/400x300?text=Roomies')"></div>
-            {% endif %}
+
+            {% if images|length < 2 %} <div class="gallery-item"
+                style="background-image: url('https://placehold.co/400x300?text=Roomies')">
         </div>
+        <div class="gallery-item" style="background-image: url('https://placehold.co/400x300?text=Roomies')"></div>
+        {% endif %}
+    </div>
 
-        <div class="content-grid">
-            <!-- Left Column: Details -->
-            <div class="room-info">
-                <div class="host-info">
-                    <div class="host-details">
-                        <h3>Hosted by {{ room.owner.name }}</h3>
-                        <p>{% if room.verified %}Verified Listing ✅{% else %}Unverified Listing ⚠️{% endif %}</p>
-                    </div>
-                    <div style="width: 48px; height: 48px; background: #222; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600;">
-                        {{ room.owner.name[0] }}
-                    </div>
+    <div class="content-grid">
+        <!-- Left Column: Details -->
+        <div class="room-info">
+            <div class="host-info">
+                <div class="host-details">
+                    <h3>Hosted by {{ room.owner.name }}</h3>
+                    <p>{% if room.verified %}Verified Listing ✅{% else %}Unverified Listing ⚠️{% endif %}</p>
                 </div>
-
-                <div class="amenities-section">
-                    <h2>What this place offers</h2>
-                    <div class="amenities-grid">
-                        {% if room.amenities %}
-                            {% for amenity in room.amenities.split(',') %}
-                                <div class="amenity-item">✓ {{ amenity.strip() }}</div>
-                            {% endfor %}
-                        {% else %}
-                            <p>No specific amenities listed.</p>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="description-section">
-                    <h2>About this place</h2>
-                    <p>
-                        Located near {{ room.college_nearby }}, this {{ room.property_type }} accommodation offers a comfortable stay for students.
-                        With a total capacity of {{ room.capacity_total }} students, currently {{ room.capacity_occupied }} spots are occupied.
-                        {{ room.available_slots }} spots available!
-                    </p>
-                </div>
-
-                <!-- Map -->
-                <div class="map-section">
-                    <h2>Where you'll be</h2>
-                    <div id="map"></div>
+                <div
+                    style="width: 48px; height: 48px; background: #222; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600;">
+                    {{ room.owner.name[0] }}
                 </div>
             </div>
 
-            <!-- Right Column: Booking Card -->
-            <div class="booking-sidebar">
-                <div class="booking-card">
-                    <div class="price-header">
-                        <div>
-                            <span class="price-amount">₹{{ room.price }}</span>
-                            <span class="price-period">/ month</span>
-                        </div>
-                    </div>
+            <div class="amenities-section">
+                <h2>What this place offers</h2>
+                <div class="amenities-grid">
+                    {% if room.amenities %}
+                    {% for amenity in room.amenities.split(',') %}
+                    <div class="amenity-item">✓ {{ amenity.strip() }}</div>
+                    {% endfor %}
+                    {% else %}
+                    <p>No specific amenities listed.</p>
+                    {% endif %}
+                </div>
+            </div>
 
-                    <div style="margin-bottom: 16px; border: 1px solid #ddd; border-radius: 8px; padding: 12px;">
-                        <div style="font-size: 12px; font-weight: 600; margin-bottom: 4px;">AVAILABILITY</div>
-                        <div>{{ room.available_slots }} slots left</div>
-                    </div>
+            <div class="description-section">
+                <h2>About this place</h2>
+                <p>
+                    Located near {{ room.college_nearby }}, this {{ room.property_type }} accommodation offers a
+                    comfortable stay for students.
+                    With a total capacity of {{ room.capacity_total }} students, currently {{ room.capacity_occupied }}
+                    spots are occupied.
+                    {{ room.available_slots }} spots available!
+                </p>
+            </div>
 
-                    <button class="booking-btn" id="reserveBtn">Reserve</button>
-                    
-                    <p class="booking-info">You won't be charged yet</p>
-                    
-                    <div style="margin-top: 16px; display: flex; justify-content: space-between; color: #717171;">
-                        <span>Security Deposit</span>
-                        <span>₹{{ room.price * 2 }}</span>
+            <!-- Map -->
+            <div class="map-section">
+                <h2>Where you'll be</h2>
+                <div id="map"></div>
+            </div>
+        </div>
+
+        <!-- Right Column: Booking Card -->
+        <div class="booking-sidebar">
+            <div class="booking-card">
+                <div class="price-header">
+                    <div>
+                        <span class="price-amount">₹{{ room.price }}</span>
+                        <span class="price-period">/ month</span>
                     </div>
+                </div>
+
+                <div style="margin-bottom: 16px; border: 1px solid #ddd; border-radius: 8px; padding: 12px;">
+                    <div style="font-size: 12px; font-weight: 600; margin-bottom: 4px;">AVAILABILITY</div>
+                    <div>{{ room.available_slots }} slots left</div>
+                </div>
+
+                <button class="booking-btn" id="reserveBtn">Reserve</button>
+
+                <p class="booking-info">You won't be charged yet</p>
+
+                <div style="margin-top: 16px; display: flex; justify-content: space-between; color: #717171;">
+                    <span>Security Deposit</span>
+                    <span>₹{{ room.price * 2 }}</span>
                 </div>
             </div>
         </div>
     </div>
+    </div>
 
     <script>
         // Reserve/Book Button Handler
-        document.getElementById('reserveBtn').addEventListener('click', async function() {
+        document.getElementById('reserveBtn').addEventListener('click', async function () {
             // Check if user is logged in
             {% if current_user.is_authenticated %}
-                // Check if user is a student
-                {% if current_user.role == 'student' %}
-                    // Create booking
-                    const confirmed = confirm('Reserve this room for ₹{{ room.price }}/month?\n\n✅ Simulated Flow:\n1. Pay ₹999 booking fee\n2. Send request to owner\n3. Auto-approve by owner\n4. Complete full payment\n5. Sign contract\n\nProceed?');
-                    
-                    if (!confirmed) return;
-                    
-                    const btn = document.getElementById('reserveBtn');
-                    const originalText = btn.textContent;
-                    btn.disabled = true;
-                    btn.textContent = 'Step 1/5: Creating booking...';
-                    
-                    try {
-                        // STEP 1: Create booking
-                        console.log('Step 1: Creating booking...');
-                        const createResponse = await fetch('/api/bookings/create', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                room_id: {{ room.id }},
-                                move_in_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                                contract_duration_months: 11
+            // Check if user is a student
+            {% if current_user.role == 'student' %}
+            // Create booking
+            const confirmed = confirm('Reserve this room for ₹{{ room.price }}/month?\n\n✅ Simulated Flow:\n1. Pay ₹999 booking fee\n2. Send request to owner\n3. Auto-approve by owner\n4. Complete full payment\n5. Sign contract\n\nProceed?');
+
+            if (!confirmed) return;
+
+            const btn = document.getElementById('reserveBtn');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Step 1/5: Creating booking...';
+
+            try {
+                // STEP 1: Create booking
+                console.log('Step 1: Creating booking...');
+                const createResponse = await fetch('/api/bookings/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        room_id: {{ room.id }},
+                    move_in_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                    contract_duration_months: 11
                             })
                         });
-                        
-                        const createResult = await createResponse.json();
-                        console.log('Create result:', createResult);
-                        
-                        if (!createResponse.ok || !createResult.success) {
-                            throw new Error(createResult.error || 'Failed to create booking');
-                        }
-                        
-                        const bookingId = createResult.booking.id;
-                        
-                        // STEP 2: Pay booking fee (₹999)
-                        btn.textContent = 'Step 2/5: Paying ₹999...';
-                        console.log('Step 2: Paying booking fee...');
-                        await sleep(500);
-                        
-                        const payResponse = await fetch(`/api/bookings/${bookingId}/pay-booking-fee`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                razorpay_payment_id: 'sim_pay_' + Date.now(),
-                                razorpay_signature: 'sim_sig_' + Date.now()
-                            })
-                        });
-                        
-                        const payResult = await payResponse.json();
-                        console.log('Payment result:', payResult);
-                        
-                        if (!payResponse.ok || !payResult.success) {
-                            throw new Error(payResult.error || 'Payment failed');
-                        }
-                        
-                        // Success!
-                        alert('✅ Booking Successful!\n\n' +
-                              'Step 1: ✓ Booking created\n' +
-                              'Step 2: ✓ Paid ₹999 booking fee\n\n' +
-                              'Your request has been sent to the owner.\n' +
-                              'You will be notified when they respond.\n\n' +
-                              'Redirecting to home page...');
-                        
-                        window.location.href = '/';
+
+        const createResult = await createResponse.json();
+        console.log('Create result:', createResult);
+
+        if (!createResponse.ok || !createResult.success) {
+            throw new Error(createResult.error || 'Failed to create booking');
+        }
+
+        const bookingId = createResult.booking.id;
+
+        // STEP 2: Pay booking fee (₹999)
+        btn.textContent = 'Step 2/5: Paying ₹999...';
+        console.log('Step 2: Paying booking fee...');
+        await sleep(500);
+
+        const payResponse = await fetch(`/api/bookings/${bookingId}/pay-booking-fee`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                razorpay_payment_id: 'sim_pay_' + Date.now(),
+                razorpay_signature: 'sim_sig_' + Date.now()
+            })
+        });
+
+        const payResult = await payResponse.json();
+        console.log('Payment result:', payResult);
+
+        if (!payResponse.ok || !payResult.success) {
+            throw new Error(payResult.error || 'Payment failed');
+        }
+
+        // Success!
+        alert('✅ Booking Successful!\n\n' +
+            'Step 1: ✓ Booking created\n' +
+            'Step 2: ✓ Paid ₹999 booking fee\n\n' +
+            'Your request has been sent to the owner.\n' +
+            'You will be notified when they respond.\n\n' +
+            'Redirecting to home page...');
+
+        window.location.href = '/';
                         
                     } catch (error) {
-                        console.error('Booking error:', error);
-                        btn.disabled = false;
-                        btn.textContent = originalText;
-                        alert('❌ Error: ' + error.message + '\n\nCheck console (F12) for details.');
-                    }
-                {% else %}
-                    alert('Only students can book rooms. You are logged in as an owner.');
-                {% endif %}
-            {% else %}
-                // Redirect to login
-                if (confirm('Please login to reserve this room.\n\nClick OK to go to login page.')) {
-                    window.location.href = '/login';
-                }
-            {% endif %}
+            console.error('Booking error:', error);
+            btn.disabled = false;
+            btn.textContent = originalText;
+            alert('❌ Error: ' + error.message + '\n\nCheck console (F12) for details.');
+        }
+        {% else %}
+        alert('Only students can book rooms. You are logged in as an owner.');
+        {% endif %}
+        {% else %}
+        // Redirect to login
+        if (confirm('Please login to reserve this room.\n\nClick OK to go to login page.')) {
+            window.location.href = '/login';
+        }
+        {% endif %}
         });
-        
+
         // Helper: Sleep function
         function sleep(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
         }
-        
-        // Initialize Map
-        {% if room.latitude and room.longitude %}
-            var map = L.map('map').setView([{{ room.latitude }}, {{ room.longitude }}], 15);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
-            
-            L.marker([{{ room.latitude }}, {{ room.longitude }}]).addTo(map)
-                .bindPopup("<b>{{ room.title }}</b><br>{{ room.location }}")
-                .openPopup();
+
+        // Initialize Google Map
+        function initDetailMap() {
+            {% if room.latitude and room.longitude %}
+            const mapContainer = document.getElementById('map');
+            const roomLocation = { lat: {{ room.latitude }
+        }, lng: { { room.longitude } } };
+
+        const map = new google.maps.Map(mapContainer, {
+            center: roomLocation,
+            zoom: 15,
+            mapTypeControl: false,
+            streetViewControl: true,
+            fullscreenControl: true
+        });
+
+        const marker = new google.maps.Marker({
+            position: roomLocation,
+            map: map,
+            title: '{{ room.title }}',
+            icon: {
+                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                            <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20 0C12 0 5 7 5 15c0 11 15 25 15 25s15-14 15-25c0-8-7-15-15-15z" fill="#ff385c"/>
+                                <circle cx="20" cy="15" r="6" fill="white"/>
+                            </svg>
+                        `),
+                scaledSize: new google.maps.Size(40, 40),
+                anchor: new google.maps.Point(20, 40)
+            }
+        });
+
+        const infoWindow = new google.maps.InfoWindow({
+            content: '<div style="padding: 8px;"><b>{{ room.title }}</b><br>{{ room.location }}</div>'
+        });
+
+        marker.addListener('click', () => {
+            infoWindow.open(map, marker);
+        });
+
+        // Open info window by default
+        infoWindow.open(map, marker);
         {% else %}
-            document.getElementById('map').innerHTML = '<div style="height:100%; display:flex; align-items:center; justify-content:center; background:#f0f0f0; color:#666;">Map location not available</div>';
+        document.getElementById('map').innerHTML = '<div style="height:100%; display:flex; align-items:center; justify-content:center; background:#f0f0f0; color:#666;">Map location not available</div>';
         {% endif %}
+        }
     </script>
 
- </body>
+    <!-- Google Maps API -->
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key={{ config.get('GOOGLE_MAPS_API_KEY', '') }}&callback=initDetailMap"
+        async defer></script>
+
+</body>
+
 </html>

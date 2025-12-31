@@ -44,18 +44,19 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.exc import SQLAlchemyError
 from functools import wraps
 from search_engine import SearchTrie
-# from agents.chatbot import chatbot  <-- Disabled for Render if missing
+# Use lightweight chatbot (no FAISS/SentenceTransformers - better for Render)
 try:
-    from agents.chatbot import chatbot
-except ImportError:
+    from agents.chatbot_lite import chatbot
+    print("✅ Lightweight Gemini chatbot loaded")
+except ImportError as e:
     # Mock chatbot if agents module is missing or fails to load
     class MockChatbot:
         def get_response(self, msg):
-            return "Chatbot is currently disabled."
+            return "Chatbot is currently disabled. Please try again later."
         def set_room_provider(self, func):
             pass
     chatbot = MockChatbot()
-    print("Warning: Could not import agents.chatbot. Chat functionality disabled.")
+    print(f"⚠️ Could not import chatbot_lite: {e}. Chat functionality disabled.")
 
 # from utils.verification import process_verification  # Import verification logic
 try:
@@ -96,6 +97,9 @@ database_url = os.environ.get("DATABASE_URL", getattr(config, "DATABASE_URL", "s
 
 # Debug: Print which database is being used
 print(f"🔧 DATABASE_URL from env: {'SET' if os.environ.get('DATABASE_URL') else 'NOT SET'}")
+
+# Google Maps Configuration
+app.config["GOOGLE_MAPS_API_KEY"] = os.environ.get("GOOGLE_MAPS_API_KEY", "")
 print(f"🔧 Using database: {'PostgreSQL' if 'postgres' in database_url.lower() else 'SQLite'}")
 
 # Fix for Render's postgres:// usage (SQLAlchemy requires postgresql://)
