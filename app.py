@@ -3149,7 +3149,18 @@ def create_booking():
         return jsonify({"error": "Only students can book rooms."}), 403
     
     data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid request body"}), 400
+
     room_id = data.get("room_id")
+    if not room_id:
+        return jsonify({"error": "Room ID is required"}), 400
+        
+    try:
+        room_id = int(room_id)
+    except (ValueError, TypeError):
+        return jsonify({"error": "Invalid Room ID format"}), 400
+
     move_in_date_str = data.get("move_in_date")  # Format: YYYY-MM-DD
     contract_duration = data.get("contract_duration_months", 11)
     
