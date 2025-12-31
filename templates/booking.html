@@ -424,13 +424,18 @@
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
     <script>
-        // Get room ID from URL if provided
+        // Get room ID from URL query params or existing input value (from Flask template)
         const urlParams = new URLSearchParams(window.location.search);
-        const roomIdFromUrl = urlParams.get('room_id');
+        let roomId = urlParams.get('room_id');
 
-        if (roomIdFromUrl) {
-            document.getElementById('roomId').value = roomIdFromUrl;
-            loadRoomDetails(roomIdFromUrl);
+        // Check if roomId is already set in the hidden input (via Flask route /book/<id>)
+        if (!roomId) {
+            roomId = document.getElementById('roomId').value;
+        }
+
+        if (roomId) {
+            document.getElementById('roomId').value = roomId;
+            loadRoomDetails(roomId);
         }
 
         // Date constraints
@@ -560,7 +565,7 @@
 
             try {
                 const bookingData = {
-                    room_id: window.roomId,
+                    room_id: window.roomId || document.getElementById('roomId').value,
                     move_in_date: checkIn,
                     contract_duration_months: parseInt(document.getElementById('durationDisplay').textContent)
                 };
