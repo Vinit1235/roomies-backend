@@ -14,6 +14,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
+import traceback
 
 from flask import (
     Flask,
@@ -342,6 +343,19 @@ class Room(TimestampMixin, db.Model):
     def available_slots(self) -> int:
         return max((self.capacity_total or 0) - (self.capacity_occupied or 0), 0)
 
+    @property
+    def availability_status(self) -> str:
+        """
+        green: Instant Booking (Verified Room & Verified Owner)
+        yellow: Approval Required (Unverified)
+        red: Sold Out
+        """
+        if self.available_slots <= 0:
+            return "red"
+        if self.verified and self.owner and getattr(self.owner, 'kyc_verified', False):
+            return "green"
+        return "yellow"
+
     def to_dict(self) -> dict:
         image_url: Optional[str] = None
         if self.images:
@@ -620,6 +634,11 @@ class Booking(db.Model):
             self.platform_fee,
             2
         )
+
+    @property
+    def room_availability_status(self):
+        """Proxy for room availability status."""
+        return self.room.availability_status if self.room else 'red'
     
     def to_dict(self):
         return {
@@ -1034,8 +1053,14 @@ def list_room():
 @app.route("/room/<int:room_id>")
 def room_details(room_id):
     """Room details page."""
-    room = Room.query.get_or_404(room_id)
-    return render_template("room_details.html", room=room)
+    try:
+        room = Room.query.get_or_404(room_id)
+        if not room.owner:
+             app.logger.warning(f"Room {room_id} has no owner!")
+        return render_template("room_details.html", room=room)
+    except Exception as e:
+        app.logger.error(f"Error in room_details: {e}")
+        return f"<h3>Error loading room details</h3><p>{str(e)}</p><pre>{traceback.format_exc()}</pre>", 500
 
 
 @app.route("/book")
