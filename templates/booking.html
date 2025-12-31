@@ -571,6 +571,17 @@
                     body: JSON.stringify(bookingData)
                 });
 
+                // Check content type
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") === -1) {
+                    const text = await response.text();
+                    console.error("Non-JSON Response:", text);
+                    if (text.includes("Log In")) {
+                        throw new Error("Session expired. Please log in again.");
+                    }
+                    throw new Error(`Server Error (${response.status}). Check console for details.`);
+                }
+
                 const result = await response.json();
 
                 if (!response.ok) {
@@ -588,6 +599,10 @@
                 showAlert(error.message, 'error');
                 document.getElementById('submitBtn').disabled = false;
                 document.getElementById('loading').style.display = 'none';
+
+                if (error.message.includes("log in")) {
+                    setTimeout(() => window.location.href = "/login", 2000);
+                }
             }
         });
 
