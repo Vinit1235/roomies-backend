@@ -259,7 +259,10 @@
                         <h4 style="margin: 0 0 5px 0; color: #dc2626; font-size: 14px;">${room.title}</h4>
                         <p style="margin: 0; font-weight: bold; font-size: 16px;">₹${room.price}/mo</p>
                         <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">${room.location}</p>
-                        <a href="/room/${room.id}" style="display: block; margin-top: 8px; color: #2563eb; text-decoration: none; font-weight: 600;">View Details →</a>
+                        <div style="margin-top: 10px; display: flex; gap: 8px;">
+                            <a href="/room/${room.id}" style="flex: 1; text-align: center; padding: 4px; border: 1px solid #2563eb; color: #2563eb; text-decoration: none; border-radius: 4px; font-size: 12px;">View</a>
+                            <a href="/book/${room.id}" style="flex: 1; text-align: center; padding: 4px; background: #dc2626; color: white; text-decoration: none; border-radius: 4px; font-size: 12px; font-weight: bold;">Book Now</a>
+                        </div>
                     </div>
                 `;
 
@@ -286,6 +289,9 @@
                             <div class="sidebar-card-meta">
                                 <i class="fas fa-bed"></i> ${room.property_type} • ${room.available_slots} slots left
                             </div>
+                            <a href="/book/${room.id}" class="sidebar-book-btn" style="display: block; width: 100%; text-align: center; margin-top: 10px; padding: 8px; background: #dc2626; color: white; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 14px;">
+                                Book Now
+                            </a>
                         </div>
                     `;
 

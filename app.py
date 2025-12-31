@@ -1568,6 +1568,20 @@ def api_rooms():
         app.logger.exception("Room search failed", extra={"args": request.args})
         return jsonify({"error": "Unable to fetch rooms at this time."}), 500
 
+@app.route("/api/room/<int:room_id>")
+def api_room_detail(room_id):
+    """Get single room details as JSON."""
+    try:
+        room = Room.query.get_or_404(room_id)
+        # Ensure availability status is included
+        data = room.to_dict()
+        data['availability_status'] = room.availability_status
+        data['available_slots'] = room.available_slots
+        return jsonify(data)
+    except Exception as e:
+        app.logger.error(f"API Room Detail Error: {e}")
+        return jsonify({"error": "Room not found"}), 404
+
 @app.route("/api/colleges")
 def api_colleges():
     """Get list of unique colleges for autocomplete/filter."""

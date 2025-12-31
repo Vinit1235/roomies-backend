@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -67,7 +68,7 @@
             background: white;
             padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .form-section-title {
@@ -110,7 +111,7 @@
             background: white;
             padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             position: sticky;
             top: 20px;
         }
@@ -251,8 +252,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .alert {
@@ -294,6 +300,7 @@
         }
     </style>
 </head>
+
 <body>
     {% include 'partials/header.html' %}
 
@@ -344,7 +351,8 @@
                     <!-- Special Requests -->
                     <div class="form-group">
                         <label for="specialRequests">Special Requests (Optional)</label>
-                        <textarea id="specialRequests" name="special_requests" rows="4" placeholder="Any special requirements or preferences..."></textarea>
+                        <textarea id="specialRequests" name="special_requests" rows="4"
+                            placeholder="Any special requirements or preferences..."></textarea>
                     </div>
 
                     <!-- Terms -->
@@ -437,7 +445,7 @@
         function calculateDuration() {
             const checkIn = new Date(document.getElementById('checkInDate').value);
             const checkOut = new Date(document.getElementById('checkOutDate').value);
-            
+
             if (checkIn && checkOut && checkOut > checkIn) {
                 const months = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24 * 30));
                 document.getElementById('durationDisplay').textContent = months;
@@ -447,24 +455,25 @@
 
         async function loadRoomDetails(roomId) {
             try {
-                const response = await fetch(`/api/rooms/featured`);
-                const data = await response.json();
-                
-                // Find the room in featured rooms (or we could create a specific endpoint)
-                const room = data.rooms.find(r => r.id == roomId);
+                const response = await fetch(`/api/room/${roomId}`);
+                if (!response.ok) throw new Error('Failed to load room details');
+
+                const room = await response.json();
+
                 if (room) {
                     displayRoomSummary(room);
                 }
             } catch (error) {
                 console.error('Error loading room:', error);
+                showAlert('Error loading room details. Please try again.', 'error');
             }
         }
 
         function displayRoomSummary(room) {
-            const statusClass = room.availability_status === 'green' ? 'status-green' : 
-                               room.availability_status === 'yellow' ? 'status-yellow' : 'status-red';
-            const statusText = room.availability_status === 'green' ? 'Instant Booking' : 
-                              room.availability_status === 'yellow' ? 'Needs Approval' : 'Booked';
+            const statusClass = room.availability_status === 'green' ? 'status-green' :
+                room.availability_status === 'yellow' ? 'status-yellow' : 'status-red';
+            const statusText = room.availability_status === 'green' ? 'Instant Booking' :
+                room.availability_status === 'yellow' ? 'Needs Approval' : 'Booked';
 
             const html = `
                 <img src="${room.image_url}" alt="${room.title}" class="room-image">
@@ -486,11 +495,11 @@
             `;
 
             document.getElementById('roomSummary').innerHTML = html;
-            
+
             // Show status info
             const statusInfoDiv = document.getElementById('statusInfo');
             const statusTextSpan = document.getElementById('statusText');
-            
+
             if (room.availability_status === 'green') {
                 statusTextSpan.textContent = 'Green status: Your booking will be confirmed immediately after payment.';
                 statusInfoDiv.style.display = 'block';
@@ -507,7 +516,7 @@
             window.roomPrice = room.price;
             window.roomId = room.id;
             window.roomAvailability = room.availability_status;
-            
+
             updatePricing();
         }
 
@@ -601,4 +610,5 @@
         }
     </script>
 </body>
+
 </html>
