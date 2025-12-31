@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Gateway - Roomies</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .payment-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .payment-header {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+            padding: 20px 40px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .payment-header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .payment-header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .payment-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+
+        /* Left Side - Order Summary */
+        .order-summary {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .order-summary h2 {
+            font-size: 24px;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .order-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .order-item-title {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 8px;
+        }
+
+        .order-item-value {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .order-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.2);
+            margin: 20px 0;
+        }
+
+        .order-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .order-total-label {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .order-total-amount {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+
+        .security-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 20px;
+            padding: 12px;
+            background: rgba(76, 175, 80, 0.2);
+            border-radius: 8px;
+            font-size: 12px;
+        }
+
+        .security-badge i {
+            color: #4caf50;
+        }
+
+        /* Right Side - Payment Methods */
+        .payment-methods {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .payment-methods h3 {
+            font-size: 18px;
+            margin-bottom: 25px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .methods-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .payment-method {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .payment-method input {
+            display: none;
+        }
+
+        .payment-method-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .payment-method input:checked+.payment-method-card {
+            border-color: #dc2626;
+            background: #fef2f2;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+
+        .payment-method-card:hover {
+            border-color: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        .payment-method-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: #dc2626;
+        }
+
+        .payment-method-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .payment-method-badge {
+            font-size: 11px;
+            padding: 4px 8px;
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        /* Card Details Form */
+        .card-details {
+            display: none;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .card-details.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #dc2626;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 15px;
+        }
+
+        .upi-details {
+            margin-bottom: 25px;
+        }
+
+        .upi-apps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .upi-app {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .upi-app:hover {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+
+        .upi-app i {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: #dc2626;
+        }
+
+        .upi-app-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Submit Button */
+        .pay-button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .pay-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(220, 38, 38, 0.3);
+        }
+
+        .pay-button:active {
+            transform: translateY(0);
+        }
+
+        .pay-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Secure Info */
+        .secure-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fef2f2;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #dc2626;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .secure-info i {
+            color: #4caf50;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .payment-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .order-summary {
+                padding: 30px 20px;
+                order: 2;
+            }
+
+            .payment-methods {
+                padding: 30px 20px;
+                order: 1;
+            }
+
+            .methods-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .upi-apps {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .order-total-amount {
+                font-size: 24px;
+            }
+        }
+
+        /* Loading State */
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Success Animation */
+        .success-icon {
+            color: #4caf50;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #999;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .tab.active {
+            color: #dc2626;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #dc2626;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="payment-container">
+        <div class="payment-wrapper">
+            <!-- Left Side - Order Summary -->
+            <div class="order-summary">
+                <div>
+                    <h2>Order Summary</h2>
+
+                    <div class="order-item">
+                        <div class="order-item-title">Booking Type</div>
+                        <div class="order-item-value" id="bookingType">Room Booking</div>
+                    </div>
+
+                    <div class="order-item">
+                        <div class="order-item-title">Duration</div>
+                        <div class="order-item-value" id="duration">1 Month</div>
+                    </div>
+
+                    <div class="order-item">
+                        <div class="order-item-title">Location</div>
+                        <div class="order-item-value" id="location">Mumbai, India</div>
+                    </div>
+
+                    <div class="order-divider"></div>
+
+                    <div class="order-item">
+                        <div class="order-item-title">Security Deposit</div>
+                        <div class="order-item-value">₹<span id="depositAmount">2,500</span></div>
+                    </div>
+
+                    <div class="order-item">
+                        <div class="order-item-title">First Month Rent</div>
+                        <div class="order-item-value">₹<span id="rentAmount">10,000</span></div>
+                    </div>
+
+                    <div class="order-item">
+                        <div class="order-item-title">Platform Fee</div>
+                        <div class="order-item-value">₹<span id="feeAmount">500</span></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="order-divider"></div>
+                    <div class="order-total">
+                        <div class="order-total-label">Total Amount</div>
+                        <div class="order-total-amount">₹<span id="totalAmount">13,000</span></div>
+                    </div>
+
+                    <div class="security-badge">
+                        <i class="fas fa-lock"></i>
+                        <span>256-bit SSL Encryption</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side - Payment Methods -->
+            <div class="payment-methods">
+                <h3>Select Payment Method</h3>
+
+                <!-- Tabs -->
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('digital')">Digital Wallets</button>
+                    <button class="tab" onclick="switchTab('card')">Cards</button>
+                    <button class="tab" onclick="switchTab('bank')">Bank Transfer</button>
+                </div>
+
+                <!-- Digital Wallets Tab -->
+                <div id="digital" class="tab-content active">
+                    <div class="methods-grid">
+                        <label class="payment-method">
+                            <input type="radio" name="paymentMethod" value="upi" onchange="showPaymentDetails('upi')">
+                            <div class="payment-method-card">
+                                <div class="payment-method-icon">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <div class="payment-method-name">UPI</div>
+                                <span class="payment-method-badge">Recommended</span>
+                            </div>
+                        </label>
+
+                        <label class="payment-method">
+                            <input type="radio" name="paymentMethod" value="google_pay"
+                                onchange="showPaymentDetails('google_pay')">
+                            <div class="payment-method-card">
+                                <div class="payment-method-icon">
+                                    <i class="fab fa-google"></i>
+                                </div>
+                                <div class="payment-method-name">Google Pay</div>
+                                <span class="payment-method-badge">Instant</span>
+                            </div>
+                        </label>
+
+                        <label class="payment-method">
+                            <input type="radio" name="paymentMethod" value="paytm"
+                                onchange="showPaymentDetails('paytm')">
+                            <div class="payment-method-card">
+                                <div class="payment-method-icon">
+                                    <i class="fas fa-wallet"></i>
+                                </div>
+                                <div class="payment-method-name">Paytm</div>
+                                <span class="payment-method-badge">Cashback</span>
+                            </div>
+                        </label>
+
+                        <label class="payment-method">
+                            <input type="radio" name="paymentMethod" value="phonepe"
+                                onchange="showPaymentDetails('phonepe')">
+                            <div class="payment-method-card">
+                                <div class="payment-method-icon">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <div class="payment-method-name">PhonePe</div>
+                                <span class="payment-method-badge">Fast</span>
+                            </div>
+                        </label>
+
+                        <label class="payment-method">
+                            <input type="radio" name="paymentMethod" value="amazon_pay"
+                                onchange="showPaymentDetails('amazon_pay')">
+                            <div class="payment-method-card">
+                                <div class="payment-method-icon">
+                                    <i class="fab fa-amazon"></i>
+                                </div>
+                                <div class="payment-method-name">Amazon Pay</div>
+                                <span class="payment-method-badge">Secure</span>
+                            </div>
+                        </label>
+
+                        <label class="payment-method">
+                            <input type="radio" name="paymentMethod" value="wallet"
+                                onchange="showPaymentDetails('wallet')">
+                            <div class="payment-method-card">
+                                <div class="payment-method-icon">
+                                    <i class="fas fa-piggy-bank"></i>
+                                </div>
+                                <div class="payment-method-name">Roomies Wallet</div>
+                                <span class="payment-method-badge">Balance: ₹500</span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- UPI Details -->
+                    <div id="upi-details" class="card-details">
+                        <label style="font-size: 14px; font-weight: 600; margin-bottom: 15px; display: block;">Select
+                            UPI App</label>
+                        <div class="upi-apps">
+                            <div class="upi-app" onclick="selectUPIApp('google_pay')">
+                                <i class="fab fa-google"></i>
+                                <div class="upi-app-name">Google Pay</div>
+                            </div>
+                            <div class="upi-app" onclick="selectUPIApp('phonepe')">
+                                <i class="fas fa-mobile-alt"></i>
+                                <div class="upi-app-name">PhonePe</div>
+                            </div>
+                            <div class="upi-app" onclick="selectUPIApp('paytm')">
+                                <i class="fas fa-wallet"></i>
+                                <div class="upi-app-name">Paytm</div>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top: 15px;">
+                            <label>Or enter UPI ID</label>
+                            <input type="text" placeholder="yourname@upi" id="upiId">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Tab -->
+                <div id="card" class="tab-content">
+                    <div class="methods-grid">
+                        <label class="payment-method">
+                            <input type="radio" name="paymentMethod" value="debit_card"
+                                onchange="showPaymentDetails('debit_card')">
+                            <div class="payment-method-card">
+                                <div class="payment-method-icon">
+                                    <i class="fas fa-credit-card"></i>
+                                </div>
+                                <div class="payment-method-name">Debit Card</div>
+                                <span class="payment-method-badge">Secure</span>
+                            </div>
+                        </label>
+
+                        <label class="payment-method">
+                            <input type="radio" name="paymentMethod" value="credit_card"
+                                onchange="showPaymentDetails('credit_card')">
+                            <div class="payment-method-card">
+                                <div class="payment-method-icon">
+                                    <i class="fas fa-credit-card"></i>
+                                </div>
+                                <div class="payment-method-name">Credit Card</div>
+                                <span class="payment-method-badge">EMI Available</span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Card Details -->
+                    <div id="card-details" class="card-details">
+                        <div class="form-group">
+                            <label>Card Number</label>
+                            <input type="text" placeholder="1234 5678 9012 3456" id="cardNumber" maxlength="19">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Expiry Date</label>
+                                <input type="text" placeholder="MM/YY" id="expiryDate" maxlength="5">
+                            </div>
+                            <div class="form-group">
+                                <label>CVV</label>
+                                <input type="password" placeholder="123" id="cvv" maxlength="4">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Card Holder Name</label>
+                            <input type="text" placeholder="John Doe" id="cardHolder">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bank Transfer Tab -->
+                <div id="bank" class="tab-content">
+                    <div class="methods-grid">
+                        <label class="payment-method">
+                            <input type="radio" name="paymentMethod" value="netbanking"
+                                onchange="showPaymentDetails('netbanking')">
+                            <div class="payment-method-card">
+                                <div class="payment-method-icon">
+                                    <i class="fas fa-university"></i>
+                                </div>
+                                <div class="payment-method-name">Net Banking</div>
+                                <span class="payment-method-badge">All Banks</span>
+                            </div>
+                        </label>
+
+                        <label class="payment-method">
+                            <input type="radio" name="paymentMethod" value="bank_transfer"
+                                onchange="showPaymentDetails('bank_transfer')">
+                            <div class="payment-method-card">
+                                <div class="payment-method-icon">
+                                    <i class="fas fa-exchange-alt"></i>
+                                </div>
+                                <div class="payment-method-name">Bank Transfer</div>
+                                <span class="payment-method-badge">NEFT/RTGS</span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div id="bank-details" class="card-details">
+                        <p style="font-size: 14px; color: #666; margin-bottom: 15px;">
+                            <strong>Bank Account Details:</strong>
+                        </p>
+                        <div
+                            style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #ffc107;">
+                            <p><strong>Account Name:</strong> Roomies Tech Pvt Ltd</p>
+                            <p><strong>Account Number:</strong> 1234567890123456</p>
+                            <p><strong>IFSC Code:</strong> HDFC0001234</p>
+                            <p><strong>Amount:</strong> ₹<span id="transferAmount">13,000</span></p>
+                        </div>
+                        <p style="font-size: 12px; color: #999;">Please transfer the amount and confirm below.</p>
+                    </div>
+                </div>
+
+                <!-- Pay Button -->
+                <button class="pay-button" onclick="processPayment()">
+                    <i class="fas fa-lock"></i>
+                    <span>Pay ₹<span id="payButtonAmount">13,000</span> Securely</span>
+                </button>
+
+                <!-- Secure Info -->
+                <div class="secure-info">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Your payment is 100% secure and encrypted</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Razorpay Script -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <script>
+        // Get booking details from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const bookingId = urlParams.get('booking_id');
+        const amount = urlParams.get('amount') || 13000;
+
+        // Initialize amounts
+        document.getElementById('totalAmount').textContent = (amount / 100).toLocaleString();
+        document.getElementById('payButtonAmount').textContent = (amount / 100).toLocaleString();
+        document.getElementById('transferAmount').textContent = (amount / 100).toLocaleString();
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function showPaymentDetails(method) {
+            // Hide all details
+            document.querySelectorAll('.card-details').forEach(detail => {
+                detail.classList.remove('active');
+            });
+
+            // Show selected method details
+            if (method === 'upi') {
+                document.getElementById('upi-details').classList.add('active');
+            } else if (method === 'debit_card' || method === 'credit_card') {
+                document.getElementById('card-details').classList.add('active');
+            } else if (method === 'netbanking' || method === 'bank_transfer') {
+                document.getElementById('bank-details').classList.add('active');
+            }
+        }
+
+        function selectUPIApp(app) {
+            console.log('Selected UPI App:', app);
+            // Would redirect to actual UPI app
+        }
+
+        function processPayment() {
+            const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked');
+
+            if (!selectedMethod) {
+                alert('Please select a payment method');
+                return;
+            }
+
+            const method = selectedMethod.value;
+            console.log('Processing payment with method:', method);
+
+            // For demo purposes, show success
+            if (method === 'upi') {
+                processUPIPayment();
+            } else if (method === 'debit_card' || method === 'credit_card') {
+                processCardPayment();
+            } else if (method === 'netbanking' || method === 'bank_transfer') {
+                processBankPayment();
+            } else {
+                processWalletPayment();
+            }
+        }
+
+        function processUPIPayment() {
+            const upiId = document.getElementById('upiId').value;
+
+            if (!upiId && !selectedUPI) {
+                alert('Please select or enter UPI ID');
+                return;
+            }
+
+            // In production, integrate with actual UPI gateway
+            console.log('Processing UPI payment with:', upiId);
+
+            // Simulate UPI verification
+            alert('UPI payment initiated. Please complete the payment in your UPI app.');
+
+            // After confirmation, call backend
+            confirmPayment('upi', upiId);
+        }
+
+        function processCardPayment() {
+            const cardNumber = document.getElementById('cardNumber').value;
+            const expiryDate = document.getElementById('expiryDate').value;
+            const cvv = document.getElementById('cvv').value;
+            const cardHolder = document.getElementById('cardHolder').value;
+
+            if (!cardNumber || !expiryDate || !cvv || !cardHolder) {
+                alert('Please fill in all card details');
+                return;
+            }
+
+            // Validate card number (basic check)
+            if (cardNumber.replace(/\s/g, '').length !== 16) {
+                alert('Invalid card number');
+                return;
+            }
+
+            console.log('Processing card payment');
+
+            // In production, use Razorpay or similar gateway
+            confirmPayment('card', cardNumber.slice(-4));
+        }
+
+        function processBankPayment() {
+            alert('Bank transfer details provided. Please complete the transfer and confirm.');
+            confirmPayment('bank', 'transfer_pending');
+        }
+
+        function processWalletPayment() {
+            console.log('Processing wallet payment');
+            confirmPayment('wallet', 'wallet_deducted');
+        }
+
+        function confirmPayment(method, details) {
+            // Call backend to confirm payment
+            fetch('/api/bookings/confirm-payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    booking_id: bookingId,
+                    payment_method: method,
+                    amount: parseInt(document.getElementById('totalAmount').textContent.replace(/,/g, '')) * 100,
+                    transaction_id: 'txn_' + Date.now(),
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Payment successful!');
+                        window.location.href = '/booking-confirmation?booking_id=' + bookingId;
+                    } else {
+                        alert('Payment failed: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error processing payment');
+                });
+        }
+
+        // Card number formatting
+        document.getElementById('cardNumber')?.addEventListener('input', function (e) {
+            e.target.value = e.target.value.replace(/\s/g, '').replace(/(.{4})/g, '$1 ').trim();
+        });
+
+        // Expiry date formatting
+        document.getElementById('expiryDate')?.addEventListener('input', function (e) {
+            e.target.value = e.target.value.replace(/[^\d]/g, '').replace(/(.{2})/, '$1/').slice(0, 5);
+        });
+
+        // CVV validation
+        document.getElementById('cvv')?.addEventListener('input', function (e) {
+            e.target.value = e.target.value.replace(/[^\d]/g, '').slice(0, 4);
+        });
+
+        let selectedUPI = null;
+
+        function selectUPIApp(app) {
+            selectedUPI = app;
+            document.querySelectorAll('.upi-app').forEach(el => {
+                el.style.borderColor = '#e0e0e0';
+                el.style.background = 'white';
+            });
+            event.target.closest('.upi-app').style.borderColor = '#dc2626';
+            event.target.closest('.upi-app').style.background = '#fef2f2';
+        }
+
+        // Initialize payment page with booking details from URL
+        function initializePaymentPage() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookingId = urlParams.get('booking_id');
+            const roomId = urlParams.get('room_id');
+            const amount = urlParams.get('amount');
+
+            window.bookingId = bookingId;
+
+            if (amount) {
+                const totalAmount = parseInt(amount);
+                const deposit = Math.floor(totalAmount * 0.4); // 40% is deposit
+                const rent = totalAmount - deposit;
+
+                // Update order summary
+                document.getElementById('depositAmount').textContent = formatCurrency(deposit);
+                document.getElementById('rentAmount').textContent = formatCurrency(rent);
+                document.getElementById('feeAmount').textContent = '0';
+                document.getElementById('totalAmount').textContent = formatCurrency(totalAmount);
+
+                console.log('[OK] Payment page initialized with:');
+                console.log('- Booking ID:', bookingId);
+                console.log('- Room ID:', roomId);
+                console.log('- Total Amount: ' + formatCurrency(totalAmount));
+            }
+
+            if (!bookingId) {
+                console.warn('[WARN] No booking_id in URL parameters');
+            }
+        }
+
+        function formatCurrency(amount) {
+            return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', initializePaymentPage);
+    </script>
+</body>
+
+</html>

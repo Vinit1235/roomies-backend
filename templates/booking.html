@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Room - Roomies</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #dc2626;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --light-gray: #f3f4f6;
+            --dark-gray: #374151;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--light-gray);
+            color: var(--dark-gray);
+        }
+
+        .booking-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .booking-header {
+            margin-bottom: 40px;
+        }
+
+        .booking-header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: #1f2937;
+        }
+
+        .booking-header p {
+            color: #6b7280;
+            font-size: 16px;
+        }
+
+        .booking-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .booking-wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .booking-form-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .form-section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light-gray);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+
+        .room-summary {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 20px;
+        }
+
+        .room-image {
+            width: 100%;
+            height: 200px;
+            background: var(--light-gray);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            object-fit: cover;
+        }
+
+        .room-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .room-location {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .pricing-breakdown {
+            background: var(--light-gray);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .price-row:last-child {
+            margin-bottom: 0;
+            padding-top: 10px;
+            border-top: 1px solid #d1d5db;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .status-green {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-yellow {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-red {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .amenities-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 15px 0;
+        }
+
+        .amenity-tag {
+            background: var(--light-gray);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #b91c1c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--light-gray);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid var(--light-gray);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #6ee7b7;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #0c4a6e;
+            border: 1px solid #93c5fd;
+        }
+
+        .status-info {
+            background: #f0f9ff;
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .status-info strong {
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    {% include 'partials/header.html' %}
+
+    <div class="booking-container">
+        <div class="booking-header">
+            <h1>Book Your Perfect Room</h1>
+            <p>Complete the booking form below to reserve your room</p>
+        </div>
+
+        <div id="statusAlert" class="alert"></div>
+
+        <div class="booking-wrapper">
+            <!-- Booking Form -->
+            <div class="booking-form-section">
+                <h3 class="form-section-title">Booking Details</h3>
+
+                <form id="bookingForm">
+                    <!-- Room Selection (if not passed via URL) -->
+                    <div class="form-group">
+                        <label for="roomId">Select Room *</label>
+                        <input type="hidden" id="roomId" name="room_id" value="{{ room_id or '' }}">
+                        <input type="text" id="roomDisplay" placeholder="Room will be pre-filled" readonly disabled>
+                    </div>
+
+                    <!-- Check-in Date -->
+                    <div class="form-group">
+                        <label for="checkInDate">Check-in Date *</label>
+                        <input type="date" id="checkInDate" name="check_in_date" required>
+                    </div>
+
+                    <!-- Check-out Date -->
+                    <div class="form-group">
+                        <label for="checkOutDate">Check-out Date *</label>
+                        <input type="date" id="checkOutDate" name="check_out_date" required>
+                    </div>
+
+                    <!-- Duration -->
+                    <div class="form-group">
+                        <label>Duration: <span id="durationDisplay">--</span> months</label>
+                    </div>
+
+                    <!-- Guest Count -->
+                    <div class="form-group">
+                        <label for="guestCount">Number of Guests</label>
+                        <input type="number" id="guestCount" name="guest_count" min="1" max="5" value="1">
+                    </div>
+
+                    <!-- Special Requests -->
+                    <div class="form-group">
+                        <label for="specialRequests">Special Requests (Optional)</label>
+                        <textarea id="specialRequests" name="special_requests" rows="4" placeholder="Any special requirements or preferences..."></textarea>
+                    </div>
+
+                    <!-- Terms -->
+                    <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                        <input type="checkbox" id="agreeTerms" required style="width: auto;">
+                        <label for="agreeTerms" style="margin: 0;">I agree to the terms and conditions</label>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn btn-secondary" onclick="history.back()">
+                            <i class="fas fa-arrow-left"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <i class="fas fa-credit-card"></i> Proceed to Payment
+                        </button>
+                    </div>
+
+                    <div class="loading" id="loading">
+                        <div class="spinner"></div>
+                        <p>Processing your booking...</p>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Room Summary -->
+            <div class="room-summary">
+                <h3 class="form-section-title">Summary</h3>
+
+                <div id="roomSummary">
+                    <p style="color: #9ca3af; text-align: center;">Room details will appear here</p>
+                </div>
+
+                <div id="statusInfo" class="status-info" style="display: none;">
+                    <strong>Booking Status:</strong><br>
+                    <span id="statusText"></span>
+                </div>
+
+                <div class="pricing-breakdown">
+                    <div class="price-row">
+                        <span>Monthly Rent:</span>
+                        <span id="rentAmount">Rs. 0</span>
+                    </div>
+                    <div class="price-row">
+                        <span>Booking Fee:</span>
+                        <span id="bookingFeeAmount">Rs. 999</span>
+                    </div>
+                    <div class="price-row">
+                        <span>Security Deposit (2x rent):</span>
+                        <span id="depositAmount">Rs. 0</span>
+                    </div>
+                    <div class="price-row">
+                        <span>Platform Fee (2%):</span>
+                        <span id="platformFeeAmount">Rs. 0</span>
+                    </div>
+                    <div class="price-row">
+                        <span>Total Amount Due:</span>
+                        <span id="totalAmount">Rs. 0</span>
+                    </div>
+                </div>
+
+                <p style="color: #6b7280; font-size: 12px; margin-top: 15px; text-align: center;">
+                    Secure payment powered by Razorpay
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Razorpay Script -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <script>
+        // Get room ID from URL if provided
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomIdFromUrl = urlParams.get('room_id');
+
+        if (roomIdFromUrl) {
+            document.getElementById('roomId').value = roomIdFromUrl;
+            loadRoomDetails(roomIdFromUrl);
+        }
+
+        // Date constraints
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('checkInDate').setAttribute('min', today);
+        document.getElementById('checkOutDate').setAttribute('min', today);
+
+        // Calculate duration on date change
+        document.getElementById('checkInDate').addEventListener('change', calculateDuration);
+        document.getElementById('checkOutDate').addEventListener('change', calculateDuration);
+
+        function calculateDuration() {
+            const checkIn = new Date(document.getElementById('checkInDate').value);
+            const checkOut = new Date(document.getElementById('checkOutDate').value);
+            
+            if (checkIn && checkOut && checkOut > checkIn) {
+                const months = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24 * 30));
+                document.getElementById('durationDisplay').textContent = months;
+                updatePricing();
+            }
+        }
+
+        async function loadRoomDetails(roomId) {
+            try {
+                const response = await fetch(`/api/rooms/featured`);
+                const data = await response.json();
+                
+                // Find the room in featured rooms (or we could create a specific endpoint)
+                const room = data.rooms.find(r => r.id == roomId);
+                if (room) {
+                    displayRoomSummary(room);
+                }
+            } catch (error) {
+                console.error('Error loading room:', error);
+            }
+        }
+
+        function displayRoomSummary(room) {
+            const statusClass = room.availability_status === 'green' ? 'status-green' : 
+                               room.availability_status === 'yellow' ? 'status-yellow' : 'status-red';
+            const statusText = room.availability_status === 'green' ? 'Instant Booking' : 
+                              room.availability_status === 'yellow' ? 'Needs Approval' : 'Booked';
+
+            const html = `
+                <img src="${room.image_url}" alt="${room.title}" class="room-image">
+                <h4 class="room-title">${room.title}</h4>
+                <p class="room-location">${room.location} • ${room.college}</p>
+                <span class="status-badge ${statusClass}">${statusText}</span>
+                
+                <div style="margin: 15px 0;">
+                    <strong style="font-size: 18px; color: var(--primary);">Rs. ${room.price.toLocaleString()}/month</strong>
+                </div>
+
+                <div class="amenities-list">
+                    ${room.amenities.slice(0, 3).map(a => `<span class="amenity-tag">${a}</span>`).join('')}
+                </div>
+
+                <p style="font-size: 12px; color: #6b7280; margin-top: 10px;">
+                    ${room.available_slots} slots available
+                </p>
+            `;
+
+            document.getElementById('roomSummary').innerHTML = html;
+            
+            // Show status info
+            const statusInfoDiv = document.getElementById('statusInfo');
+            const statusTextSpan = document.getElementById('statusText');
+            
+            if (room.availability_status === 'green') {
+                statusTextSpan.textContent = 'Green status: Your booking will be confirmed immediately after payment.';
+                statusInfoDiv.style.display = 'block';
+            } else if (room.availability_status === 'yellow') {
+                statusTextSpan.textContent = 'Yellow status: Your booking needs owner approval. You\'ll be notified within 24 hours.';
+                statusInfoDiv.style.display = 'block';
+            } else {
+                statusTextSpan.textContent = 'Red status: This room is already booked and unavailable.';
+                statusInfoDiv.style.display = 'block';
+            }
+
+            // Store room price for later
+            document.getElementById('rentAmount').textContent = `Rs. ${room.price.toLocaleString()}`;
+            window.roomPrice = room.price;
+            window.roomId = room.id;
+            window.roomAvailability = room.availability_status;
+            
+            updatePricing();
+        }
+
+        function updatePricing() {
+            const rentAmount = window.roomPrice || 0;
+            const bookingFee = 999;
+            const deposit = rentAmount * 2;
+            const platformFee = Math.round(rentAmount * 0.02);
+            const total = rentAmount + bookingFee + deposit + platformFee;
+
+            document.getElementById('rentAmount').textContent = `Rs. ${rentAmount.toLocaleString()}`;
+            document.getElementById('bookingFeeAmount').textContent = `Rs. ${bookingFee.toLocaleString()}`;
+            document.getElementById('depositAmount').textContent = `Rs. ${deposit.toLocaleString()}`;
+            document.getElementById('platformFeeAmount').textContent = `Rs. ${platformFee.toLocaleString()}`;
+            document.getElementById('totalAmount').textContent = `Rs. ${total.toLocaleString()}`;
+
+            window.totalBookingAmount = total;
+        }
+
+        // Form submission
+        document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Validate dates
+            const checkIn = document.getElementById('checkInDate').value;
+            const checkOut = document.getElementById('checkOutDate').value;
+
+            if (!checkIn || !checkOut) {
+                showAlert('Please select both check-in and check-out dates', 'error');
+                return;
+            }
+
+            if (window.roomAvailability === 'red') {
+                showAlert('This room is not available for booking', 'error');
+                return;
+            }
+
+            // Create booking
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('submitBtn').disabled = true;
+
+            try {
+                const bookingData = {
+                    room_id: window.roomId,
+                    move_in_date: checkIn,
+                    contract_duration_months: parseInt(document.getElementById('durationDisplay').textContent)
+                };
+
+                const response = await fetch('/api/bookings/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bookingData)
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'Booking failed');
+                }
+
+                // Proceed to confirmation page
+                if (result.success) {
+                    showAlert('Booking created successfully!', 'success');
+                    setTimeout(() => {
+                        window.location.href = `/bookings/${result.booking.id}`;
+                    }, 1500);
+                }
+            } catch (error) {
+                showAlert(error.message, 'error');
+                document.getElementById('submitBtn').disabled = false;
+                document.getElementById('loading').style.display = 'none';
+            }
+        });
+
+        function initiatePayment(bookingId, amount) {
+            // Razorpay integration would go here
+            console.log('Initiating payment for booking:', bookingId, 'Amount:', amount);
+            showAlert('Payment gateway would open here (Razorpay)', 'info');
+        }
+
+        function showAlert(message, type) {
+            const alert = document.getElementById('statusAlert');
+            alert.textContent = message;
+            alert.className = `alert alert-${type}`;
+            alert.style.display = 'block';
+            document.getElementById('loading').style.display = 'none';
+
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
