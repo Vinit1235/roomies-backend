@@ -120,6 +120,21 @@ if "postgresql" in database_url or "postgres" in database_url:
     }
     print("🔒 SSL mode enabled for PostgreSQL connection")
 
+# Razorpay Payment Gateway Configuration
+try:
+    import razorpay
+    RAZORPAY_KEY_ID = os.environ.get("RAZORPAY_KEY_ID", "")
+    RAZORPAY_KEY_SECRET = os.environ.get("RAZORPAY_KEY_SECRET", "")
+    if RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET:
+        razorpay_client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
+        print("✅ Razorpay payment gateway initialized")
+    else:
+        razorpay_client = None
+        print("⚠️ Razorpay keys not configured. Payment gateway disabled.")
+except ImportError:
+    razorpay_client = None
+    print("⚠️ Razorpay not installed. Payment gateway disabled.")
+
 # Initialize Search Trie
 search_trie = SearchTrie()
 
@@ -1023,6 +1038,55 @@ def room_details(room_id):
     return render_template("room_details.html", room=room)
 
 
+@app.route("/book")
+@app.route("/book/<int:room_id>")
+@login_required
+def book_room(room_id=None):
+    """Booking page for a room."""
+    return render_template("booking.html", room_id=room_id)
+
+
+@app.route("/payment")
+@login_required
+def payment_page():
+    """Payment gateway page."""
+    booking_id = request.args.get("booking_id")
+    amount = request.args.get("amount")
+    return render_template(
+        "payment_gateway.html",
+        booking_id=booking_id,
+        amount=amount,
+        razorpay_key=os.environ.get("RAZORPAY_KEY_ID", "")
+    )
+
+
+@app.route("/my-bookings")
+@login_required
+def my_bookings_page():
+    """User's bookings page."""
+    return render_template("my_bookings.html")
+
+
+@app.route("/booking-confirmation")
+@app.route("/bookings/<int:booking_id>")
+@login_required
+def booking_confirmation_page(booking_id=None):
+    """Booking confirmation page."""
+    if not booking_id:
+        booking_id = request.args.get("booking_id")
+    
+    if booking_id:
+        booking = Booking.query.get_or_404(booking_id)
+        # Check if user owns this booking
+        if current_user.role == 'student' and booking.student_id != current_user.id:
+            flash("You don't have permission to view this booking.", "error")
+            return redirect(url_for("home"))
+        return render_template("booking_confirmation.html", booking=booking)
+    
+    return redirect(url_for("my_bookings_page"))
+
+
+
 @app.route("/verify")
 @login_required
 def verify_page():
@@ -1781,6 +1845,9 @@ def approve_verification(verification_id):
                 user.kyc_verified = True
         
         db.session.commit()
+        
+        # Send notification email
+        email_service.send_verification_approved_email(user, verification.user_type)
         
         return jsonify({
             "success": True,
@@ -2939,6 +3006,101 @@ except ImportError as e:
     email_service = MockService()
     contract_generator = MockService()
 
+
+# ---------------------------------------------------------------------------
+# Payment Gateway APIs (Razorpay)
+# ---------------------------------------------------------------------------
+
+@app.route("/api/payment/create-order", methods=["POST"])
+@login_required
+def create_razorpay_order():
+    """Create a Razorpay order for payment."""
+    if razorpay_client is None:
+        return jsonify({"error": "Payment gateway not configured"}), 503
+    
+    data = request.get_json()
+    amount = data.get("amount")  # Amount in paise (₹999 = 99900 paise)
+    booking_id = data.get("booking_id")
+    
+    if not amount:
+        return jsonify({"error": "Amount is required"}), 400
+    
+    try:
+        # Create Razorpay order
+        order_data = {
+            "amount": int(amount),  # Amount in paise
+            "currency": "INR",
+            "receipt": f"booking_{booking_id}_{datetime.utcnow().timestamp()}",
+            "notes": {
+                "booking_id": str(booking_id) if booking_id else "",
+                "user_id": str(current_user.id),
+                "user_type": current_user.role
+            }
+        }
+        
+        order = razorpay_client.order.create(data=order_data)
+        
+        return jsonify({
+            "success": True,
+            "order_id": order["id"],
+            "amount": order["amount"],
+            "currency": order["currency"],
+            "key": os.environ.get("RAZORPAY_KEY_ID", "")
+        })
+    except Exception as e:
+        app.logger.error(f"Razorpay order creation error: {e}")
+        return jsonify({"error": "Failed to create payment order"}), 500
+
+
+@app.route("/api/payment/verify", methods=["POST"])
+@login_required
+def verify_razorpay_payment():
+    """Verify Razorpay payment signature."""
+    if razorpay_client is None:
+        return jsonify({"error": "Payment gateway not configured"}), 503
+    
+    data = request.get_json()
+    razorpay_order_id = data.get("razorpay_order_id")
+    razorpay_payment_id = data.get("razorpay_payment_id")
+    razorpay_signature = data.get("razorpay_signature")
+    booking_id = data.get("booking_id")
+    
+    if not all([razorpay_order_id, razorpay_payment_id, razorpay_signature]):
+        return jsonify({"error": "Missing payment details"}), 400
+    
+    try:
+        # Verify payment signature
+        params = {
+            "razorpay_order_id": razorpay_order_id,
+            "razorpay_payment_id": razorpay_payment_id,
+            "razorpay_signature": razorpay_signature
+        }
+        
+        razorpay_client.utility.verify_payment_signature(params)
+        
+        # Update booking if booking_id provided
+        if booking_id:
+            booking = Booking.query.get(booking_id)
+            if booking:
+                booking.razorpay_payment_id = razorpay_payment_id
+                booking.razorpay_signature = razorpay_signature
+                booking.payment_status = "completed"
+                booking.booking_status = "confirmed"
+                booking.total_paid = booking.calculate_total_due()
+                booking.confirmed_at = datetime.utcnow()
+                db.session.commit()
+        
+        return jsonify({
+            "success": True,
+            "message": "Payment verified successfully"
+        })
+    except razorpay.errors.SignatureVerificationError:
+        return jsonify({"error": "Payment verification failed"}), 400
+    except Exception as e:
+        app.logger.error(f"Payment verification error: {e}")
+        return jsonify({"error": "Payment verification failed"}), 500
+
+
 @app.route("/api/bookings/create", methods=["POST"])
 @login_required
 def create_booking():
@@ -3826,15 +3988,16 @@ def init_database():
                 print("📦 No rooms found. Loading data from real_data_dump.json...")
                 
                 # Room images for variety
+                # Room images for variety
                 room_images = [
+                    "/static/images/room1.png",
+                    "/static/images/room2.png",
+                    "/static/images/room3.png",
                     "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600",
                     "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=600",
                     "https://images.unsplash.com/photo-1522771753035-4a50354b6063?w=600",
                     "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600",
                     "https://images.unsplash.com/photo-1505693416388-b0346efee539?w=600",
-                    "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=600",
-                    "https://images.unsplash.com/photo-1540518614846-7eded433c457?w=600",
-                    "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600",
                 ]
                 
                 try:

@@ -364,6 +364,12 @@ const fetchRooms = async (params = {}) => {
 
 const executeSearch = async () => {
     if (!roomsGrid) return;
+
+    // Smooth scroll to results if not auto-loading
+    if (searchInput && (searchInput.value || propertyTypeFilter.value)) {
+        document.getElementById("roomsExplorer").scrollIntoView({ behavior: 'smooth' });
+    }
+
     roomsGrid.dataset.loading = "true";
     setFeedback(searchSummary, "Fetching live availability…", "info");
 
@@ -548,6 +554,7 @@ window.addEventListener("DOMContentLoaded", () => {
     initVoiceSearch();
     initPWA();
     loadFlashDeals();
+    executeSearch(); // Auto-load listings on page load
 });
 
 

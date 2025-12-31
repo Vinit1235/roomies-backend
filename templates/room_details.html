@@ -394,95 +394,23 @@
 
     <script>
         // Reserve/Book Button Handler
-        document.getElementById('reserveBtn').addEventListener('click', async function () {
+        document.getElementById('reserveBtn').addEventListener('click', function () {
             // Check if user is logged in
             {% if current_user.is_authenticated %}
             // Check if user is a student
             {% if current_user.role == 'student' %}
-            // Create booking
-            const confirmed = confirm('Reserve this room for ₹{{ room.price }}/month?\n\n✅ Simulated Flow:\n1. Pay ₹999 booking fee\n2. Send request to owner\n3. Auto-approve by owner\n4. Complete full payment\n5. Sign contract\n\nProceed?');
-
-            if (!confirmed) return;
-
-            const btn = document.getElementById('reserveBtn');
-            const originalText = btn.textContent;
-            btn.disabled = true;
-            btn.textContent = 'Step 1/5: Creating booking...';
-
-            try {
-                // STEP 1: Create booking
-                console.log('Step 1: Creating booking...');
-                const createResponse = await fetch('/api/bookings/create', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        room_id: {{ room.id }},
-                    move_in_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                    contract_duration_months: 11
-                            })
-                        });
-
-        const createResult = await createResponse.json();
-        console.log('Create result:', createResult);
-
-        if (!createResponse.ok || !createResult.success) {
-            throw new Error(createResult.error || 'Failed to create booking');
-        }
-
-        const bookingId = createResult.booking.id;
-
-        // STEP 2: Pay booking fee (₹999)
-        btn.textContent = 'Step 2/5: Paying ₹999...';
-        console.log('Step 2: Paying booking fee...');
-        await sleep(500);
-
-        const payResponse = await fetch(`/api/bookings/${bookingId}/pay-booking-fee`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                razorpay_payment_id: 'sim_pay_' + Date.now(),
-                razorpay_signature: 'sim_sig_' + Date.now()
-            })
+            // Redirect to booking page
+            window.location.href = '/book/{{ room.id }}';
+            {% else %}
+            alert('Only students can book rooms. You are logged in as an owner.');
+            {% endif %}
+            {% else %}
+            // Redirect to login
+            if (confirm('Please login to reserve this room.\n\nClick OK to go to login page.')) {
+                window.location.href = '/login?next=/room/{{ room.id }}';
+            }
+            {% endif %}
         });
-
-        const payResult = await payResponse.json();
-        console.log('Payment result:', payResult);
-
-        if (!payResponse.ok || !payResult.success) {
-            throw new Error(payResult.error || 'Payment failed');
-        }
-
-        // Success!
-        alert('✅ Booking Successful!\n\n' +
-            'Step 1: ✓ Booking created\n' +
-            'Step 2: ✓ Paid ₹999 booking fee\n\n' +
-            'Your request has been sent to the owner.\n' +
-            'You will be notified when they respond.\n\n' +
-            'Redirecting to home page...');
-
-        window.location.href = '/';
-                        
-                    } catch (error) {
-            console.error('Booking error:', error);
-            btn.disabled = false;
-            btn.textContent = originalText;
-            alert('❌ Error: ' + error.message + '\n\nCheck console (F12) for details.');
-        }
-        {% else %}
-        alert('Only students can book rooms. You are logged in as an owner.');
-        {% endif %}
-        {% else %}
-        // Redirect to login
-        if (confirm('Please login to reserve this room.\n\nClick OK to go to login page.')) {
-            window.location.href = '/login';
-        }
-        {% endif %}
-        });
-
-        // Helper: Sleep function
-        function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
 
         // Initialize Google Map
         function initDetailMap() {

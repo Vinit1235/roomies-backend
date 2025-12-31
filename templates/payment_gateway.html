@@ -779,7 +779,8 @@
 
         function selectUPIApp(app) {
             console.log('Selected UPI App:', app);
-            // Would redirect to actual UPI app
+            // This will be handled by Razorpay checkout
+            openRazorpayCheckout('upi');
         }
 
         function processPayment() {
@@ -793,34 +794,126 @@
             const method = selectedMethod.value;
             console.log('Processing payment with method:', method);
 
-            // For demo purposes, show success
-            if (method === 'upi') {
-                processUPIPayment();
-            } else if (method === 'debit_card' || method === 'credit_card') {
-                processCardPayment();
-            } else if (method === 'netbanking' || method === 'bank_transfer') {
-                processBankPayment();
-            } else {
-                processWalletPayment();
+            // Open Razorpay checkout with preferred method
+            openRazorpayCheckout(method);
+        }
+
+        async function openRazorpayCheckout(preferredMethod) {
+            const totalAmount = parseInt(document.getElementById('totalAmount').textContent.replace(/,/g, '')) * 100;
+
+            try {
+                // Create Razorpay order
+                const orderResponse = await fetch('/api/payment/create-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        amount: totalAmount,
+                        booking_id: bookingId
+                    })
+                });
+
+                const orderData = await orderResponse.json();
+
+                if (!orderData.success) {
+                    alert('Failed to create payment order: ' + (orderData.error || 'Unknown error'));
+                    return;
+                }
+
+                // Configure Razorpay options
+                const options = {
+                    key: orderData.key || '{{ razorpay_key }}',
+                    amount: orderData.amount,
+                    currency: orderData.currency || 'INR',
+                    name: 'Roomies',
+                    description: 'Room Booking Payment',
+                    order_id: orderData.order_id,
+                    prefill: {
+                        name: '',
+                        email: '',
+                        contact: ''
+                    },
+                    notes: {
+                        booking_id: bookingId
+                    },
+                    theme: {
+                        color: '#dc2626'
+                    },
+                    handler: function (response) {
+                        // Payment successful - verify on backend
+                        verifyPayment(response);
+                    },
+                    modal: {
+                        ondismiss: function () {
+                            console.log('Payment cancelled');
+                        }
+                    }
+                };
+
+                // Set preferred payment method
+                if (preferredMethod === 'upi' || preferredMethod === 'google_pay' || preferredMethod === 'phonepe' || preferredMethod === 'paytm') {
+                    options.method = {
+                        upi: true,
+                        card: false,
+                        netbanking: false,
+                        wallet: false
+                    };
+                } else if (preferredMethod === 'credit_card' || preferredMethod === 'debit_card') {
+                    options.method = {
+                        upi: false,
+                        card: true,
+                        netbanking: false,
+                        wallet: false
+                    };
+                } else if (preferredMethod === 'netbanking') {
+                    options.method = {
+                        upi: false,
+                        card: false,
+                        netbanking: true,
+                        wallet: false
+                    };
+                }
+
+                const razorpay = new Razorpay(options);
+                razorpay.open();
+            } catch (error) {
+                console.error('Payment error:', error);
+                alert('Payment initialization failed. Please try again.');
+            }
+        }
+
+        async function verifyPayment(response) {
+            try {
+                const verifyResponse = await fetch('/api/payment/verify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_signature: response.razorpay_signature,
+                        booking_id: bookingId
+                    })
+                });
+
+                const result = await verifyResponse.json();
+
+                if (result.success) {
+                    alert('Payment successful! Your booking is confirmed.');
+                    window.location.href = '/booking-confirmation?booking_id=' + bookingId;
+                } else {
+                    alert('Payment verification failed: ' + (result.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Verification error:', error);
+                alert('Payment verification failed. Please contact support.');
             }
         }
 
         function processUPIPayment() {
-            const upiId = document.getElementById('upiId').value;
-
-            if (!upiId && !selectedUPI) {
-                alert('Please select or enter UPI ID');
-                return;
-            }
-
-            // In production, integrate with actual UPI gateway
-            console.log('Processing UPI payment with:', upiId);
-
-            // Simulate UPI verification
-            alert('UPI payment initiated. Please complete the payment in your UPI app.');
-
-            // After confirmation, call backend
-            confirmPayment('upi', upiId);
+            openRazorpayCheckout('upi');
         }
 
         function processCardPayment() {

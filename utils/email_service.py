@@ -418,8 +418,59 @@ class EmailService:
             f"Rental_Agreement_{booking.id}.pdf": contract_pdf_path
         } if contract_pdf_path and os.path.exists(contract_pdf_path) else None
         
-        return self.send_email(student.email, subject, html_content, attachments)
+    
+    def send_verification_approved_email(self, user, user_type):
+        """Notify user that their verification was approved."""
+        subject = "✅ Account Verification Approved - Roomies"
+        
+        html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+                .header {{ background: #4caf50; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }}
+                .content {{ background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }}
+                .success-box {{ background: white; padding: 20px; margin: 20px 0; border-radius: 8px; border-left: 4px solid #4caf50; }}
+                .btn {{ display: inline-block; padding: 12px 30px; margin: 10px; text-decoration: none; border-radius: 6px; background: #ff385c; color: white; font-weight: bold; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>✅ Verification Approved!</h1>
+                </div>
+                <div class="content">
+                    <p>Hello <strong>{user.name}</strong>,</p>
+                    
+                    <div class="success-box">
+                        <h3>Congratulations!</h3>
+                        <p>Your identity verification has been successfully approved by our team.</p>
+                    </div>
+                    
+                    <p>You now have full access to all verified features on Roomies:</p>
+                    <ul>
+                        <li>{'Apply for rooms with verified badge' if user_type == 'student' else 'List your property with "Verified" badge'}</li>
+                        <li>{'Faster booking approvals' if user_type == 'student' else 'Higher visibility in search results'}</li>
+                        <li>{'Access to premium listings' if user_type == 'student' else 'Access to verified students'}</li>
+                    </ul>
+                    
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="{os.getenv('APP_URL', 'http://localhost:5000')}/login" class="btn">
+                            Go to Dashboard
+                        </a>
+                    </div>
+                    
+                    <p>Thank you for helping us keep the Roomies community safe and trusted.</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        return self.send_email(user.email, subject, html_content)
 
 
 # Initialize email service
 email_service = EmailService()
+
