@@ -18,8 +18,8 @@ class EmailService:
         # Support both MAIL_* (from .env.example) and EMAIL_* variable names
         self.smtp_host = "smtp.gmail.com"
         self.smtp_port = 587
-        self.smtp_user = "vinitranjan12345@gmail.com"
-        self.smtp_password = "qovx fopk hfow frps"
+        self.smtp_user = "viniit881@gmail.com"
+        self.smtp_password = "hfmk tzsc ypxs oryi"
         self.from_email = f"Roomies <{self.smtp_user}>"
     
     def send_email(self, to_email, subject, html_content, attachments=None):
