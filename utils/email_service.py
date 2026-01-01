@@ -16,11 +16,11 @@ class EmailService:
     
     def __init__(self):
         # Support both MAIL_* (from .env.example) and EMAIL_* variable names
-        self.smtp_host = os.getenv("MAIL_SERVER") or os.getenv("EMAIL_HOST", "smtp.gmail.com")
-        self.smtp_port = int(os.getenv("MAIL_PORT") or os.getenv("EMAIL_PORT", "587"))
-        self.smtp_user = os.getenv("MAIL_USERNAME") or os.getenv("EMAIL_USER")
-        self.smtp_password = os.getenv("MAIL_PASSWORD") or os.getenv("EMAIL_PASSWORD")
-        self.from_email = os.getenv("EMAIL_FROM", f"Roomies <{self.smtp_user}>" if self.smtp_user else "Roomies <noreply@roomies.in>")
+        self.smtp_host = "smtp.gmail.com"
+        self.smtp_port = 587
+        self.smtp_user = "vinitranjan12345@gmail.com"
+        self.smtp_password = "qovx fopk hfow frps"
+        self.from_email = f"Roomies <{self.smtp_user}>"
     
     def send_email(self, to_email, subject, html_content, attachments=None):
         """Send email with optional attachments."""
