@@ -36,10 +36,11 @@
                 <p>Verified hosts, transparent pricing, and roommate matching engineered for campus life.</p>
 
                 <form id="searchForm" class="search-panel">
-                    <div class="field">
+                    <div class="field" style="position: relative;">
                         <label for="searchInput">College / City</label>
-                        <input id="searchInput" type="text"
+                        <input id="searchInput" type="text" autocomplete="off"
                             placeholder="Search by college, neighbourhood or listing name">
+                        <div id="searchSuggestions" class="suggestions-dropdown"></div>
                     </div>
                     <div class="field">
                         <label for="propertyTypeFilter">Property Type</label>

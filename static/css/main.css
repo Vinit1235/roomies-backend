@@ -2494,3 +2494,12 @@ video {
 .pro-badge i {
     font-size: 0.9rem;
 }
+
+/* Autocomplete */
+.suggestions-dropdown { position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid var(--gray-200); border-radius: var(--radius); box-shadow: var(--shadow-xl); z-index: 1000; max-height: 300px; overflow-y: auto; display: none; margin-top: 5px; }
+.suggestions-dropdown.active { display: block; }
+.suggestion-item { padding: 0.75rem 1rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gray-100); transition: background 0.2s; }
+.suggestion-item:last-child { border-bottom: none; }
+.suggestion-item:hover { background: var(--gray-50); }
+.suggestion-text { font-weight: 500; color: var(--gray-800); }
+.suggestion-type { font-size: 0.75rem; color: var(--gray-500); text-transform: uppercase; background: var(--gray-100); padding: 2px 6px; border-radius: 4px; }

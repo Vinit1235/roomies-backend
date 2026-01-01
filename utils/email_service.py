@@ -24,6 +24,10 @@ class EmailService:
     
     def send_email(self, to_email, subject, html_content, attachments=None):
         """Send email with optional attachments."""
+        # Debug logging for Render
+        logging.info(f"Preparing to send email to {to_email} via {self.smtp_host}:{self.smtp_port}")
+        logging.info(f"SMTP User: {self.smtp_user}")
+        
         try:
             msg = MIMEMultipart('alternative')
             msg['Subject'] = subject
@@ -44,6 +48,7 @@ class EmailService:
             
             # Send email
             with smtplib.SMTP(self.smtp_host, self.smtp_port) as server:
+                # server.set_debuglevel(1) # Uncomment for verbose SMTP logs
                 server.starttls()
                 if self.smtp_user and self.smtp_password:
                     server.login(self.smtp_user, self.smtp_password)
@@ -54,6 +59,11 @@ class EmailService:
         
         except Exception as e:
             logger.error(f"Failed to send email to {to_email}: {str(e)}")
+            # Log specific SMTP errors for better debugging
+            if isinstance(e, smtplib.SMTPAuthenticationError):
+                logger.error("SMTP Authentication failed. Check username/password.")
+            elif isinstance(e, smtplib.SMTPConnectError):
+                logger.error("SMTP Connection failed. Check server address and port.")
             return False
     
     def send_booking_request_to_owner(self, booking, room, student, owner):

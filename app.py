@@ -1592,6 +1592,42 @@ def api_colleges():
         app.logger.error(f"Failed to fetch colleges: {e}")
         return jsonify([]), 500
 
+@app.route("/api/suggestions")
+def api_suggestions():
+    """Get search suggestions for rooms, locations, and colleges."""
+    q = request.args.get("q", "").strip()
+    if len(q) < 2:
+        return jsonify([])
+    
+    try:
+        # Search Colleges
+        colleges = db.session.query(Room.college_nearby)\
+            .filter(Room.college_nearby.ilike(f"%{q}%"))\
+            .distinct().limit(3).all()
+            
+        # Search Locations
+        locations = db.session.query(Room.location)\
+            .filter(Room.location.ilike(f"%{q}%"))\
+            .distinct().limit(3).all()
+            
+        # Search Room Titles
+        titles = db.session.query(Room.title)\
+            .filter(Room.title.ilike(f"%{q}%"))\
+            .distinct().limit(3).all()
+            
+        results = []
+        for c in colleges:
+            if c[0]: results.append({"type": "College", "text": c[0]})
+        for l in locations:
+            if l[0]: results.append({"type": "Location", "text": l[0]})
+        for t in titles:
+            if t[0]: results.append({"type": "Room", "text": t[0]})
+            
+        return jsonify(results)
+    except Exception as e:
+        app.logger.error(f"Suggestion API error: {e}")
+        return jsonify([])
+
 @app.route("/api/owner/listings", methods=["POST"])
 @login_required
 def create_listing():

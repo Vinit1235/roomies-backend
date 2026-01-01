@@ -778,3 +778,55 @@ function displayCarbonSavings(containerId) {
     `;
 }
 
+// ============= AUTOCOMPLETE SEARCH =============
+
+const suggestionsContainer = document.getElementById("searchSuggestions");
+let debounceTimer;
+
+if (searchInput && suggestionsContainer) {
+    searchInput.addEventListener("input", (e) => {
+        const query = e.target.value.trim();
+        clearTimeout(debounceTimer);
+
+        if (query.length < 2) {
+            suggestionsContainer.classList.remove("active");
+            return;
+        }
+
+        debounceTimer = setTimeout(async () => {
+            try {
+                const res = await fetch(`/api/suggestions?q=${encodeURIComponent(query)}`);
+                const suggestions = await res.json();
+
+                if (suggestions.length > 0) {
+                    suggestionsContainer.innerHTML = suggestions.map(s => `
+                        <div class="suggestion-item" onclick="selectSuggestion('${s.text.replace(/'/g, "\\'")}')">
+                            <span class="suggestion-text">${s.text}</span>
+                            <span class="suggestion-type">${s.type}</span>
+                        </div>
+                     `).join("");
+                    suggestionsContainer.classList.add("active");
+                } else {
+                    suggestionsContainer.classList.remove("active");
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }, 300);
+    });
+
+    // Hide when clicking outside
+    document.addEventListener("click", (e) => {
+        if (!searchInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+            suggestionsContainer.classList.remove("active");
+        }
+    });
+}
+
+window.selectSuggestion = (text) => {
+    if (searchInput) {
+        searchInput.value = text;
+        if (suggestionsContainer) suggestionsContainer.classList.remove("active");
+        executeSearch();
+    }
+};
