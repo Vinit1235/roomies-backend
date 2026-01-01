@@ -47,11 +47,23 @@ class EmailService:
                         msg.attach(attach)
             
             # Send email
-            with smtplib.SMTP(self.smtp_host, self.smtp_port) as server:
-                # server.set_debuglevel(1) # Uncomment for verbose SMTP logs
-                server.starttls()
+            # Send email
+            # Use explicit timeout and EHLO/HELO sequence
+            with smtplib.SMTP(self.smtp_host, self.smtp_port, timeout=10) as server:
+                server.set_debuglevel(1)  # Enable debug output for logs
+                server.ehlo()  # Identify to server
+                
+                # Only use TLS if valid port (587 usually)
+                if self.smtp_port == 587:
+                    try:
+                        server.starttls()
+                        server.ehlo()  # Re-identify after TLS
+                    except Exception as tls_error:
+                         logger.warning(f"TLS start failed: {tls_error}")
+                         
                 if self.smtp_user and self.smtp_password:
                     server.login(self.smtp_user, self.smtp_password)
+                    
                 server.send_message(msg)
             
             logger.info(f"Email sent successfully to {to_email}")
@@ -60,6 +72,9 @@ class EmailService:
         except Exception as e:
             logger.error(f"Failed to send email to {to_email}: {str(e)}")
             # Log specific SMTP errors for better debugging
+            import traceback
+            logger.error(traceback.format_exc())
+            
             if isinstance(e, smtplib.SMTPAuthenticationError):
                 logger.error("SMTP Authentication failed. Check username/password.")
             elif isinstance(e, smtplib.SMTPConnectError):

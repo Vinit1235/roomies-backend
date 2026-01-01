@@ -143,6 +143,26 @@ search_trie = SearchTrie()
 ADMIN_EMAIL = getattr(config, "ADMIN_EMAIL", "admin@roomies.in")
 ADMIN_PASSWORD = getattr(config, "ADMIN_PASSWORD", "admin123")
 
+@app.route("/test-email")
+def test_email_route():
+    """Debug route to test email sending."""
+    recipient = request.args.get("to")
+    if not recipient:
+        return "Missing 'to' parameter. Usage: /test-email?to=your@email.com", 400
+    
+    try:
+        from utils.email_service import email_service
+        subject = "Test Email from Render"
+        content = "<h1>It Works!</h1><p>Email sending is active on this server.</p>"
+        
+        success = email_service.send_email(recipient, subject, content)
+        if success:
+            return f"✅ Email sent successfully to {recipient}"
+        else:
+            return f"❌ Failed to send email. Check logs."
+    except Exception as e:
+        return f"❌ Error: {str(e)}"
+
 CORS(app)
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
@@ -3298,9 +3318,16 @@ def pay_booking_fee(booking_id):
     if booking.student_id != student.id:
         return jsonify({"error": "Not your booking"}), 403
     
-    data = request.get_json()
+    data = request.get_json() or {}
     payment_id = data.get("razorpay_payment_id")
     signature = data.get("razorpay_signature")
+    
+    # Bypass/Skip Payment Logic
+    # If no payment info provided, generate dummy info to progress the flow
+    if not payment_id:
+        app.logger.info("No payment ID provided - Using SKIP/BYPASS payment mode")
+        payment_id = f"skip_pay_{datetime.utcnow().timestamp()}"
+        signature = "skip_signature_bypass"
     
     # TODO: Verify Razorpay payment signature
     # For now, mark as paid
@@ -3448,9 +3475,15 @@ def complete_booking_payment(booking_id):
     if booking.booking_status != "confirmed":
         return jsonify({"error": "Booking not confirmed by owner yet."}), 400
     
-    data = request.get_json()
+    data = request.get_json() or {}
     payment_id = data.get("razorpay_payment_id")
     signature = data.get("razorpay_signature")
+    
+    # Bypass/Skip Payment Logic
+    if not payment_id:
+        app.logger.info("No payment ID provided provided - Using SKIP/BYPASS payment mode")
+        payment_id = f"skip_pay_complete_{datetime.utcnow().timestamp()}"
+        signature = "skip_signature_complete_bypass"
     
     # Calculate remaining amount
     remaining_amount = booking.calculate_total_due() - booking.total_paid
