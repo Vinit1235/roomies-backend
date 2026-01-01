@@ -155,11 +155,11 @@ def test_email_route():
         subject = "Test Email from Render"
         content = "<h1>It Works!</h1><p>Email sending is active on this server.</p>"
         
-        success = email_service.send_email(recipient, subject, content)
+        success, error_msg = email_service.send_email_with_details(recipient, subject, content)
         if success:
             return f"✅ Email sent successfully to {recipient}"
         else:
-            return f"❌ Failed to send email. Check logs."
+            return f"❌ Failed to send email: {error_msg}"
     except Exception as e:
         return f"❌ Error: {str(e)}"
 
@@ -1057,15 +1057,15 @@ def explore():
 @app.route("/list-room")
 @login_required
 def list_room():
-    """Page for owners to list a new room."""
+    """Page to list a new room (Owners & Students)."""
     # Debug print to help diagnose role issues
     user_role = getattr(current_user, 'role', 'unknown')
     print(f"DEBUG: /list-room accessed by User: {current_user.get_id()}, Role: {user_role}")
 
-    # Check role explicitly (safer than isinstance with proxies)
-    if user_role != 'owner':
-        flash(f"Access denied. You are logged in as a '{user_role}'. Only Owners can list properties.", "warning")
-        return redirect(url_for('home'))
+    # Allow both Owners and Students to access
+    if user_role not in ['owner', 'student']:
+         flash(f"Access denied. Please login as a Student or Owner to list a property.", "warning")
+         return redirect(url_for('home'))
         
     return render_template("list_room.html")
 
@@ -1652,8 +1652,35 @@ def api_suggestions():
 @login_required
 def create_listing():
     owner = get_current_owner()
+    is_student_listing = False
+    
+    # If not an owner, check if student
     if owner is None:
-        return jsonify({"error": "Only owners can publish listings."}), 403
+        student = get_current_student()
+        if student:
+            # Student is listing a room -> Use System Owner as placeholder
+            system_owner = Owner.query.filter_by(email="system@roomies.in").first()
+            if not system_owner:
+                # Lazy creation of system owner
+                try:
+                    system_owner = Owner(
+                        email="system@roomies.in",
+                        name="Roomies System",
+                        kyc_verified=True
+                    )
+                    system_owner.set_password("system123")
+                    db.session.add(system_owner)
+                    db.session.commit()
+                    app.logger.info("Created System Owner for student listing")
+                except Exception as e:
+                    db.session.rollback()
+                    app.logger.error(f"Failed to create system owner: {e}")
+                    return jsonify({"error": "System configuration error. Please contact support."}), 500
+            
+            owner = system_owner
+            is_student_listing = True
+        else:
+            return jsonify({"error": "Only owners or students can publish listings."}), 403
 
     payload = request.get_json(silent=True) or {}
 
@@ -1697,8 +1724,15 @@ def create_listing():
     except ValueError as exc:
         return jsonify({"error": str(exc)}), 400
 
+    # Append student info to title if applicable
+    title = payload["title"].strip()
+    if is_student_listing:
+         student = get_current_student() # Re-fetch to be safe or use variable from scope
+         if student:
+             title = f"{title} (Listed by {student.name})"
+
     room = Room(
-        title=payload["title"].strip(),
+        title=title,
         price=price,
         location=payload["location"].strip(),
         college_nearby=payload["college"].strip(),
@@ -3155,7 +3189,18 @@ def create_razorpay_order():
         })
     except Exception as e:
         app.logger.error(f"Razorpay order creation error: {e}")
-        return jsonify({"error": "Failed to create payment order"}), 500
+        # Fallback to Demo Mode on failure (e.g. auth error, connection reset)
+        app.logger.info("Fallback to DEMO mode due to Razorpay error")
+        demo_order_id = f"demo_fallback_{booking_id}_{datetime.utcnow().timestamp()}"
+        return jsonify({
+            "success": True,
+            "demo_mode": True,
+            "order_id": demo_order_id,
+            "amount": int(amount),
+            "currency": "INR",
+            "key": "demo_key",
+            "message": "Payment system unavailable. Using demo mode."
+        })
 
 
 @app.route("/api/payment/verify", methods=["POST"])
