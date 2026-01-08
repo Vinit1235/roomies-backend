@@ -68,6 +68,30 @@ except ImportError:
         return {"verified": False, "message": "Auto-verification disabled on this server."}
     print("Warning: Could not import utils.verification. Auto-verification disabled.")
 
+# Supabase OAuth Authentication
+try:
+    from utils.supabase_auth import (
+        supabase_auth,
+        get_google_oauth_url,
+        get_github_oauth_url,
+        handle_oauth_callback,
+        is_oauth_available
+    )
+    OAUTH_ENABLED = is_oauth_available()
+    if OAUTH_ENABLED:
+        print("✅ Supabase OAuth enabled")
+    else:
+        print("⚠️ Supabase OAuth not configured (missing credentials)")
+except ImportError as e:
+    print(f"⚠️ Could not import supabase_auth: {e}. OAuth disabled.")
+    OAUTH_ENABLED = False
+    def get_google_oauth_url(redirect_to=None):
+        return False, "OAuth not available"
+    def get_github_oauth_url(redirect_to=None):
+        return False, "OAuth not available"
+    def handle_oauth_callback(code=None, access_token=None):
+        return False, {"error": "OAuth not available"}
+
 # from services.news_service import NewsService
 try:
     from services.news_service import NewsService
@@ -1512,6 +1536,172 @@ def logout():
     logout_user()
     flash("You have been signed out.", "info")
     return redirect(url_for("home"))
+
+
+# ---------------------------------------------------------------------------
+# OAuth Routes (Supabase)
+# ---------------------------------------------------------------------------
+@app.route("/auth/google")
+def auth_google():
+    """Initiate Google OAuth login via Supabase."""
+    if not OAUTH_ENABLED:
+        flash("Google login is not available at this time.", "error")
+        return redirect(url_for("login"))
+    
+    # Get role from query params (student or owner)
+    role = request.args.get("role", "student").lower()
+    if role not in {"student", "owner"}:
+        role = "student"
+    
+    # Store role in session for callback
+    from flask import session
+    session["oauth_role"] = role
+    
+    # Generate OAuth URL
+    redirect_url = url_for("auth_callback", _external=True)
+    success, url_or_error = get_google_oauth_url(redirect_url)
+    
+    if success:
+        return redirect(url_or_error)
+    else:
+        flash(f"Google login error: {url_or_error}", "error")
+        return redirect(url_for("login"))
+
+
+@app.route("/auth/github")
+def auth_github():
+    """Initiate GitHub OAuth login via Supabase."""
+    if not OAUTH_ENABLED:
+        flash("GitHub login is not available at this time.", "error")
+        return redirect(url_for("login"))
+    
+    # Get role from query params (student or owner)
+    role = request.args.get("role", "student").lower()
+    if role not in {"student", "owner"}:
+        role = "student"
+    
+    # Store role in session for callback
+    from flask import session
+    session["oauth_role"] = role
+    
+    # Generate OAuth URL
+    redirect_url = url_for("auth_callback", _external=True)
+    success, url_or_error = get_github_oauth_url(redirect_url)
+    
+    if success:
+        return redirect(url_or_error)
+    else:
+        flash(f"GitHub login error: {url_or_error}", "error")
+        return redirect(url_for("login"))
+
+
+@app.route("/auth/callback")
+def auth_callback():
+    """Handle OAuth callback from Supabase."""
+    from flask import session
+    
+    # Get the authorization code or access token from callback
+    code = request.args.get("code")
+    access_token = request.args.get("access_token")
+    error = request.args.get("error")
+    error_description = request.args.get("error_description")
+    
+    if error:
+        flash(f"Authentication failed: {error_description or error}", "error")
+        return redirect(url_for("login"))
+    
+    if not code and not access_token:
+        flash("Authentication failed: No authorization code received.", "error")
+        return redirect(url_for("login"))
+    
+    # Handle the OAuth callback
+    success, user_data = handle_oauth_callback(code=code, access_token=access_token)
+    
+    if not success:
+        error_msg = user_data.get("error", "Unknown error") if isinstance(user_data, dict) else "Unknown error"
+        flash(f"Authentication failed: {error_msg}", "error")
+        return redirect(url_for("login"))
+    
+    # Extract user information
+    email = user_data.get("email", "").lower()
+    name = user_data.get("name", "OAuth User")
+    provider = user_data.get("provider", "oauth")
+    
+    if not email:
+        flash("Could not retrieve email from OAuth provider.", "error")
+        return redirect(url_for("login"))
+    
+    # Get role from session (default to student)
+    role = session.pop("oauth_role", "student")
+    
+    # Check if user already exists in either table
+    existing_student = Student.query.filter(func.lower(Student.email) == email).first()
+    existing_owner = Owner.query.filter(func.lower(Owner.email) == email).first()
+    
+    if existing_student:
+        # Login existing student
+        login_user(existing_student)
+        flash(f"Welcome back, {existing_student.name}! (via {provider.title()})", "success")
+        return redirect(url_for("home"))
+    
+    if existing_owner:
+        # Login existing owner
+        login_user(existing_owner)
+        flash(f"Welcome back, {existing_owner.name}! (via {provider.title()})", "success")
+        return redirect(url_for("home"))
+    
+    # Create new user based on role
+    try:
+        if role == "owner":
+            owner = Owner(
+                email=email,
+                name=name,
+                kyc_verified=False
+            )
+            # Set a random secure password (user won't use it with OAuth)
+            import secrets
+            owner.set_password(secrets.token_urlsafe(32))
+            db.session.add(owner)
+            db.session.commit()
+            
+            login_user(owner)
+            flash(f"Welcome to Roomies, {name}! Your owner account has been created via {provider.title()}.", "success")
+        else:
+            student = Student(
+                email=email,
+                name=name,
+                college="Not specified",  # OAuth users can update this later
+                role="student",
+                verified=True  # OAuth accounts are considered email-verified
+            )
+            # Set a random secure password (user won't use it with OAuth)
+            import secrets
+            student.set_password(secrets.token_urlsafe(32))
+            db.session.add(student)
+            db.session.commit()
+            
+            login_user(student)
+            flash(f"Welcome to Roomies, {name}! Your account has been created via {provider.title()}.", "success")
+        
+        return redirect(url_for("home"))
+        
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f"OAuth user creation failed: {e}")
+        flash("Failed to create account. Please try again or use email signup.", "error")
+        return redirect(url_for("signup"))
+
+
+@app.route("/api/oauth/status")
+def oauth_status():
+    """Check if OAuth providers are available."""
+    return jsonify({
+        "oauth_enabled": OAUTH_ENABLED,
+        "providers": {
+            "google": OAUTH_ENABLED,
+            "github": OAUTH_ENABLED
+        }
+    })
 
 
 @app.route("/settings")
