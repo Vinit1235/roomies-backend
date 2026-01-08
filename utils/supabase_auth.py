@@ -210,6 +210,158 @@ class SupabaseAuthService:
     def verify_token(self, access_token: str) -> Tuple[bool, Optional[Dict[str, Any]]]:
         """Verify an access token and get user info."""
         return self._get_user_from_token(access_token)
+    
+    def signup_with_email(self, email: str, password: str, user_metadata: Dict[str, Any] = None) -> Tuple[bool, Dict[str, Any]]:
+        """
+        Sign up a new user with email and password.
+        Supabase will automatically send a verification email.
+        
+        Args:
+            email: User's email address
+            password: User's password
+            user_metadata: Additional user data (name, role, etc.)
+            
+        Returns:
+            Tuple of (success, user_data_or_error)
+        """
+        if not self.is_available:
+            return False, {"error": "Supabase authentication not configured"}
+        
+        try:
+            url = f"{self.supabase_url}/auth/v1/signup"
+            
+            payload = {
+                "email": email,
+                "password": password
+            }
+            
+            if user_metadata:
+                payload["data"] = user_metadata  # User metadata goes in 'data' field
+            
+            response = requests.post(
+                url,
+                headers=self._get_headers(),
+                json=payload
+            )
+            
+            if response.status_code in [200, 201]:
+                data = response.json()
+                user = data.get("user")
+                
+                if user:
+                    return True, {
+                        "supabase_id": user.get("id"),
+                        "email": user.get("email"),
+                        "email_verified": user.get("email_confirmed_at") is not None,
+                        "message": "Signup successful! Please check your email to verify your account.",
+                        "user": user
+                    }
+                
+                return True, {
+                    "message": "Signup successful! Please check your email to verify your account.",
+                    "data": data
+                }
+            
+            # Handle error responses
+            error_data = response.json() if response.text else {}
+            error_msg = error_data.get("message") or error_data.get("error_description") or "Signup failed"
+            
+            return False, {"error": error_msg}
+            
+        except Exception as e:
+            return False, {"error": f"Signup error: {str(e)}"}
+    
+    def login_with_email(self, email: str, password: str) -> Tuple[bool, Dict[str, Any]]:
+        """
+        Log in a user with email and password.
+        
+        Args:
+            email: User's email address
+            password: User's password
+            
+        Returns:
+            Tuple of (success, session_data_or_error)
+        """
+        if not self.is_available:
+            return False, {"error": "Supabase authentication not configured"}
+        
+        try:
+            url = f"{self.supabase_url}/auth/v1/token?grant_type=password"
+            
+            payload = {
+                "email": email,
+                "password": password
+            }
+            
+            response = requests.post(
+                url,
+                headers=self._get_headers(),
+                json=payload
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                user = data.get("user")
+                access_token = data.get("access_token")
+                
+                if user:
+                    user_data = self._extract_user_data(user)
+                    user_data["access_token"] = access_token
+                    user_data["refresh_token"] = data.get("refresh_token")
+                    return True, user_data
+                
+                return False, {"error": "Login successful but user data missing"}
+            
+            # Handle error responses  
+            error_data = response.json() if response.text else {}
+            error_msg = error_data.get("message") or error_data.get("error_description") or "Login failed"
+            
+            # Check if email not verified
+            if "email not confirmed" in error_msg.lower():
+                return False, {"error": "Please verify your email before logging in. Check your inbox for the verification link."}
+            
+            return False, {"error": error_msg}
+            
+        except Exception as e:
+            return False, {"error": f"Login error: {str(e)}"}
+    
+    def resend_verification_email(self, email: str) -> Tuple[bool, str]:
+        """
+        Resend email verification link.
+        
+        Args:
+            email: User's email address
+            
+        Returns:
+            Tuple of (success, message)
+        """
+        if not self.is_available:
+            return False, "Supabase authentication not configured"
+        
+        try:
+            url = f"{self.supabase_url}/auth/v1/resend"
+            
+            payload = {
+                "type": "signup",
+                "email": email
+            }
+            
+            response = requests.post(
+                url,
+                headers=self._get_headers(),
+                json=payload
+            )
+            
+            if response.status_code in [200, 201]:
+                return True, "Verification email sent! Please check your inbox."
+            
+            error_data = response.json() if response.text else {}
+            error_msg = error_data.get("message") or error_data.get("error_description") or "Failed to resend email"
+            
+            return False, error_msg
+            
+        except Exception as e:
+            return False, f"Error: {str(e)}"
 
 
 # Singleton instance
@@ -235,3 +387,18 @@ def handle_oauth_callback(code: str = None, access_token: str = None) -> Tuple[b
 def is_oauth_available() -> bool:
     """Check if OAuth is available."""
     return supabase_auth.is_available
+
+
+def signup_with_email(email: str, password: str, user_metadata: Dict[str, Any] = None) -> Tuple[bool, Dict[str, Any]]:
+    """Sign up user with email/password - Supabase sends verification email."""
+    return supabase_auth.signup_with_email(email, password, user_metadata)
+
+
+def login_with_email(email: str, password: str) -> Tuple[bool, Dict[str, Any]]:
+    """Login user with email/password."""
+    return supabase_auth.login_with_email(email, password)
+
+
+def resend_verification_email(email: str) -> Tuple[bool, str]:
+    """Resend email verification link."""
+    return supabase_auth.resend_verification_email(email)

@@ -75,7 +75,10 @@ try:
         get_google_oauth_url,
         get_github_oauth_url,
         handle_oauth_callback,
-        is_oauth_available
+        is_oauth_available,
+        signup_with_email,
+        login_with_email,
+        resend_verification_email
     )
     OAUTH_ENABLED = is_oauth_available()
     if OAUTH_ENABLED:
@@ -91,6 +94,12 @@ except ImportError as e:
         return False, "OAuth not available"
     def handle_oauth_callback(code=None, access_token=None):
         return False, {"error": "OAuth not available"}
+    def signup_with_email(email, password, user_metadata=None):
+        return False, {"error": "Email auth not available"}
+    def login_with_email(email, password):
+        return False, {"error": "Email auth not available"}
+    def resend_verification_email(email):
+        return False, "Email auth not available"
 
 # from services.news_service import NewsService
 try:
@@ -1503,6 +1512,7 @@ def signup():
             flash("Please fill in all required fields.", "error")
             return redirect(url_for("signup"))
 
+        # Check if email already exists in local database
         email_taken = (
             Owner.query.filter(func.lower(Owner.email) == email).first()
             or Student.query.filter(func.lower(Student.email) == email).first()
@@ -1511,21 +1521,62 @@ def signup():
             flash("An account with that email already exists.", "error")
             return redirect(url_for("signup"))
 
-        if role == "owner":
-            owner = Owner(email=email, name=name, kyc_verified=False)
-            owner.set_password(password)
-            db.session.add(owner)
-            db.session.commit()
-            flash("Owner account created. Please sign in.", "success")
-            return redirect(url_for("login"))
+        # Register user with Supabase for email verification
+        if OAUTH_ENABLED:
+            user_metadata = {
+                "name": name,
+                "role": role,
+                "college": college if role == "student" else None
+            }
+            
+            success, result = signup_with_email(email, password, user_metadata)
+            
+            if not success:
+                error_msg = result.get("error", "Signup failed. Please try again.")
+                flash(error_msg, "error")
+                return redirect(url_for("signup"))
+            
+            # Supabase signup successful, now create local database record
+            # User will be marked as unverified until they click the email link
+            try:
+                if role == "owner":
+                    owner = Owner(email=email, name=name, kyc_verified=False)
+                    owner.set_password(password)
+                    db.session.add(owner)
+                    db.session.commit()
+                else:
+                    student = Student(email=email, name=name, college=college, role="student", verified=False)
+                    student.set_password(password)
+                    db.session.add(student)
+                    db.session.commit()
+                
+                # Success - verification email sent by Supabase
+                flash("Account created! Please check your email to verify your account before logging in.", "success")
+                return redirect(url_for("login"))
+                
+            except Exception as e:
+                db.session.rollback()
+                app.logger.error(f"Local DB creation failed: {e}")
+                flash("Account created in Supabase but local setup failed. Please contact support.", "warning")
+                return redirect(url_for("login"))
+        
+        else:
+            # Fallback to old method if Supabase not configured
+            if role == "owner":
+                owner = Owner(email=email, name=name, kyc_verified=False)
+                owner.set_password(password)
+                db.session.add(owner)
+                db.session.commit()
+                flash("Owner account created. Please sign in.", "success")
+                return redirect(url_for("login"))
 
-        student = Student(email=email, name=name, college=college, role="student")
-        student.set_password(password)
-        db.session.add(student)
-        db.session.commit()
-        login_user(student)
-        flash("Account created successfully!", "success")
-        return redirect(url_for("home"))
+            student = Student(email=email, name=name, college=college, role="student")
+            student.set_password(password)
+            db.session.add(student)
+            db.session.commit()
+            login_user(student)
+            flash("Account created successfully!", "success")
+            return redirect(url_for("home"))
 
     return render_template("signup.html")
 
@@ -1702,6 +1753,31 @@ def oauth_status():
             "github": OAUTH_ENABLED
         }
     })
+
+
+@app.route("/api/resend-verification", methods=["POST"])
+def resend_verification():
+    """Resend email verification link."""
+    try:
+        data = request.get_json() or request.form
+        email = data.get("email", "").strip().lower()
+        
+        if not email:
+            return jsonify({"success": False, "error": "Email is required"}), 400
+        
+        if not OAUTH_ENABLED:
+            return jsonify({"success": False, "error": "Email verification not configured"}), 503
+        
+        success, message = resend_verification_email(email)
+        
+        if success:
+            return jsonify({"success": True, "message": message}), 200
+        else:
+            return jsonify({"success": False, "error": message}), 400
+            
+    except Exception as e:
+        app.logger.error(f"Resend verification error: {e}")
+        return jsonify({"success": False, "error": "Failed to resend verification email"}), 500
 
 
 @app.route("/settings")
