@@ -11,24 +11,7 @@ This guide shows you how to integrate Firebase into your Roomies Flask applicati
 
 ---
 
-## 📋 Step 1: Create Firebase Project
-
-1. Go to [Firebase Console](https://console.firebase.google.com/)
-2. Click **"Add Project"**
-3. Project name: `roomies-platform` (or your choice)
-4. Disable Google Analytics (optional for free tier)
-5. Click **"Create Project"**
-
----
-
-## 📦 Step 2: Enable Firebase Services
-
-### A. Enable Firebase Storage (For Image Uploads)
-1. In Firebase Console, go to **Build → Storage**
-2. Click **"Get Started"**
-3. Choose **"Start in production mode"** (we'll set rules later)
-4. Select location: `asia-south1` (Mumbai) or nearest to you
-5. Click **"Done"**
+## 
 
 ### B. Update Storage Rules
 Go to **Storage → Rules** and paste:

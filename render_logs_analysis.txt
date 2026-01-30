@@ -1,0 +1,9 @@
+Log Analysis for 'roomies-app' (Deploy: dep-d5b5m0l6ubrc73d4r18g)
+========================================
+Status: live
+Commit: Enable payment bypass and robust email debugging
+Created: 2026-01-01T11:31:14.911863Z
+========================================
+
+Attempting to fetch logs...
+No logs returned or error fetching logs.

@@ -1,0 +1,14 @@
+{
+    "mcpServers": {
+        "render": {
+            "url": "https://mcp.render.com/mcp",
+            "headers": {
+                "Authorization": "Bearer rnd_cTOdDdx1JHDHkidZ96UQkWGRe1Ay"
+            },
+            "env": {
+                "RENDER_WORKSPACE": "My project",
+                "RENDER_SERVICE_NAME": "roomies-app"
+            }
+        }
+    }
+}

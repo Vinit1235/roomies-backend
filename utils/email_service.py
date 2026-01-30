@@ -23,10 +23,14 @@ class EmailService:
         self.from_email = os.getenv("EMAIL_FROM", f"Roomies <{self.smtp_user}>" if self.smtp_user else "Roomies <noreply@roomies.in>")
     
     def send_email(self, to_email, subject, html_content, attachments=None):
-        """Send email with optional attachments."""
+        """Send email and return success boolean (backward compatibility)."""
+        success, _ = self.send_email_with_details(to_email, subject, html_content, attachments)
+        return success
+    
+    def send_email_with_details(self, to_email, subject, html_content, attachments=None):
+        """Send email with optional attachments and return (success, error_message)."""
         # Debug logging for Render
         logging.info(f"Preparing to send email to {to_email} via {self.smtp_host}:{self.smtp_port}")
-        logging.info(f"SMTP User: {self.smtp_user}")
         
         try:
             msg = MIMEMultipart('alternative')
@@ -47,7 +51,6 @@ class EmailService:
                         msg.attach(attach)
             
             # Send email
-            # Send email
             # Use explicit timeout and EHLO/HELO sequence
             with smtplib.SMTP(self.smtp_host, self.smtp_port, timeout=10) as server:
                 server.set_debuglevel(1)  # Enable debug output for logs
@@ -67,19 +70,23 @@ class EmailService:
                 server.send_message(msg)
             
             logger.info(f"Email sent successfully to {to_email}")
-            return True
+            return True, "Email sent successfully"
         
         except Exception as e:
-            logger.error(f"Failed to send email to {to_email}: {str(e)}")
-            # Log specific SMTP errors for better debugging
+            error_msg = str(e)
+            logger.error(f"Failed to send email to {to_email}: {error_msg}")
+            
+            if isinstance(e, smtplib.SMTPAuthenticationError):
+                error_msg = "SMTP Authentication failed. Check username/password."
+                logger.error(error_msg)
+            elif isinstance(e, smtplib.SMTPConnectError):
+                error_msg = "SMTP Connection failed. Check server address and port."
+                logger.error(error_msg)
+            
             import traceback
             logger.error(traceback.format_exc())
             
-            if isinstance(e, smtplib.SMTPAuthenticationError):
-                logger.error("SMTP Authentication failed. Check username/password.")
-            elif isinstance(e, smtplib.SMTPConnectError):
-                logger.error("SMTP Connection failed. Check server address and port.")
-            return False
+            return False, error_msg
     
     def send_booking_request_to_owner(self, booking, room, student, owner):
         """Notify owner about new booking request."""

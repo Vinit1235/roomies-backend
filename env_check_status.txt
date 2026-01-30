@@ -1,0 +1,15 @@
+Environment Verification for 'roomies-app'
+========================================
+
+Variable Status:
+[MISSING] RAZORPAY_KEY_ID is NOT set.
+[MISSING] RAZORPAY_KEY_SECRET is NOT set.
+[OK] MAIL_SERVER is set. (Value: smtp**********)
+[OK] MAIL_PORT is set. (Value: ****)
+[OK] MAIL_USERNAME is set. (Value: vini***************)
+[OK] MAIL_PASSWORD is set. (Value: hfmk************)
+
+All Variables Found:
+- DATABASE_URL
+- Python_Version
+- SECRET_KEY

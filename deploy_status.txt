@@ -1,0 +1,15 @@
+Found service 'roomies-app' (ID: srv-d4k8uoogjchc73a17pjg)
+
+Recent Deployments:
+- Status: build_in_progress
+  Created: 2026-01-01T12:49:16.065845Z
+  Commit: Allow students to list rooms and fix Razorpay fallback
+--------------------
+- Status: live
+  Created: 2026-01-01T12:38:42.284115Z
+  Commit: Enable payment bypass and robust email debugging
+--------------------
+- Status: deactivated
+  Created: 2026-01-01T12:32:01.439191Z
+  Commit: Enable payment bypass and robust email debugging
+--------------------
