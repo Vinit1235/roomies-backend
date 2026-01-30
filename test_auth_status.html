@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auth Status Test</title>
+</head>
+<body>
+    <h1>Authentication Status Test</h1>
+    
+    <h2>Current User Info:</h2>
+    {% if current_user.is_authenticated %}
+        <p>✅ <strong>User IS authenticated</strong></p>
+        <ul>
+            <li>Email: {{ current_user.email }}</li>
+            <li>Name: {{ current_user.name }}</li>
+            <li>Role: {{ current_user.role }}</li>
+            <li>ID: {{ current_user.id }}</li>
+            <li>Verified: {{ current_user.verified }}</li>
+        </ul>
+    {% else %}
+        <p>❌ <strong>User is NOT authenticated</strong></p>
+    {% endif %}
+    
+    <h2>Session Info:</h2>
+    <pre>{{ session }}</pre>
+    
+    <h2>Actions:</h2>
+    <a href="/">Go to Home</a> | 
+    <a href="/explore">Go to Explore</a> |
+    <a href="/logout">Logout</a>
+</body>
+</html>

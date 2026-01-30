@@ -392,6 +392,7 @@
     </div>
     </div>
 
+
     <script>
         // Reserve/Book Button Handler
         document.getElementById('reserveBtn').addEventListener('click', function () {
@@ -412,57 +413,33 @@
             {% endif %}
         });
 
-        // Initialize Google Map
+
+        // Initialize Map (Using Free Embed)
         function initDetailMap() {
             {% if room.latitude and room.longitude %}
             const mapContainer = document.getElementById('map');
-            const roomLocation = { lat: {{ room.latitude }
-        }, lng: { { room.longitude } } };
-
-        const map = new google.maps.Map(mapContainer, {
-            center: roomLocation,
-            zoom: 15,
-            mapTypeControl: false,
-            streetViewControl: true,
-            fullscreenControl: true
-        });
-
-        const marker = new google.maps.Marker({
-            position: roomLocation,
-            map: map,
-            title: '{{ room.title }}',
-            icon: {
-                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-                            <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M20 0C12 0 5 7 5 15c0 11 15 25 15 25s15-14 15-25c0-8-7-15-15-15z" fill="#ff385c"/>
-                                <circle cx="20" cy="15" r="6" fill="white"/>
-                            </svg>
-                        `),
-                scaledSize: new google.maps.Size(40, 40),
-                anchor: new google.maps.Point(20, 40)
-            }
-        });
-
-        const infoWindow = new google.maps.InfoWindow({
-            content: '<div style="padding: 8px;"><b>{{ room.title }}</b><br>{{ room.location }}</div>'
-        });
-
-        marker.addListener('click', () => {
-            infoWindow.open(map, marker);
-        });
-
-        // Open info window by default
-        infoWindow.open(map, marker);
-        {% else %}
-        document.getElementById('map').innerHTML = '<div style="height:100%; display:flex; align-items:center; justify-content:center; background:#f0f0f0; color:#666;">Map location not available</div>';
-        {% endif %}
+            // Using Google Maps Iframe Embed (Free, No API Key needed)
+            mapContainer.innerHTML = `
+                <iframe 
+                    width="100%" 
+                    height="100%" 
+                    style="border:0; border-radius: 12px;" 
+                    loading="lazy" 
+                    allowfullscreen
+                    referrerpolicy="no-referrer-when-downgrade"
+                    src="https://maps.google.com/maps?q={{ room.latitude }},{{ room.longitude }}&z=15&output=embed">
+                </iframe>
+            `;
+            {% else %}
+            document.getElementById('map').innerHTML = '<div style="height:100%; display:flex; align-items:center; justify-content:center; background:#f0f0f0; color:#666;">Map location not available</div>';
+            {% endif %}
         }
+
+        // Initialize map immediately (No API key required)
+        document.addEventListener('DOMContentLoaded', initDetailMap);
+
     </script>
 
-    <!-- Google Maps API -->
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key={{ config.get('GOOGLE_MAPS_API_KEY', '') }}&callback=initDetailMap"
-        async defer></script>
 
 </body>
 

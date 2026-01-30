@@ -64,19 +64,40 @@ window.addEventListener("resize", () => {
     }, 250);
 });
 
-// Sync global search with main search
-if (globalSearch && searchInput) {
-    globalSearch.addEventListener("input", (e) => {
-        searchInput.value = e.target.value;
-    });
-
+// Global Search Logic (Works on all pages)
+if (globalSearch) {
+    // Handle Enter key
     globalSearch.addEventListener("keypress", (e) => {
         if (e.key === "Enter") {
             e.preventDefault();
-            executeSearch();
+            const query = globalSearch.value.trim();
+            if (!query) return;
+
+            // If on homepage, just search
+            if (window.location.pathname === "/" || window.location.pathname === "/index.html") {
+                if (searchInput) {
+                    searchInput.value = query;
+                    executeSearch();
+                    document.getElementById("roomsExplorer").scrollIntoView({ behavior: 'smooth' });
+                }
+            } else {
+                // If on other pages, redirect to homepage with query
+                window.location.href = `/?q=${encodeURIComponent(query)}#roomsExplorer`;
+            }
         }
     });
+
+    // Sync with main search input if it exists (Homepage only)
+    if (searchInput) {
+        globalSearch.addEventListener("input", (e) => {
+            searchInput.value = e.target.value;
+        });
+        searchInput.addEventListener("input", (e) => {
+            globalSearch.value = e.target.value;
+        });
+    }
 }
+
 
 // Sidebar active state
 const sidebarItems = document.querySelectorAll(".sidebar-item");
@@ -549,12 +570,20 @@ if (contactForm) {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
+    // Check URL params for search query (coming from other pages)
+    const urlParams = new URLSearchParams(window.location.search);
+    const queryParam = urlParams.get('q');
+
+    if (queryParam) {
+        if (searchInput) searchInput.value = queryParam;
+        if (globalSearch) globalSearch.value = queryParam;
+    }
+
     // Map initialization is handled by Google Maps callback (initIndexMap)
-    // Skip manual initialization as Google Maps API calls the callback
     initVoiceSearch();
     initPWA();
     loadFlashDeals();
-    executeSearch(); // Auto-load listings on page load
+    executeSearch(); // Auto-load listings
 });
 
 
