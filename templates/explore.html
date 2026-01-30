@@ -259,13 +259,16 @@
     <!-- AI Chatbot Widget -->
     {% include 'partials/chatbot.html' %}
 
-    <!-- Google Maps API - Add your API key -->
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key={{ config.get('GOOGLE_MAPS_API_KEY', '') }}&callback=initExploreMap"
-        async defer></script>
+    <!-- Leaflet.js for OpenStreetMap (Free, no API key needed) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
     <script>
         // Set a flag to prevent main.js from initializing the map on this page.
         window.isExplorePage = true;
+        window.useOpenStreetMap = true; // Flag for explore.js to use Leaflet instead of Google Maps
     </script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/explore.js') }}"></script>
