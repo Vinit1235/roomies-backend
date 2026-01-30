@@ -54,7 +54,7 @@ The routes to add are:
 4. Update `.env`:
 
 ```env
-GOOGLE_CLIENT_ID=your_actual_client_id_here
+GOOGLE_CLIENT_IDD=your_actual_client_id_here
 GOOGLE_CLIENT_SECRET=your_actual_client_secret_here
 GOOGLE_REDIRECT_URI=http://localhost:5000/auth/google/callback
 ```

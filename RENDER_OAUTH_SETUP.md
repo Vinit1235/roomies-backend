@@ -4,14 +4,14 @@
 
 ### Local Development (.env file)
 ```env
-GOOGLE_CLIENT_ID=123456789-abcdefghijklmnop.apps.googleusercontent.com
+GOOGLE_CLIENT_IDD=123456789-abcdefghijklmnop.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=GOCSPX-abcdefghijklmnopqrstuvwxyz
 GOOGLE_REDIRECT_URI=http://localhost:5000/auth/google/callback
 ```
 
 ### Production (Render Environment Variables)
 ```
-GOOGLE_CLIENT_ID=123456789-abcdefghijklmnop.apps.googleusercontent.com
+GOOGLE_CLIENT_IDD=123456789-abcdefghijklmnop.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=GOCSPX-abcdefghijklmnopqrstuvwxyz
 GOOGLE_REDIRECT_URI=https://your-app-name.onrender.com/auth/google/callback
 ```
@@ -27,7 +27,7 @@ GOOGLE_REDIRECT_URI=https://your-app-name.onrender.com/auth/google/callback
    ```env
    # Google OAuth Configuration
    # ⬇️ PASTE YOUR GOOGLE CLIENT ID HERE (replace the text below)
-   GOOGLE_CLIENT_ID=your_google_client_id_here
+   GOOGLE_CLIENT_IDD=your_google_client_id_here
    # ⬇️ PASTE YOUR GOOGLE CLIENT SECRET HERE (replace the text below)
    GOOGLE_CLIENT_SECRET=your_google_client_secret_here
    # ⬇️ For local development, keep this as is. For Render, change to your production URL
@@ -36,7 +36,7 @@ GOOGLE_REDIRECT_URI=https://your-app-name.onrender.com/auth/google/callback
 
 3. **Replace the placeholder values**:
    ```env
-   GOOGLE_CLIENT_ID=123456789-abcdefghijklmnop.apps.googleusercontent.com
+   GOOGLE_CLIENT_IDD=123456789-abcdefghijklmnop.apps.googleusercontent.com
    GOOGLE_CLIENT_SECRET=GOCSPX-abcdefghijklmnopqrstuvwxyz
    GOOGLE_REDIRECT_URI=http://localhost:5000/auth/google/callback
    ```
@@ -161,7 +161,7 @@ RAZORPAY_KEY_SECRET=your_razorpay_key_secret
 GOOGLE_MAPS_API_KEY=your_google_maps_api_key_here
 
 # Google OAuth Configuration
-GOOGLE_CLIENT_ID=123456789-abcdefghijklmnop.apps.googleusercontent.com
+GOOGLE_CLIENT_IDD=123456789-abcdefghijklmnop.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=GOCSPX-abcdefghijklmnopqrstuvwxyz
 GOOGLE_REDIRECT_URI=http://localhost:5000/auth/google/callback
 ```
@@ -187,7 +187,7 @@ RAZORPAY_KEY_SECRET=your_razorpay_key_secret
 GOOGLE_MAPS_API_KEY=your_google_maps_api_key_here
 
 # Google OAuth Configuration (NEW - ADD THESE)
-GOOGLE_CLIENT_ID=123456789-abcdefghijklmnop.apps.googleusercontent.com
+GOOGLE_CLIENT_IDD=123456789-abcdefghijklmnop.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=GOCSPX-abcdefghijklmnopqrstuvwxyz
 GOOGLE_REDIRECT_URI=https://your-app-name.onrender.com/auth/google/callback
 ```

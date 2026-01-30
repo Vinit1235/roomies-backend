@@ -13,7 +13,7 @@ Add these lines to your `.env` file:
 
 ```env
 # Google OAuth Configuration
-GOOGLE_CLIENT_ID=your_google_client_id_here
+GOOGLE_CLIENT_IDD=your_google_client_id_here
 GOOGLE_CLIENT_SECRET=your_google_client_secret_here
 GOOGLE_REDIRECT_URI=http://localhost:5000/auth/google/callback
 ```
@@ -61,7 +61,7 @@ Add the Google OAuth configuration template:
 ```env
 # Google OAuth Configuration
 # Get credentials from: https://console.cloud.google.com/apis/credentials
-GOOGLE_CLIENT_ID=your_google_client_id_here
+GOOGLE_CLIENT_IDD=your_google_client_id_here
 GOOGLE_CLIENT_SECRET=your_google_client_secret_here
 GOOGLE_REDIRECT_URI=http://localhost:5000/auth/google/callback
 ```
@@ -196,7 +196,7 @@ SECRET_KEY=dev-secret-key-123
 DATABASE_URL=sqlite:///roomies.db
 
 # Google OAuth (NEW)
-GOOGLE_CLIENT_ID=your_actual_client_id
+GOOGLE_CLIENT_IDD=your_actual_client_id
 GOOGLE_CLIENT_SECRET=your_actual_client_secret
 GOOGLE_REDIRECT_URI=http://localhost:5000/auth/google/callback
 
