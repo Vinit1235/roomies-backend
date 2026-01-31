@@ -27,7 +27,7 @@ class ChatbotLite:
                 genai.configure(api_key=self.api_key)
                 # Use gemini-1.5-flash (fast and efficient)
                 self.model = genai.GenerativeModel('gemini-1.5-flash')
-                print("✅ Gemini chatbot initialized (Lite mode)")
+                print("✅ Gemini chatbot initialized (gemini-2.5-flash)")
             except Exception as e:
                 print(f"❌ Error initializing Gemini: {e}")
                 self.model = None
@@ -302,14 +302,23 @@ INSTRUCTIONS:
 10. Use emojis sparingly to be friendly but professional.
 11. If relevant, include helpful links in HTML format: <a href='/page' class='text-blue-600 underline'>Click here</a>
 12. For roommate matching questions, mention the /ai-matching page.
+13. For general queries like "best home" or "best room", suggest exploring listings and provide helpful criteria.
 
 RESPONSE:"""
 
+                print(f"[Chatbot] Calling Gemini API for: '{user_message[:50]}...'")
                 response = self.model.generate_content(prompt)
-                return response.text.strip()
                 
+                if response and response.text:
+                    print(f"[Chatbot] Gemini responded successfully")
+                    return response.text.strip()
+                else:
+                    print(f"[Chatbot] Gemini returned empty response")
+                    
             except Exception as e:
-                print(f"Gemini API error: {e}")
+                print(f"[Chatbot] Gemini API error: {e}")
+                import traceback
+                traceback.print_exc()
                 # Fall through to FAQ fallback
         
         # Fallback: Best matching FAQ

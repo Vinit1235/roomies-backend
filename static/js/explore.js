@@ -161,12 +161,26 @@
     async function fetchSearchResults(query) {
         try {
             console.log(`[Explore Map] Searching for: ${query}`);
-            const response = await fetch(`/api/search/autocomplete?q=${encodeURIComponent(query)}`);
+
+            // Use the same API as home page with q parameter
+            const propertyType = document.getElementById('propertyTypeFilter')?.value || '';
+            const sort = document.getElementById('sortFilter')?.value || 'price_asc';
+            const maxRent = document.getElementById('budgetSlider')?.value || '';
+
+            const params = new URLSearchParams({
+                limit: 50,
+                q: query,
+                property_type: propertyType,
+                sort: sort
+            });
+            if (maxRent) params.append('max_rent', maxRent);
+
+            const response = await fetch(`/api/rooms?${params.toString()}`);
             if (!response.ok) throw new Error('Search failed');
 
             const data = await response.json();
-            const rooms = data.results || [];
-            console.log(`[Explore Map] Found ${rooms.length} matches`);
+            const rooms = data.rooms || [];
+            console.log(`[Explore Map] Found ${rooms.length} matches for "${query}"`);
             plotRooms(rooms);
 
         } catch (error) {

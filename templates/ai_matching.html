@@ -213,10 +213,18 @@
                     })
                 });
 
-                if (!updateResponse.ok) throw new Error('Failed to update preferences');
+                if (!updateResponse.ok) {
+                    const errorData = await updateResponse.json().catch(() => ({}));
+                    throw new Error(errorData.error || `Update failed (${updateResponse.status})`);
+                }
 
                 // 3. Fetch Matches
                 const matchResponse = await fetch('/api/roommate-match');
+                if (!matchResponse.ok) {
+                    const errorData = await matchResponse.json().catch(() => ({}));
+                    throw new Error(errorData.error || `Match failed (${matchResponse.status})`);
+                }
+
                 const matchData = await matchResponse.json();
 
                 loading.style.display = 'none';
@@ -257,9 +265,15 @@
                 }
 
             } catch (error) {
-                console.error(error);
+                console.error('AI Matching Error:', error);
                 loading.style.display = 'none';
-                alert('Something went wrong. Please try again.');
+                resultsSection.classList.remove('hidden');
+                matchesContainer.innerHTML = `
+                    <div style="text-align:center; padding: 20px; color: #e74c3c;">
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <p>Please make sure you're logged in as a student.</p>
+                    </div>
+                `;
             }
         });
     </script>

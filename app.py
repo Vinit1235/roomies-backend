@@ -28,6 +28,8 @@ from flask import (
     send_file,
 )
 import io
+import time
+from werkzeug.utils import secure_filename
 import pandas as pd
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
@@ -322,6 +324,9 @@ class Student(TimestampMixin, PasswordMixin, UserMixin, db.Model):
     cleanliness_pref = db.Column(db.String(50))  # neat_freak, moderate_clean, messy
     budget_range = db.Column(db.String(50))    # 5k-8k, 8k-12k, 12k-18k, 18k+
     
+    # Profile Data
+    profile_image = db.Column(db.String(255))
+    
     # Free tier limits
     property_inquiries_count = db.Column(db.Integer, default=0)  # Reset monthly
     inquiries_reset_date = db.Column(db.Date)
@@ -351,6 +356,7 @@ class Owner(TimestampMixin, PasswordMixin, UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255), unique=True, nullable=False)
     name = db.Column(db.String(255), nullable=False)
+    profile_image = db.Column(db.String(255))
     kyc_verified = db.Column(db.Boolean, default=False)
     rooms = db.relationship(
         "Room",
@@ -2198,10 +2204,55 @@ def resend_verification():
         return jsonify({"success": False, "error": "Failed to resend verification email"}), 500
 
 
-@app.route("/settings")
+@app.route("/settings", methods=["GET", "POST"])
 @login_required
 def settings():
     """User settings page."""
+    if request.method == "POST":
+        try:
+            # Handle profile update
+            name = request.form.get("name")
+            email = request.form.get("email")
+            college = request.form.get("college")
+            
+            if name:
+                current_user.name = name
+            if email:
+                current_user.email = email
+            if college and hasattr(current_user, 'college'):
+                current_user.college = college
+                
+            # Handle Profile Image Upload
+            if 'profile_image' in request.files:
+                file = request.files['profile_image']
+                if file and file.filename:
+                    # Validate file type (simple check)
+                    filename = secure_filename(file.filename)
+                    ext = os.path.splitext(filename)[1].lower()
+                    if ext in ['.jpg', '.jpeg', '.png', '.gif', '.webp']:
+                        # Ensure uploads directory exists
+                        upload_folder = os.path.join(app.root_path, 'static', 'uploads', 'profiles')
+                        os.makedirs(upload_folder, exist_ok=True)
+                        
+                        # Generate unique filename
+                        unique_filename = f"user_{current_user.id}_{int(time.time())}{ext}"
+                        file.save(os.path.join(upload_folder, unique_filename))
+                        
+                        # Save relative path (accessible via static)
+                        current_user.profile_image = f"uploads/profiles/{unique_filename}"
+                    else:
+                        flash("Invalid image format. Please upload JPG, PNG, or WebP.", "error")
+            
+            db.session.commit()
+            flash("Profile updated successfully!", "success")
+            
+        except Exception as e:
+            db.session.rollback()
+            app.logger.error(f"Settings update error: {e}")
+            flash(f"Error updating settings: {str(e)}", "error")
+            
+        return redirect(url_for("settings"))
+        
     return render_template("settings.html")
 
 
