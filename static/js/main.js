@@ -49,6 +49,24 @@ if (menuToggle && sidebar && mainContent) {
     }
 }
 
+// User Dropdown Logic
+const userMenuBtn = document.getElementById("userMenuBtn");
+const userDropdown = document.getElementById("userDropdown");
+
+if (userMenuBtn && userDropdown) {
+    userMenuBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        userDropdown.classList.toggle("show");
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener("click", (e) => {
+        if (!userMenuBtn.contains(e.target) && !userDropdown.contains(e.target)) {
+            userDropdown.classList.remove("show");
+        }
+    });
+}
+
 // Handle window resize for sidebar
 let resizeTimer;
 window.addEventListener("resize", () => {
