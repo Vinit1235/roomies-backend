@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,58 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .match-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: transform 0.3s ease;
+            border-left: 5px solid #ff385c;
+        }
+
+        .match-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .match-info h4 {
+            margin: 0 0 5px 0;
+            color: #333;
+        }
+
+        .match-info p {
+            margin: 2px 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .match-score {
+            text-align: center;
+            background: #e6fffa;
+            color: #00b894;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
+
 <body>
     {% include 'partials/header.html' %}
     {% include 'partials/sidebar.html' %}
@@ -20,7 +72,8 @@
                         <i class="fas fa-brain"></i>
                     </div>
                     <h2>AI-Powered Roommate Matching</h2>
-                    <p>Our intelligent matching algorithm considers your lifestyle, study habits, budget preferences, and personality traits to find compatible roommates.</p>
+                    <p>Our intelligent matching algorithm considers your lifestyle, study habits, budget preferences,
+                        and personality traits to find compatible roommates.</p>
                     <div class="ai-features">
                         <div class="ai-feature">
                             <i class="fas fa-check-circle"></i>
@@ -39,26 +92,14 @@
                             <span>Budget range optimization</span>
                         </div>
                     </div>
-                    <button class="btn-ai-start">
-                        <i class="fas fa-magic"></i>
-                        Start AI Matching
-                    </button>
                 </div>
-                <div class="ai-visual">
+
+                <div class="ai-stats" id="aiStatsVisual">
+                    <!-- Animation container -->
                     <div class="ai-circle pulse"></div>
-                    <div class="ai-stats">
-                        <div class="stat-item">
-                            <h3>98%</h3>
-                            <p>Match Success Rate</p>
-                        </div>
-                        <div class="stat-item">
-                            <h3>5000+</h3>
-                            <p>Happy Roommates</p>
-                        </div>
-                        <div class="stat-item">
-                            <h3>&lt;2min</h3>
-                            <p>Match Time</p>
-                        </div>
+                    <div class="stat-item">
+                        <h3>98%</h3>
+                        <p>Match Success Rate</p>
                     </div>
                 </div>
             </div>
@@ -66,49 +107,162 @@
             <div class="ai-form-section">
                 <h3>Tell us about yourself</h3>
                 <p>Complete this quick questionnaire to help our AI find your perfect roommate match.</p>
-                
-                <form class="ai-questionnaire">
+
+                <form class="ai-questionnaire" id="aiMatchingForm">
                     <div class="form-row">
                         <label>What's your sleep schedule?</label>
-                        <select name="sleep_schedule">
-                            <option>Early bird (sleep before 11 PM)</option>
-                            <option>Night owl (sleep after 1 AM)</option>
-                            <option>Flexible / Varies</option>
+                        <select id="sleep" required>
+                            <option value="early_bird">Early bird (sleep before 11 PM)</option>
+                            <option value="night_owl">Night owl (sleep after 1 AM)</option>
+                            <option value="flexible_sleep">Flexible / Varies</option>
                         </select>
                     </div>
                     <div class="form-row">
                         <label>How social are you?</label>
-                        <select name="social_level">
-                            <option>Very social - Love having friends over</option>
-                            <option>Moderately social - Occasional gatherings</option>
-                            <option>Private - Prefer quiet time</option>
+                        <select id="social" required>
+                            <option value="extrovert">Very social - Love having friends over</option>
+                            <option value="ambivert">Moderately social - Occasional gatherings</option>
+                            <option value="introvert">Private - Prefer quiet time</option>
                         </select>
                     </div>
                     <div class="form-row">
                         <label>Cleanliness preference?</label>
-                        <select name="cleanliness">
-                            <option>Very organized - Everything in place</option>
-                            <option>Moderately clean - Generally tidy</option>
-                            <option>Relaxed - Casual about cleanliness</option>
+                        <select id="cleanliness" required>
+                            <option value="neat_freak">Very organized - Everything in place</option>
+                            <option value="moderate_clean">Moderately clean - Generally tidy</option>
+                            <option value="messy">Relaxed - Casual about cleanliness</option>
                         </select>
                     </div>
                     <div class="form-row">
                         <label>Budget range (monthly)</label>
-                        <select name="budget">
-                            <option>₹5,000 - ₹8,000</option>
-                            <option>₹8,000 - ₹12,000</option>
-                            <option>₹12,000 - ₹18,000</option>
-                            <option>₹18,000+</option>
+                        <select id="budget" required>
+                            <option value="5k-8k">₹5,000 - ₹8,000</option>
+                            <option value="8k-12k">₹8,000 - ₹12,000</option>
+                            <option value="12k-18k">₹12,000 - ₹18,000</option>
+                            <option value="18k+">₹18,000+</option>
                         </select>
                     </div>
                     <button type="submit" class="btn-primary full-width">
                         <i class="fas fa-search"></i> Find My Matches
                     </button>
                 </form>
+
+                <div id="loading" class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i> Analyzing profiles...
+                </div>
+
+                <div id="resultsSection" class="hidden" style="margin-top: 40px;">
+                    <h3>✨ Your Top Matches</h3>
+                    <p id="matchStats" style="color: #666; margin-bottom: 20px;"></p>
+                    <div id="matchesContainer"></div>
+                </div>
             </div>
         </section>
     </div>
 
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // Map internal values to display names
+        const displayNames = {
+            "early_bird": "🌅 Early Bird",
+            "night_owl": "🦉 Night Owl",
+            "flexible": "⏰ Flexible",
+            "flexible_sleep": "⏰ Flexible",
+            "extrovert": "🎉 Very Social",
+            "ambivert": "🤝 Moderately Social",
+            "introvert": "🧘 Private/Quiet",
+            "neat_freak": "✨ Very Organized",
+            "moderate_clean": "🧹 Moderately Clean",
+            "messy": "😎 Relaxed",
+            "5k-8k": "₹5K-8K",
+            "8k-12k": "₹8K-12K",
+            "12k-18k": "₹12K-18K",
+            "18k+": "₹18K+"
+        };
+
+        document.getElementById('aiMatchingForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const loading = document.getElementById('loading');
+            const resultsSection = document.getElementById('resultsSection');
+            const matchesContainer = document.getElementById('matchesContainer');
+            const matchStats = document.getElementById('matchStats');
+
+            loading.style.display = 'block';
+            resultsSection.classList.add('hidden');
+            matchesContainer.innerHTML = '';
+
+            // 1. Gather Tags and Preferences
+            const sleep = document.getElementById('sleep').value;
+            const social = document.getElementById('social').value;
+            const cleanliness = document.getElementById('cleanliness').value;
+            const budget = document.getElementById('budget').value;
+
+            const tags = [sleep, social, cleanliness];
+
+            try {
+                // 2. Update Profile Tags and Preferences
+                const updateResponse = await fetch('/api/profile-tags/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        tags: tags,
+                        sleep_schedule: sleep,
+                        social_level: social,
+                        cleanliness_pref: cleanliness,
+                        budget_range: budget
+                    })
+                });
+
+                if (!updateResponse.ok) throw new Error('Failed to update preferences');
+
+                // 3. Fetch Matches
+                const matchResponse = await fetch('/api/roommate-match');
+                const matchData = await matchResponse.json();
+
+                loading.style.display = 'none';
+                resultsSection.classList.remove('hidden');
+
+                // Show stats
+                matchStats.innerHTML = `Searched ${matchData.total_students || 0} students for compatibility`;
+
+                if (matchData.matches && matchData.matches.length > 0) {
+                    matchData.matches.forEach(match => {
+                        const sleepDisplay = displayNames[match.sleep_schedule] || match.sleep_schedule || 'N/A';
+                        const socialDisplay = displayNames[match.social_level] || match.social_level || 'N/A';
+                        const budgetDisplay = displayNames[match.budget_range] || match.budget_range || 'N/A';
+
+                        const html = `
+                            <div class="match-card">
+                                <div class="match-info">
+                                    <h4>${match.name}</h4>
+                                    <p><i class="fas fa-university"></i> ${match.college}</p>
+                                    <p><i class="fas fa-moon"></i> ${sleepDisplay} | <i class="fas fa-users"></i> ${socialDisplay}</p>
+                                    <p><i class="fas fa-wallet"></i> ${budgetDisplay}</p>
+                                </div>
+                                <div class="match-score">
+                                    ${match.compatibility_score}%<br>
+                                    <small>Compatible</small>
+                                </div>
+                            </div>
+                        `;
+                        matchesContainer.innerHTML += html;
+                    });
+                } else {
+                    matchesContainer.innerHTML = `
+                        <div style="text-align:center; padding: 20px;">
+                            <p>No exact matches found yet. We'll keep looking!</p>
+                            <p>Try inviting friends to join Roomies.</p>
+                        </div>
+                    `;
+                }
+
+            } catch (error) {
+                console.error(error);
+                loading.style.display = 'none';
+                alert('Something went wrong. Please try again.');
+            }
+        });
+    </script>
 </body>
+
 </html>

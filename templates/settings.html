@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,7 +19,7 @@
             border-radius: 16px;
             padding: 2rem;
             margin-bottom: 1.5rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .settings-card h2 {
@@ -145,6 +146,7 @@
         }
     </style>
 </head>
+
 <body>
     {% include 'partials/header.html' %}
     {% include 'partials/sidebar.html' %}
@@ -160,7 +162,7 @@
                 <!-- User Profile Info -->
                 <div class="settings-card">
                     <h2><i class="fas fa-user"></i> Profile Information</h2>
-                    
+
                     <div class="user-info-display">
                         <div class="user-avatar-large">
                             {{ current_user.name[0].upper() }}
@@ -169,20 +171,20 @@
                             <h3>{{ current_user.name }}</h3>
                             <p>{{ current_user.email }}</p>
                             {% if current_user.role is defined %}
-                                <p style="margin-top: 0.25rem; color: #dc2626; font-weight: 600;">
-                                    <i class="fas fa-tag"></i> {{ current_user.role|capitalize }}
-                                </p>
+                            <p style="margin-top: 0.25rem; color: #dc2626; font-weight: 600;">
+                                <i class="fas fa-tag"></i> {{ current_user.role|capitalize }}
+                            </p>
                             {% endif %}
                             {% if current_user.verified is defined %}
-                                {% if current_user.verified %}
-                                    <span class="badge badge-verified">
-                                        <i class="fas fa-check-circle"></i> Verified
-                                    </span>
-                                {% else %}
-                                    <span class="badge badge-unverified">
-                                        <i class="fas fa-clock"></i> Not Verified
-                                    </span>
-                                {% endif %}
+                            {% if current_user.verified %}
+                            <span class="badge badge-verified">
+                                <i class="fas fa-check-circle"></i> Verified
+                            </span>
+                            {% else %}
+                            <span class="badge badge-unverified">
+                                <i class="fas fa-clock"></i> Not Verified
+                            </span>
+                            {% endif %}
                             {% endif %}
                         </div>
                     </div>
@@ -220,7 +222,7 @@
                 <!-- Password Change -->
                 <div class="settings-card">
                     <h2><i class="fas fa-lock"></i> Change Password</h2>
-                    
+
                     <form method="POST" action="#">
                         <div class="form-group">
                             <label for="current_password">
@@ -252,48 +254,50 @@
                 <!-- Account Verification -->
                 <div class="settings-card">
                     <h2><i class="fas fa-shield-alt"></i> Account Verification</h2>
-                    
+
                     {% if current_user.verified is defined %}
-                        {% if current_user.verified %}
-                            <div style="padding: 1.5rem; background: #d1fae5; border-radius: 12px; border-left: 4px solid #16a34a; margin-bottom: 1.5rem;">
-                                <div style="display: flex; align-items: center; gap: 1rem;">
-                                    <i class="fas fa-check-circle" style="font-size: 2rem; color: #16a34a;"></i>
-                                    <div>
-                                        <h3 style="margin: 0 0 0.25rem 0; color: #065f46; font-size: 1.125rem;">
-                                            Your account is verified!
-                                        </h3>
-                                        <p style="margin: 0; color: #047857; font-size: 0.95rem;">
-                                            You have full access to all Roomies features.
-                                        </p>
-                                    </div>
-                                </div>
+                    {% if current_user.verified %}
+                    <div
+                        style="padding: 1.5rem; background: #d1fae5; border-radius: 12px; border-left: 4px solid #16a34a; margin-bottom: 1.5rem;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <i class="fas fa-check-circle" style="font-size: 2rem; color: #16a34a;"></i>
+                            <div>
+                                <h3 style="margin: 0 0 0.25rem 0; color: #065f46; font-size: 1.125rem;">
+                                    Your account is verified!
+                                </h3>
+                                <p style="margin: 0; color: #047857; font-size: 0.95rem;">
+                                    You have full access to all Roomies features.
+                                </p>
                             </div>
-                        {% else %}
-                            <div style="padding: 1.5rem; background: #fef3c7; border-radius: 12px; border-left: 4px solid #f59e0b; margin-bottom: 1.5rem;">
-                                <div style="display: flex; align-items: center; gap: 1rem;">
-                                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #f59e0b;"></i>
-                                    <div>
-                                        <h3 style="margin: 0 0 0.25rem 0; color: #92400e; font-size: 1.125rem;">
-                                            Account Not Verified
-                                        </h3>
-                                        <p style="margin: 0; color: #b45309; font-size: 0.95rem;">
-                                            Upload your documents to get verified and unlock premium features.
-                                        </p>
-                                    </div>
-                                </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div
+                        style="padding: 1.5rem; background: #fef3c7; border-radius: 12px; border-left: 4px solid #f59e0b; margin-bottom: 1.5rem;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #f59e0b;"></i>
+                            <div>
+                                <h3 style="margin: 0 0 0.25rem 0; color: #92400e; font-size: 1.125rem;">
+                                    Account Not Verified
+                                </h3>
+                                <p style="margin: 0; color: #b45309; font-size: 0.95rem;">
+                                    Upload your documents to get verified and unlock premium features.
+                                </p>
                             </div>
-                            
-                            <a href="/verify" class="btn-primary" style="display: inline-block; text-decoration: none;">
-                                <i class="fas fa-upload"></i> Upload Verification Documents
-                            </a>
-                        {% endif %}
+                        </div>
+                    </div>
+
+                    <a href="/verify" class="btn-primary" style="display: inline-block; text-decoration: none;">
+                        <i class="fas fa-upload"></i> Upload Verification Documents
+                    </a>
+                    {% endif %}
                     {% endif %}
                 </div>
 
                 <!-- Preferences -->
                 <div class="settings-card">
                     <h2><i class="fas fa-cog"></i> Preferences</h2>
-                    
+
                     <form method="POST" action="#">
                         <div class="form-group">
                             <label for="language">
@@ -326,10 +330,21 @@
                     </form>
                 </div>
 
+                <!-- AI Roommate Preferences -->
+                <div class="settings-card">
+                    <h2><i class="fas fa-brain"></i> AI Roommate Preferences</h2>
+                    <p style="color: #6b7280; margin-bottom: 1.5rem;">
+                        Update your lifestyle preferences to find compatible roommates using our AI matching system.
+                    </p>
+                    <a href="/ai-matching" class="btn-primary" style="display: inline-block; text-decoration: none;">
+                        <i class="fas fa-magic"></i> Manage Preferences & Find Matches
+                    </a>
+                </div>
+
                 <!-- Danger Zone -->
                 <div class="settings-card" style="border: 2px solid #fee2e2;">
                     <h2 style="color: #dc2626;"><i class="fas fa-exclamation-triangle"></i> Danger Zone</h2>
-                    
+
                     <p style="color: #6b7280; margin-bottom: 1rem;">
                         Once you delete your account, there is no going back. Please be certain.
                     </p>
@@ -344,4 +359,5 @@
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
+
 </html>

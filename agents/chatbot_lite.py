@@ -17,6 +17,7 @@ class ChatbotLite:
         self.data_path = data_path
         self.faqs = self._load_faqs()
         self.room_provider = None
+        self.roommate_provider = None  # New: for AI roommate matching
         self.model = None
         
         # Initialize Gemini
@@ -36,6 +37,10 @@ class ChatbotLite:
     def set_room_provider(self, provider_func):
         """Register a callback function to fetch room listings."""
         self.room_provider = provider_func
+
+    def set_roommate_provider(self, provider_func):
+        """Register a callback function to fetch roommate matches."""
+        self.roommate_provider = provider_func
 
     def _load_faqs(self):
         """Load FAQs from JSON file."""
@@ -65,6 +70,94 @@ class ChatbotLite:
         
         scored.sort(key=lambda x: x[0], reverse=True)
         return [item[1] for item in scored[:max_results]]
+
+    def _detect_roommate_intent(self, message):
+        """Detect if user wants roommate matching."""
+        message_lower = message.lower()
+        
+        # Keywords for roommate matching
+        roommate_keywords = ['roommate', 'roomie', 'room mate', 'flatmate', 'flat mate', 
+                           'match me', 'find me a match', 'compatible', 'partner']
+        find_keywords = ['find', 'search', 'looking', 'want', 'need', 'get', 'show']
+        
+        # Direct roommate request
+        if any(k in message_lower for k in roommate_keywords):
+            return True
+        
+        # Find + person context
+        if any(f in message_lower for f in find_keywords):
+            if any(p in message_lower for p in ['someone', 'person', 'student', 'buddy']):
+                return True
+        
+        return False
+
+    def _extract_preferences_from_message(self, message):
+        """Extract roommate preferences from natural language."""
+        preferences = {}
+        message_lower = message.lower()
+        
+        # Sleep schedule
+        if any(w in message_lower for w in ['early bird', 'morning person', 'wake up early', 'early riser']):
+            preferences['sleep_schedule'] = 'early_bird'
+        elif any(w in message_lower for w in ['night owl', 'late night', 'stay up late', 'night person']):
+            preferences['sleep_schedule'] = 'night_owl'
+        elif 'flexible' in message_lower:
+            preferences['sleep_schedule'] = 'flexible'
+        
+        # Social level
+        if any(w in message_lower for w in ['extrovert', 'social', 'outgoing', 'party', 'friends over']):
+            preferences['social_level'] = 'extrovert'
+        elif any(w in message_lower for w in ['introvert', 'quiet', 'private', 'alone']):
+            preferences['social_level'] = 'introvert'
+        elif any(w in message_lower for w in ['moderate', 'sometimes', 'occasional']):
+            preferences['social_level'] = 'ambivert'
+        
+        # Cleanliness
+        if any(w in message_lower for w in ['clean', 'neat', 'organized', 'tidy']):
+            preferences['cleanliness_pref'] = 'neat_freak'
+        elif any(w in message_lower for w in ['messy', 'relaxed', 'casual']):
+            preferences['cleanliness_pref'] = 'messy'
+        
+        # Budget
+        if '5k' in message_lower or '5000' in message_lower:
+            preferences['budget_range'] = '5k-8k'
+        elif '8k' in message_lower or '8000' in message_lower:
+            preferences['budget_range'] = '8k-12k'
+        elif '12k' in message_lower or '12000' in message_lower:
+            preferences['budget_range'] = '12k-18k'
+        elif '18k' in message_lower or '18000' in message_lower or '20k' in message_lower:
+            preferences['budget_range'] = '18k+'
+        
+        return preferences
+
+    def _format_roommate_matches(self, matches):
+        """Format roommate matches for display."""
+        if not matches:
+            return None
+        
+        result = "🎯 **Top Roommate Matches:**\n\n"
+        
+        display_names = {
+            "early_bird": "🌅 Early Bird",
+            "night_owl": "🦉 Night Owl",
+            "flexible": "⏰ Flexible",
+            "extrovert": "🎉 Social",
+            "ambivert": "🤝 Moderate",
+            "introvert": "🧘 Private",
+            "neat_freak": "✨ Very Clean",
+            "moderate_clean": "🧹 Moderate",
+            "messy": "😎 Relaxed",
+        }
+        
+        for i, match in enumerate(matches[:5], 1):
+            sleep = display_names.get(match.get('sleep_schedule'), match.get('sleep_schedule', 'N/A'))
+            social = display_names.get(match.get('social_level'), match.get('social_level', 'N/A'))
+            score = match.get('compatibility_score', 0)
+            
+            result += f"**{i}. {match['name']}** - {score}% Compatible\n"
+            result += f"   🏫 {match.get('college', 'N/A')} | {sleep} | {social}\n\n"
+        
+        return result
 
     def _build_context(self, user_message):
         """Build context for Gemini prompt."""
@@ -106,102 +199,70 @@ Roomies is India's leading student housing platform that helps students find hos
 
 📍 KEY PAGES & FEATURES:
 • /explore - Browse and search all available rooms with filters for location, price range, property type, and amenities
-• /findmate - AI-powered roommate matching based on lifestyle preferences (sleep schedule, study habits, food preferences, etc.)
+• /ai-matching - AI-powered roommate matching based on lifestyle preferences
+• /findmate - Find compatible roommates based on profile
 • /list-room - Property owners can list their rooms for FREE (basic listing) or with premium features
 • /dashboard - Students can manage their profile, bookings, saved listings, and verification status
-• /flash-deals - 24-hour limited-time discounts on select properties (owners pay ₹29 to create flash deals)
-• /faq - Frequently asked questions about the platform
-• /contact - Get in touch with support team
+• /flash-deals - 24-hour limited-time discounts on select properties
 
-🏙️ SUPPORTED CITIES:
-Mumbai, Pune, Bangalore, Delhi, Chennai, Hyderabad, Kota (major education hubs in India)
+🤖 AI ROOMMATE MATCHING:
+Our AI analyzes your profile including:
+- Sleep schedule (early bird vs night owl)
+- Social level (extrovert/introvert/ambivert)
+- Cleanliness preferences (neat freak/moderate/relaxed)
+- Budget range
+And suggests compatible roommates with a compatibility score!
+
+To use AI matching, users can:
+1. Go to /ai-matching page
+2. Fill out the preference questionnaire
+3. Click "Find My Matches" to see compatible students
+4. Or chat with me and describe what they're looking for!
 
 💰 PRICING & FEES:
 - Searching for rooms: FREE for all users
 - Booking Fee: ₹999 one-time fee when booking a room
 - Security Deposit: 2x monthly rent (refundable at end of stay)
-- Platform Fee: 2% of first month's rent
-- Flash Deal Fee: ₹29 for owners to create 24-hour flash deals
-- Owner Pro Subscription: ₹199/month for premium features
-
-📋 BOOKING PROCESS:
-1. Browse rooms on /explore page
-2. Click "View Details" on a room you like
-3. Click "Reserve" or "Contact Owner"
-4. Pay the booking fee (₹999) + security deposit + first month rent
-5. Sign the digital contract
-6. Move in on your scheduled date!
-
-✅ VERIFICATION SYSTEM:
-- Students: Need College ID + Government ID (Aadhar/PAN)
-- Owners: Need Government ID + Electricity Bill for the property
-- Verified listings show a "Verified" badge
-- Our team reviews documents within 24-48 hours
-
-🔒 SAFETY FEATURES:
-- All listings undergo safety audits (fire extinguisher, CCTV, security guard checks)
-- Safety score displayed on each listing
-- Report fake listings using the "Report" button
-- Chats are monitored for harassment
-
-🍽️ MESS/FOOD:
-Some PGs and hostels include meals. Look for "Food" or "Mess" amenity icon. We display weekly mess menus where available.
-
-👥 ROOMMATE MATCHING (FINDMATE):
-Our AI analyzes your profile including:
-- Sleep schedule (early bird vs night owl)
-- Study habits
-- Food preferences (vegetarian/non-vegetarian)
-- Personality (introvert/extrovert)
-- Cleanliness preferences
-And suggests compatible roommates with a compatibility score!
-
-💳 PAYMENT METHODS:
-UPI, Credit/Debit Cards, Net Banking via secure Razorpay gateway
 
 📞 CONTACT & SUPPORT:
 - Email: support@roomies.in
-- Technical issues: tech@roomies.in
 - Response time: Within 24 hours
-- Emergency: Dial 100 (Police) or 112
-
-🏷️ SUBSCRIPTION PLANS:
-FOR STUDENTS (Roomies Premium):
-- Unlimited property inquiries
-- Priority customer support
-- Waived booking fees
-- Early access to flash deals
-
-FOR OWNERS (Owner Pro - ₹199/month):
-- Unlimited listings
-- Featured placement in search results
-- Advanced analytics dashboard
-- Reduced commission rates
-- Priority support
-
-💡 QUICK TIPS:
-- Create a complete profile for better roommate matches
-- Verify your account to build trust
-- Schedule property visits before booking
-- Read reviews from other students
-- Check the safety audit score
-- Look for the "Verified" badge on listings
 """
         context_parts.append(website_context)
         
         return "\n".join(context_parts)
 
-    def get_response(self, user_message):
+    def get_response(self, user_message, user_id=None):
         """Get AI response for user message."""
         user_message = user_message.strip()
         
         # Quick responses for greetings
         greetings = ['hi', 'hello', 'hey', 'greetings', 'hii', 'hola']
         if user_message.lower() in greetings:
-            return "👋 Hello! I'm the Roomies AI assistant. I can help you find hostels, PGs, flats, and answer questions about our platform. What are you looking for today?"
+            return "👋 Hello! I'm the Roomies AI assistant. I can help you find hostels, PGs, flats, and **compatible roommates**! Just tell me what you're looking for."
         
         if user_message.lower() in ['bye', 'goodbye', 'exit', 'quit']:
             return "👋 Goodbye! Happy house hunting! Feel free to come back anytime."
+        
+        # ROOMMATE MATCHING INTENT
+        if self._detect_roommate_intent(user_message):
+            # Extract preferences from message
+            preferences = self._extract_preferences_from_message(user_message)
+            
+            # Try to get matches if provider is available
+            if self.roommate_provider:
+                try:
+                    matches = self.roommate_provider(user_id, preferences)
+                    if matches and len(matches) > 0:
+                        formatted = self._format_roommate_matches(matches)
+                        return f"🎯 Great! I found some compatible roommates for you!\n\n{formatted}\n\n💡 Want more specific matches? Tell me your preferences for sleep schedule, social level, or budget. Or visit <a href='/ai-matching' class='text-blue-600 underline font-medium'>AI Matching page</a> for detailed questionnaire!"
+                    else:
+                        return f"🔍 I looked for roommates but couldn't find exact matches yet. To improve results:\n\n1. <a href='/ai-matching' class='text-blue-600 underline font-medium'>Complete the AI Matching questionnaire</a>\n2. Tell me your preferences (e.g., 'I'm a night owl looking for a quiet roommate with budget around 10k')\n\nMore students are joining daily!"
+                except Exception as e:
+                    print(f"Roommate provider error: {e}")
+            
+            # Fallback: Direct to AI matching page
+            return f"🤝 I can help you find a compatible roommate! Here's how:\n\n1. **Quick Match**: <a href='/ai-matching' class='text-blue-600 underline font-medium'>Go to AI Matching</a> to fill out preferences and see matches instantly\n\n2. **Chat with me**: Tell me your preferences like:\n   - Sleep schedule (early bird/night owl)\n   - Social level (social/quiet)\n   - Budget (5k-8k, 8k-12k, etc.)\n\nWhat's your lifestyle like? 🌙☀️"
         
         # Search intent - quick redirect
         search_keywords = ['find', 'search', 'looking for', 'show me', 'want', 'need']
@@ -232,14 +293,15 @@ INSTRUCTIONS:
 1. You ARE the official Roomies assistant. Answer confidently using the context provided above.
 2. For questions about pricing, fees, booking process, verification, safety, roommate matching, etc. - the answers ARE in your context. Use them!
 3. If asked about specific rooms/properties, recommend from the 'Available Rooms' list if provided.
-4. For navigation questions, provide the correct page URLs (e.g., /explore, /findmate, /dashboard, etc.)
-5. When discussing fees, always mention exact amounts: Booking Fee ₹999, Flash Deal ₹29, Owner Pro ₹199/month, etc.
+4. For navigation questions, provide the correct page URLs (e.g., /explore, /ai-matching, /findmate, /dashboard, etc.)
+5. When discussing fees, always mention exact amounts: Booking Fee ₹999, etc.
 6. For "how to" questions, provide step-by-step guidance based on the platform information.
 7. Be concise but complete. 2-4 sentences for simple questions, more for detailed explanations.
 8. Use Indian Rupee (₹) for all prices.
 9. Only say "I don't know" if the question is truly outside the platform scope (like weather, politics, etc.)
 10. Use emojis sparingly to be friendly but professional.
 11. If relevant, include helpful links in HTML format: <a href='/page' class='text-blue-600 underline'>Click here</a>
+12. For roommate matching questions, mention the /ai-matching page.
 
 RESPONSE:"""
 
@@ -260,3 +322,4 @@ RESPONSE:"""
 
 # Singleton instance
 chatbot = ChatbotLite()
+

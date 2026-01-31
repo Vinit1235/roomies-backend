@@ -316,6 +316,12 @@ class Student(TimestampMixin, PasswordMixin, UserMixin, db.Model):
     study_hours = db.Column(db.String(50))
     commute_pref = db.Column(db.String(50))
     
+    # Roommate matching preferences
+    sleep_schedule = db.Column(db.String(50))  # early_bird, night_owl, flexible
+    social_level = db.Column(db.String(50))    # extrovert, ambivert, introvert
+    cleanliness_pref = db.Column(db.String(50))  # neat_freak, moderate_clean, messy
+    budget_range = db.Column(db.String(50))    # 5k-8k, 8k-12k, 12k-18k, 18k+
+    
     # Free tier limits
     property_inquiries_count = db.Column(db.Integer, default=0)  # Reset monthly
     inquiries_reset_date = db.Column(db.Date)
@@ -1697,7 +1703,9 @@ def findmate():
 
 
 @app.route("/ai-matching")
+@login_required
 def ai_matching():
+    """AI Roommate Matching page."""
     return render_template("ai_matching.html")
 
 
@@ -1878,32 +1886,154 @@ def logout():
 
 
 # ---------------------------------------------------------------------------
-# OAuth Routes (Supabase)
+# OAuth Routes (Native Google OAuth)
 # ---------------------------------------------------------------------------
 @app.route("/auth/google")
 def auth_google():
-    """Initiate Google OAuth login via Supabase."""
-    if not OAUTH_ENABLED:
+    """Initiate Google OAuth login (native implementation)."""
+    # Try native Google OAuth first
+    if GOOGLE_OAUTH_ENABLED:
+        from flask import session
+        
+        # Get role from query params (student or owner)
+        role = request.args.get("role", "student").lower()
+        if role not in {"student", "owner"}:
+            role = "student"
+        
+        # Store role in session for callback
+        session["oauth_role"] = role
+        
+        # Generate OAuth URL using native Google OAuth
+        success, url_or_error = get_google_auth_url(role)
+        
+        if success:
+            return redirect(url_or_error)
+        else:
+            flash(f"Google login error: {url_or_error}", "error")
+            return redirect(url_for("login"))
+    
+    # Fallback to Supabase OAuth
+    elif OAUTH_ENABLED:
+        from flask import session
+        role = request.args.get("role", "student").lower()
+        if role not in {"student", "owner"}:
+            role = "student"
+        session["oauth_role"] = role
+        
+        redirect_url = url_for("auth_callback", _external=True)
+        success, url_or_error = get_google_oauth_url(redirect_url)
+        
+        if success:
+            return redirect(url_or_error)
+        else:
+            flash(f"Google login error: {url_or_error}", "error")
+            return redirect(url_for("login"))
+    else:
         flash("Google login is not available at this time.", "error")
         return redirect(url_for("login"))
-    
-    # Get role from query params (student or owner)
-    role = request.args.get("role", "student").lower()
-    if role not in {"student", "owner"}:
-        role = "student"
-    
-    # Store role in session for callback
+
+
+@app.route("/auth/google/callback")
+def auth_google_callback():
+    """Handle Google OAuth callback (native implementation)."""
     from flask import session
-    session["oauth_role"] = role
+    import secrets
     
-    # Generate OAuth URL
-    redirect_url = url_for("auth_callback", _external=True)
-    success, url_or_error = get_google_oauth_url(redirect_url)
+    code = request.args.get("code")
+    error = request.args.get("error")
     
-    if success:
-        return redirect(url_or_error)
-    else:
-        flash(f"Google login error: {url_or_error}", "error")
+    if error:
+        flash(f"Google login error: {error}", "error")
+        return redirect(url_for("login"))
+    
+    if not code:
+        flash("No authorization code received.", "error")
+        return redirect(url_for("login"))
+    
+    # Authenticate with Google
+    success, user_data = authenticate_google_user(code)
+    
+    if not success:
+        error_msg = user_data.get("error", "Authentication failed") if isinstance(user_data, dict) else "Authentication failed"
+        flash(f"Google login failed: {error_msg}", "error")
+        return redirect(url_for("login"))
+    
+    # Extract user information
+    email = user_data.get("email", "").lower()
+    name = user_data.get("name", "Google User")
+    email_verified = user_data.get("email_verified", False)
+    
+    if not email:
+        flash("Could not get email from Google.", "error")
+        return redirect(url_for("login"))
+    
+    # Get role from session (default to student)
+    role = session.pop("oauth_role", "student")
+    
+    # Check if user exists
+    existing_student = Student.query.filter(func.lower(Student.email) == email).first()
+    existing_owner = Owner.query.filter(func.lower(Owner.email) == email).first()
+    
+    if existing_student:
+        login_user(existing_student, remember=True)
+        flash(f"Welcome back, {existing_student.name}!", "success")
+        return redirect(url_for("explore"))
+    
+    if existing_owner:
+        login_user(existing_owner, remember=True)
+        flash(f"Welcome back, {existing_owner.name}!", "success")
+        return redirect(url_for("list_room"))
+    
+    # Create new user
+    try:
+        if role == "owner":
+            owner = Owner(
+                email=email,
+                name=name,
+                kyc_verified=False
+            )
+            owner.set_password(secrets.token_urlsafe(32))
+            db.session.add(owner)
+            db.session.commit()
+            
+            login_user(owner, remember=True)
+            flash(f"Welcome to Roomies, {name}! Please complete KYC verification.", "success")
+            return redirect(url_for("list_room"))
+        else:
+            # Create student with minimal required fields
+            student = Student(
+                email=email,
+                name=name,
+                college="Not specified",
+                role="student",
+                verified=True  # Google verified emails are trusted
+            )
+            student.set_password(secrets.token_urlsafe(32))
+            db.session.add(student)
+            db.session.commit()
+            
+            app.logger.info(f"Created new student via Google OAuth: {email}")
+            
+            # Create wallet for student
+            try:
+                wallet = Wallet(student_id=student.id, balance=0.0)
+                db.session.add(wallet)
+                db.session.commit()
+            except Exception as wallet_error:
+                app.logger.warning(f"Wallet creation skipped: {wallet_error}")
+            
+            login_user(student, remember=True)
+            flash(f"Welcome to Roomies, {name}! Please complete your profile.", "success")
+            return redirect(url_for("explore"))
+            
+    except Exception as e:
+        db.session.rollback()
+        import traceback
+        app.logger.error(f"OAuth user creation failed: {e}")
+        app.logger.error(traceback.format_exc())
+        print(f"OAUTH ERROR: {e}")
+        print(traceback.format_exc())
+        flash(f"Failed to create account: {str(e)[:100]}", "error")
         return redirect(url_for("login"))
 
 
@@ -4524,6 +4654,31 @@ def update_profile_tags():
     data = request.get_json()
     new_tags = data.get("tags", [])
     
+    # Also update direct Student fields if provided
+    sleep = data.get("sleep_schedule")
+    social = data.get("social_level")
+    cleanliness = data.get("cleanliness_pref")
+    budget = data.get("budget_range")
+    
+    # Map tags to student fields if tags provided
+    for tag in new_tags:
+        if tag in ["early_bird", "night_owl", "flexible", "flexible_sleep"]:
+            student.sleep_schedule = tag.replace("flexible_sleep", "flexible")
+        elif tag in ["extrovert", "ambivert", "introvert"]:
+            student.social_level = tag
+        elif tag in ["neat_freak", "moderate_clean", "messy"]:
+            student.cleanliness_pref = tag
+    
+    # Direct field updates take precedence
+    if sleep:
+        student.sleep_schedule = sleep
+    if social:
+        student.social_level = social
+    if cleanliness:
+        student.cleanliness_pref = cleanliness
+    if budget:
+        student.budget_range = budget
+    
     # Delete existing tags
     ProfileTag.query.filter_by(student_id=student.id).delete()
     
@@ -4543,45 +4698,101 @@ def update_profile_tags():
 @app.route("/api/roommate-match", methods=["GET"])
 @login_required
 def roommate_match():
-    """Find compatible roommates based on profile tags."""
+    """Find compatible roommates based on profile preferences and tags."""
     student = get_current_student()
     if student is None:
         return jsonify({"error": "Only students can find roommates."}), 403
     
-    # Get current student's tags
+    # Get current student's preferences (use both direct fields and tags)
+    my_prefs = {
+        "sleep": student.sleep_schedule,
+        "social": student.social_level,
+        "clean": student.cleanliness_pref,
+        "budget": student.budget_range
+    }
+    
+    # Also get tags for backward compatibility
     my_tags = [t.tag for t in ProfileTag.query.filter_by(student_id=student.id).all()]
     
-    if not my_tags:
+    # Check if student has any preferences set
+    has_prefs = any(my_prefs.values()) or my_tags
+    
+    if not has_prefs:
         return jsonify({
             "matches": [],
-            "message": "Update your profile tags to find compatible roommates!",
+            "message": "Update your profile preferences to find compatible roommates!",
         })
     
-    # Find other students with matching tags
-    matches = db.session.query(
-        Student,
-        func.count(ProfileTag.tag).label("match_count")
-    ).join(
-        ProfileTag, Student.id == ProfileTag.student_id
-    ).filter(
-        ProfileTag.tag.in_(my_tags),
-        Student.id != student.id
-    ).group_by(
-        Student.id
-    ).order_by(
-        func.count(ProfileTag.tag).desc()
-    ).limit(10).all()
+    # Get all other students
+    other_students = Student.query.filter(Student.id != student.id).all()
+    
+    matches = []
+    for other in other_students:
+        score = 0
+        total_criteria = 0
+        matching_details = []
+        
+        # Check direct field matches (weighted scoring)
+        if my_prefs["sleep"] and other.sleep_schedule:
+            total_criteria += 1
+            if my_prefs["sleep"] == other.sleep_schedule:
+                score += 1
+                matching_details.append("sleep schedule")
+        
+        if my_prefs["social"] and other.social_level:
+            total_criteria += 1
+            if my_prefs["social"] == other.social_level:
+                score += 1
+                matching_details.append("social style")
+        
+        if my_prefs["clean"] and other.cleanliness_pref:
+            total_criteria += 1
+            if my_prefs["clean"] == other.cleanliness_pref:
+                score += 1
+                matching_details.append("cleanliness")
+        
+        if my_prefs["budget"] and other.budget_range:
+            total_criteria += 1
+            if my_prefs["budget"] == other.budget_range:
+                score += 1
+                matching_details.append("budget range")
+        
+        # Also check tag-based matching if direct fields not fully set
+        if my_tags:
+            other_tags = [t.tag for t in ProfileTag.query.filter_by(student_id=other.id).all()]
+            tag_matches = len(set(my_tags) & set(other_tags))
+            if tag_matches > 0:
+                # Bonus for tag matches (add to score proportionally)
+                total_criteria += len(my_tags)
+                score += tag_matches
+        
+        # Calculate compatibility percentage
+        if total_criteria > 0:
+            compatibility = round((score / total_criteria) * 100)
+        else:
+            compatibility = 0
+        
+        if score > 0:  # Only include if at least one match
+            matches.append({
+                "id": other.id,
+                "name": other.name,
+                "college": other.college or "Not specified",
+                "budget_range": other.budget_range or "Not specified",
+                "sleep_schedule": other.sleep_schedule or "Not specified",
+                "social_level": other.social_level or "Not specified",
+                "compatibility_score": compatibility,
+                "matching_tags": score,
+                "matching_details": matching_details
+            })
+    
+    # Sort by compatibility score descending, limit to top 10
+    matches.sort(key=lambda x: x["compatibility_score"], reverse=True)
+    matches = matches[:10]
     
     return jsonify({
-        "matches": [{
-            "id": s.id,
-            "name": s.name,
-            "college": s.college,
-            "budget": s.budget,
-            "lifestyle": s.lifestyle,
-            "compatibility_score": round((match_count / len(my_tags)) * 100),
-            "matching_tags": match_count,
-        } for s, match_count in matches]
+        "matches": matches,
+        "my_preferences": my_prefs,
+        "total_students": len(other_students)
     })
 
 
@@ -4657,6 +4868,92 @@ def get_rooms_for_chat(query_text):
 
 # Register the provider
 chatbot.set_room_provider(get_rooms_for_chat)
+
+
+def get_roommates_for_chat(user_id, preferences):
+    """
+    Retrieves compatible roommates for the chatbot based on preferences.
+    Used when user asks things like 'find me a roommate' in chat.
+    """
+    try:
+        # If no user_id, we can't do personalized matching
+        if not user_id:
+            # Return random sample of students for demo
+            students = Student.query.filter(Student.verified == True).limit(5).all()
+            return [{
+                "id": s.id,
+                "name": s.name,
+                "college": s.college or "Not specified",
+                "sleep_schedule": s.sleep_schedule,
+                "social_level": s.social_level,
+                "cleanliness_pref": s.cleanliness_pref,
+                "budget_range": s.budget_range,
+                "compatibility_score": 75  # Default score for demo
+            } for s in students]
+        
+        # Get current student
+        student = Student.query.get(user_id)
+        if not student:
+            return []
+        
+        # Build query based on extracted preferences or student's own prefs
+        sleep_pref = preferences.get('sleep_schedule', student.sleep_schedule)
+        social_pref = preferences.get('social_level', student.social_level)
+        clean_pref = preferences.get('cleanliness_pref', student.cleanliness_pref)
+        budget_pref = preferences.get('budget_range', student.budget_range)
+        
+        # Find matching students
+        other_students = Student.query.filter(Student.id != user_id).all()
+        
+        matches = []
+        for other in other_students:
+            score = 0
+            total = 0
+            
+            if sleep_pref and other.sleep_schedule:
+                total += 1
+                if sleep_pref == other.sleep_schedule:
+                    score += 1
+            
+            if social_pref and other.social_level:
+                total += 1
+                if social_pref == other.social_level:
+                    score += 1
+            
+            if clean_pref and other.cleanliness_pref:
+                total += 1
+                if clean_pref == other.cleanliness_pref:
+                    score += 1
+            
+            if budget_pref and other.budget_range:
+                total += 1
+                if budget_pref == other.budget_range:
+                    score += 1
+            
+            if total > 0 and score > 0:
+                compatibility = round((score / total) * 100)
+                matches.append({
+                    "id": other.id,
+                    "name": other.name,
+                    "college": other.college or "Not specified",
+                    "sleep_schedule": other.sleep_schedule,
+                    "social_level": other.social_level,
+                    "cleanliness_pref": other.cleanliness_pref,
+                    "budget_range": other.budget_range,
+                    "compatibility_score": compatibility
+                })
+        
+        # Sort by compatibility and return top 5
+        matches.sort(key=lambda x: x['compatibility_score'], reverse=True)
+        return matches[:5]
+        
+    except Exception as e:
+        app.logger.error(f"Chatbot roommate provider error: {e}")
+        return []
+
+
+# Register the roommate provider
+chatbot.set_roommate_provider(get_roommates_for_chat)
 
 
 @app.route("/api/news")
